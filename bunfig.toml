@@ -1,0 +1,5 @@
+[test]
+coverage = true
+
+[dev]
+port = 3000
