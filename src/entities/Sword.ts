@@ -57,11 +57,12 @@ class Sword extends Phaser.GameObjects.Sprite {
           end: 4,  // 프레임 범위는 실제 이미지에 맞게 조정
           zeroPad: 1
         }),
-        frameRate: 20,
+        frameRate: 1000 / Math.max(100, this.owner.jumpCoolDown) * 6,
         repeat: 0
       });
     }
   }
+
   
   // 플레이어 점프 시 호출되는 메서드
   onPlayerJump(data: { x: number, y: number }): void {
@@ -110,7 +111,7 @@ class Sword extends Phaser.GameObjects.Sprite {
     
     // 이펙트 위치와 회전 설정
     this.attackEffect.setOrigin(0.5, 0.5);
-    this.attackEffect.setRotation(angle + 90);
+    this.attackEffect.setRotation(angle - 45);
     
     // range 값에 따라 공격 이펙트의 크기 조정
     // 기준 범위(24)를 100% 크기로 설정하고, range에 따라 비례하여 조정
@@ -162,6 +163,7 @@ class Sword extends Phaser.GameObjects.Sprite {
     
     // 각도 인덱스에 따라 이미지 프레임 변경
     this.updateSwordImage(angleIndex);
+    // this.rotation = angle + Math.PI / 2;
     
     // 검의 위치 업데이트
     this.updateSwordPosition(angle);

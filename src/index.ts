@@ -5,9 +5,10 @@ import PreloadScene from './scenes/PreloadScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 256,
-  height: 144,
+  width: 16*20,
+  height: 9*20,
   pixelArt: true,
+  roundPixels: true,
   scale: {
     mode: Phaser.Scale.FIT,
     // autoCenter: Phaser.Scale.CENTER_BOTH
@@ -19,7 +20,7 @@ const config: Phaser.Types.Core.GameConfig = {
           x: 0,
           y: 300,
         },
-        debug: false
+        debug: true
     }
   },
   backgroundColor: '#000000',
