@@ -16,6 +16,21 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/images/big_effects.png',
       'assets/images/big_effects.json'
     );
+    
+    this.load.atlas('ui',
+      'assets/images/ui.png',
+      'assets/images/ui.json'
+    );
+
+    // this.load.bitmapFont('font',
+    //   'assets/fonts/font.png',
+    //   'assets/fonts/font.fnt'
+    // );
+    
+    this.load.image('mushroom-bg', 'assets/images/mushroom-background.png');
+    
+    // 배경음악 로드
+    this.load.audio('bgm', 'assets/music/resolution.wav');
   }
 
   create() {

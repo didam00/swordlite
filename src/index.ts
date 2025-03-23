@@ -3,10 +3,12 @@ import BootScene from './scenes/BootScene';
 import GameScene from './scenes/GameScene';
 import PreloadScene from './scenes/PreloadScene';
 
+const SCALE = 28;
+
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 16*20,
-  height: 9*20,
+  width: 16*SCALE,
+  height: 9*SCALE,
   pixelArt: true,
   roundPixels: true,
   scale: {
@@ -18,10 +20,14 @@ const config: Phaser.Types.Core.GameConfig = {
     arcade: {
         gravity: {
           x: 0,
-          y: 300,
+          y: 0,
         },
-        debug: true
+        debug: false
     }
+  },
+  render: {
+    pixelArt: true,
+    roundPixels: true
   },
   backgroundColor: '#000000',
   parent: 'app',

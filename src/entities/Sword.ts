@@ -47,7 +47,6 @@ class Sword extends Phaser.GameObjects.Sprite {
   
   // 공격 이펙트용 애니메이션 생성
   private createAttackEffectAnimations(): void {
-    // 대규모 공격 이펙트 애니메이션
     if (!this.scene.anims.exists('attack_effect')) {
       const attack_effect = this.scene.anims.create({
         key: 'attack_effect',
@@ -122,8 +121,8 @@ class Sword extends Phaser.GameObjects.Sprite {
     if (this.effectLayer) {
       this.effectLayer.add(this.attackEffect);
     }
-    
-    // 공격 애니메이션 재생
+
+    this.owner.addState("attack");
     this.attackEffect.play('attack_effect');
     
     // 애니메이션 완료 시 이펙트 제거 및 검 표시
@@ -133,6 +132,7 @@ class Sword extends Phaser.GameObjects.Sprite {
         this.attackEffect = null;
       }
       this.isAttacking = false;
+      this.owner.removeState("attack");
       
       // 검을 다시 보이게 하기
       this.setVisible(true);

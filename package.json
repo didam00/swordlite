@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev --open": "vite & start http://localhost:5173",
     "build": "vite build"
   },
   "dependencies": {

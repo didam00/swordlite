@@ -1,28 +1,32 @@
 import Phaser from 'phaser';
 import Entity from './Entity';
+import GameScene from '../scenes/GameScene';
 
 class Player extends Entity {
   entityName = 'player';
 
   stats = {
-    health: 4,
+    maxHealth: 5,
+    health: 5,
     attack: 1,
     defense: 2,
-    speed: 20,
+    speed: 45,
     jumpPower: 150,
     range: 20,
     jumpCoolDown: 250,
+    immuneTime: 1000,
   }
   
   private lastJumpTime: number = 0;
+  private lastDamagedTime: number = 0;
   
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: GameScene, x: number, y: number) {
     super([
-      "idle", "jump", "fall"
+       "stun", "attack", "idle", "jump", "fall"
     ], scene, x, y);
 
     this.body!.setSize(6, 9);
-    this.setGravityY(0);
+    this.setGravityY(300);
     
     this.createAnimations();
     this.updateAnimation();
@@ -36,8 +40,9 @@ class Player extends Entity {
     this.createAnimation('player_fall', [0, 3], 24, -1);
   }
   
-  jump(): void {
+  jump(power?: number): void {
     const currentTime = this.scene.time.now;
+    power = power || this.stats.jumpPower;
     
     if (currentTime - this.lastJumpTime < this.stats.jumpCoolDown) {
       return;
@@ -45,7 +50,7 @@ class Player extends Entity {
     
     this.lastJumpTime = currentTime;
     
-    this.setVelocityY(-this.stats.jumpPower);
+    this.setVelocityY(-power);
     
     this.removeState('fall');
     this.addState('jump');
@@ -54,6 +59,10 @@ class Player extends Entity {
       x: this.x,
       y: this.y - 4,
       isPlayerJumping: true
+    });
+
+    this.scene.playSound('jump', {
+      volume: 0.8
     });
   }
 
@@ -75,6 +84,23 @@ class Player extends Entity {
       this.removeState("fall");
       this.addState("idle");
     }
+  }
+
+  takeDamage(amount: number): void {
+    if (this.scene.time.now - this.lastDamagedTime < this.stats.immuneTime) {
+      return;
+    }
+
+    this.stats.health -= amount;
+    console.log('Player health:', this.stats.health);
+
+    this.events.emit('healthChanged', this.stats.health);
+    this.blink(this.stats.immuneTime);
+
+    this.lastDamagedTime = this.scene.time.now;
+    this.scene.playSound('hurt', {
+      volume: 0.8
+    })
   }
 
   set jumpCoolDown(value: number) {
@@ -99,6 +125,10 @@ class Player extends Entity {
 
   get range(): number {
     return this.stats.range;
+  }
+
+  getRealRange(): number {
+    return this.stats.range * 1.125 + 2.5;
   }
 
   set speed(value: number) {

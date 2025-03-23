@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import GameScene from '../scenes/GameScene';
 
 export interface EntityState {
   [key: string]: boolean
@@ -7,8 +8,12 @@ export interface EntityState {
 export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
   abstract entityName: string;
   protected currentDisplayState: string = '';
-  protected events: Phaser.Events.EventEmitter = new Phaser.Events.EventEmitter();
+  events: Phaser.Events.EventEmitter = new Phaser.Events.EventEmitter();
   private states: EntityState = {};
+  private blinkTween?: Phaser.Tweens.Tween = null!;
+  readonly scene: GameScene = null!;
+  isDead: boolean = false;
+  isDestroyed: boolean = false;
 
   abstract stats: {
     health: number,
@@ -16,8 +21,9 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
     [key: string]: number
   };
 
-  constructor(states: string[], scene: Phaser.Scene, x: number, y: number) {
+  constructor(states: string[], scene: GameScene, x: number, y: number) {
     super(scene, x, y, "atlas", `test_idle-0`);
+    this.scene = scene;
     this.createStates(states);
     
     this.scene.physics.world.enable(this);
@@ -141,6 +147,10 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateAnimation(): void {
+    if (!this) {
+      return;
+    }
+
     const state = this.getHightestPriorityState();
 
     if (this.currentDisplayState === state) {
@@ -148,10 +158,33 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
     }
 
     this.currentDisplayState = state;
-    this.anims.play(`${this.entityName}_${state}`, true);
+    this.anims?.play(`${this.entityName}_${state}`, true);
   }
 
   abstract update(delta: number): void;
+
+  blink(duration: number = 500, count: number = 3, minAlpha: number = 0): void {
+    if (this.blinkTween) {
+      this.blinkTween.stop();
+    }
+    
+    // 트윈 생성하여 저장
+    this.blinkTween = this.scene.tweens.add({
+      targets: this,
+      alpha: { from: 1, to: minAlpha },
+      duration: duration / (count * 2), // 한 번 깜빡이는데 필요한 시간
+      yoyo: true,     // 알파값을 왔다갔다 하도록 설정
+      repeat: count * 2 - 1, // 한 사이클은 알파값 변화 2번이므로 (count * 2 - 1)
+      onComplete: () => {
+        this.setAlpha(1); // 트윈 완료 후 알파값 원상복구
+        this.blinkTween = undefined;
+      }
+    });
+  }
+
+  dead(): void {
+    
+  }
 
   // setStat(key: string, value: number): void {
   //   this.stats[key] = value;
@@ -175,5 +208,9 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
 
   get attack(): number {
     return this.stats.attack;
+  }
+
+  getDist(other: Entity): number {
+    return Phaser.Math.Distance.Between(this.x, this.y, other.x, other.y);
   }
 }

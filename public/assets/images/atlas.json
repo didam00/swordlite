@@ -159,55 +159,47 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 100
    },
-   "mushroom_idle-0": {
+   "hit_effect-0": {
     "frame": { "x": 0, "y": 384, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "mushroom_idle-1": {
+   "hit_effect-1": {
     "frame": { "x": 64, "y": 384, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "mushroom_idle-2": {
+   "hit_effect-2": {
     "frame": { "x": 128, "y": 384, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "mushroom_idle-3": {
+   "hit_effect-3": {
     "frame": { "x": 192, "y": 384, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "mushroom_idle-4": {
+   "hit_effect-4": {
     "frame": { "x": 256, "y": 384, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "mushroom_idle-5": {
-    "frame": { "x": 320, "y": 384, "w": 64, "h": 64 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
-    "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
-   },
-   "mushroom_charging-0": {
+   "purple_mushroom_idle-0": {
     "frame": { "x": 0, "y": 448, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -215,7 +207,7 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 50
    },
-   "mushroom_charging-1": {
+   "purple_mushroom_idle-1": {
     "frame": { "x": 64, "y": 448, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -223,15 +215,7 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 50
    },
-   "mushroom_charging-2": {
-    "frame": { "x": 128, "y": 448, "w": 64, "h": 64 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
-    "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
-   },
-   "mushroom_charge-0": {
+   "purple_mushroom_charging-0": {
     "frame": { "x": 0, "y": 512, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -239,8 +223,136 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 50
    },
-   "mushroom_charge-1": {
-    "frame": { "x": 64, "y": 512, "w": 64, "h": 64 },
+   "purple_mushroom_bomb-0": {
+    "frame": { "x": 0, "y": 576, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-0": {
+    "frame": { "x": 0, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-1": {
+    "frame": { "x": 64, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-2": {
+    "frame": { "x": 128, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-3": {
+    "frame": { "x": 192, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-4": {
+    "frame": { "x": 256, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-5": {
+    "frame": { "x": 320, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charging-0": {
+    "frame": { "x": 0, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charging-1": {
+    "frame": { "x": 64, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charging-2": {
+    "frame": { "x": 128, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charge-0": {
+    "frame": { "x": 0, "y": 768, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charge-1": {
+    "frame": { "x": 64, "y": 768, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_idle-0": {
+    "frame": { "x": 0, "y": 832, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_shot-0": {
+    "frame": { "x": 0, "y": 896, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_shot-1": {
+    "frame": { "x": 64, "y": 896, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_shot-2": {
+    "frame": { "x": 128, "y": 896, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_shot-3": {
+    "frame": { "x": 192, "y": 896, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -253,7 +365,7 @@
   "version": "1.x-dev",
   "image": "atlas.png",
   "format": "RGBA8888",
-  "size": { "w": 512, "h": 576 },
+  "size": { "w": 512, "h": 960 },
   "scale": "1",
   "frameTags": [
    { "name": "test_idle", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
@@ -262,12 +374,19 @@
    { "name": "player_jump", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
    { "name": "sword", "from": 7, "to": 14, "direction": "forward", "color": "#000000ff" },
    { "name": "jump_effect", "from": 15, "to": 19, "direction": "forward", "color": "#000000ff" },
-   { "name": "mushroom_idle", "from": 20, "to": 25, "direction": "forward", "color": "#000000ff" },
-   { "name": "mushroom_charging", "from": 26, "to": 28, "direction": "forward", "color": "#000000ff" },
-   { "name": "mushroom_charge", "from": 29, "to": 30, "direction": "forward", "color": "#000000ff" }
+   { "name": "hit_effect", "from": 20, "to": 24, "direction": "forward", "color": "#000000ff" },
+   { "name": "purple_mushroom_idle", "from": 25, "to": 26, "direction": "forward", "color": "#000000ff" },
+   { "name": "purple_mushroom_charging", "from": 27, "to": 27, "direction": "forward", "color": "#000000ff" },
+   { "name": "purple_mushroom_bomb", "from": 28, "to": 28, "direction": "forward", "color": "#000000ff" },
+   { "name": "red_mushroom_idle", "from": 29, "to": 34, "direction": "forward", "color": "#000000ff" },
+   { "name": "red_mushroom_charging", "from": 35, "to": 37, "direction": "forward", "color": "#000000ff" },
+   { "name": "red_mushroom_charge", "from": 38, "to": 39, "direction": "forward", "color": "#000000ff" },
+   { "name": "blue_mushroom_idle", "from": 40, "to": 40, "direction": "forward", "color": "#000000ff" },
+   { "name": "blue_mushroom_shot", "from": 41, "to": 44, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
-   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 2", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [
   ]
