@@ -54,18 +54,18 @@ export default abstract class Enemy extends Entity {
    * @param amount 데미지 양
    * @returns 데미지 처리 여부
    */
-  takeDamage(amount: number): boolean {
+  takeDamage(amount: number, isCritical: boolean = false): boolean {
     // 데미지 처리
     this.health -= amount;
     
     // 피해 효과 표시 등의 작업이 있다면 여기서 처리
-    this.onDamaged();
+    this.onDamaged(amount, isCritical);
     
     return true;
   }
   
-  protected onDamaged(): void {
-    this.createHitEffect();
+  protected onDamaged(amount: number, isCritical: boolean): void {
+    this.createHitEffect(amount, isCritical);
     this.blink();
     
     if (this.health <= 0) {
@@ -82,30 +82,31 @@ export default abstract class Enemy extends Entity {
     }
   }
 
-  private createHitEffect(): void {
+  private createHitEffect(amount: number, isCritical: boolean): void {
     const scene = this.scene as GameScene;
+    const texture = isCritical ? 'critical_hit' : 'hit';
     
     // 적 위치에 히트 이펙트 생성
-    const hitEffect = scene.add.sprite(this.x, this.y, 'atlas', 'hit_effect-0');
+    const hitEffect = scene.add.sprite(this.x, this.y, 'effects', texture + '-0');
     
     // 이펙트를 적절한 레이어에 추가
     scene.getEffectLayer()?.add(hitEffect);
     
     // 히트 이펙트 애니메이션이 없으면 생성
-    if (!scene.anims.exists('hit_effect')) {
+    if (!scene.anims.exists(texture)) {
       scene.anims.create({
-        key: 'hit_effect',
-        frames: scene.anims.generateFrameNames('atlas', {
-          prefix: 'hit_effect-',
+        key: texture,
+        frames: scene.anims.generateFrameNames('effects', {
+          prefix: texture + '-',
           start: 0,
-          end: 4  // 프레임 수는 실제 스프라이트에 맞게 조정
+          end: isCritical ? 7 : 4
         }),
         frameRate: 24,
         repeat: 0
       });
     }
     
-    hitEffect.play('hit_effect');
+    hitEffect.play(texture);
     hitEffect.setRotation(Phaser.Math.Between(0, 360));
     hitEffect.on('animationcomplete', () => {
       hitEffect.destroy();

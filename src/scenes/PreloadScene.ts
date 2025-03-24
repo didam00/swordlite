@@ -10,11 +10,16 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/images/atlas.png',
       'assets/images/atlas.json'
     );
+
+    this.load.atlas('items',
+      'assets/images/items.png',
+      'assets/images/items.json'
+    );
     
     // 새로운 공격 이펙트 에셋 로드
-    this.load.atlas('big_effects',
-      'assets/images/big_effects.png',
-      'assets/images/big_effects.json'
+    this.load.atlas('effects',
+      'assets/images/effects.png',
+      'assets/images/effects.json'
     );
     
     this.load.atlas('ui',

@@ -28,10 +28,12 @@ export default class BlueMushroom extends Enemy {
 
     this.createAnimations();
     this.updateAnimation();
-    this.setVelocityX(10);
+    // this.setVelocityX(10);
+
+    const delay = (Math.random() * 1750 + 2000) * 80 / (this.scene.player.speed);
     
     this.bulletTimer = scene.time.addEvent({
-      delay: Math.random() * 1500 + 4500,
+      delay: delay,
       callback: this.setShotMode,
       callbackScope: this,
       loop: true
@@ -74,7 +76,6 @@ export default class BlueMushroom extends Enemy {
   }
 
   setShotMode(): void {
-    console.log(this.x);
     if (this.x < 100) {
       return;
     }
@@ -92,14 +93,14 @@ export default class BlueMushroom extends Enemy {
       if (this.isDestroyed) return;
 
       this.scene.playSound('rocket', {
-        volume: 0.4,
+        volume: 1,
         detune: -500,
       })
 
       for (let i = 0; i < 10; i++) {
         this.shotToPlayer(
           this.rotation - Math.PI / 20 + Math.PI / 10 * Math.random(),
-          Math.random() * 3 + 2,
+          Math.random() * 4 + 2,
           Math.random() * 60 + 120,
           Math.random() * 3500 + 200
         );

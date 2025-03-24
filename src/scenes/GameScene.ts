@@ -1,3 +1,8 @@
+/** // TODO
+ * 1. 더블 킬 등 콤보 시스템 추가 (텍스트로 보여줌)
+ * */
+
+
 import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Sword from '../entities/Sword';
@@ -6,6 +11,8 @@ import Entity from '../entities/Entity';
 import Enemy from '../entities/Enemy';
 import RedMushroom from '../entities/RedMushroom';
 import BlueMushroom from '../entities/BlueMushroom';
+import itemList from '../items/ItemList';
+import { createItem } from '../items/Item';
 
 class GameScene extends Phaser.Scene {
   private layers: {
@@ -28,6 +35,8 @@ class GameScene extends Phaser.Scene {
     charge: 2,
     rocket$mp3: 1,
     hurt: 1,
+    collectItem: 1,
+    evade: 1,
   };
   
   player: Player = null!;
@@ -49,6 +58,7 @@ class GameScene extends Phaser.Scene {
   private healthHearts: Phaser.GameObjects.Sprite[] = [];
   private readonly HEART_SPACING: number = 6; // 하트 간격
   private previousHealth: number = 0;
+  private previousMaxHealth: number = 0; // 최대 체력 추적용 멤버 변수 명시적 선언
   
   // 디버그 모드 및 공격 범위 표시를 위한 변수 추가
   private attackRangeGraphics: Phaser.GameObjects.Graphics = null!;
@@ -57,10 +67,11 @@ class GameScene extends Phaser.Scene {
   private hitEnemies: Enemy[] = [];
   
   private bulletGroup: Phaser.Physics.Arcade.Group = null!;
-  
   private background: Phaser.GameObjects.TileSprite = null!;
-  
   private bgMusic: Phaser.Sound.BaseSound = null!;
+
+  private expBar: Phaser.GameObjects.Graphics = null!;
+  private levelText: Phaser.GameObjects.Text = null!;
   
   constructor() {
     super('GameScene')
@@ -149,8 +160,20 @@ class GameScene extends Phaser.Scene {
     })
       .setScrollFactor(0)
       .setOrigin(1, 0);
-    
     this.layers.ui.add(this.meterText);
+
+    // 경험치 표시
+    this.levelText = this.add.text(this.cameras.main.width - 8, 24, '', {
+      fontFamily: 'monospace',
+      fontSize: '9pt',
+      color: '#ffffff',
+      resolution: 1,
+    }).setScrollFactor(0).setOrigin(0.5, 0);
+    this.expBar = this.add.graphics();
+    this.updateExpBar();
+    
+    this.layers.ui.add(this.levelText);
+    this.layers.ui.add(this.expBar);
 
     this.startGame();
   }
@@ -197,6 +220,41 @@ class GameScene extends Phaser.Scene {
     
     enemy.velocity = {x: 0, y: 0};
   }
+
+  spawnItem(): void {
+    // 무작위 기본 아이템 생성
+    const normalItems = itemList.filter(item => item.type === 'normal');
+    const randomItem = normalItems[Math.floor(Math.random() * normalItems.length)];
+
+    const item = createItem(
+      randomItem.id,
+      this.cameras.main.width + 20,
+      this.player.y,
+      this
+    );
+
+    if (item) {
+      this.physics.world.enable(item);
+
+      item.setOrigin(0.5, 0.5);
+      item.setSize(2, 2);
+      item.setVelocityX(-this.player.speed + 30);
+
+      this.physics.add.overlap(
+        this.player,
+        item,
+        () => {
+          this.player.collectItem(item);
+          // collect_item effect animation
+          
+        },
+        undefined,
+        this
+      )
+
+      this.layers.item.add(item);
+    }
+  }
   
   initLayers(): void {
     for (const key in this.layers) {
@@ -219,6 +277,7 @@ class GameScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
 
     this.player.events.on('healthChanged', this.updateHealthUI, this);
+    this.player.events.on('levelUp', this.spawnItem, this);
   }
 
   createSword(): void {
@@ -240,14 +299,14 @@ class GameScene extends Phaser.Scene {
   }
 
   createJumpEffect(data: { x: number, y: number }): void {
-    const jumpEffect = this.add.sprite(data.x, data.y + 4, 'atlas', 'jump_effect-0');
+    const jumpEffect = this.add.sprite(data.x, data.y + 4, 'effects', 'jump-0');
     this.layers.effect.add(jumpEffect);
     
-    if (!this.anims.exists('jump_effect')) {
+    if (!this.anims.exists('jump')) {
       this.anims.create({
-        key: 'jump_effect',
-        frames: this.anims.generateFrameNames('atlas', {
-          prefix: 'jump_effect-',
+        key: 'jump',
+        frames: this.anims.generateFrameNames('effects', {
+          prefix: 'jump-',
           start: 0,
           end: 4
         }),
@@ -262,7 +321,7 @@ class GameScene extends Phaser.Scene {
       this.layers.particle.add(jumpEffect);
     }
 
-    jumpEffect.play('jump_effect');
+    jumpEffect.play('jump');
     jumpEffect.on('animationcomplete', () => {
       jumpEffect.destroy();
     });
@@ -272,46 +331,63 @@ class GameScene extends Phaser.Scene {
     const left = 12;
     const top = 8;
     
-    this.healthHearts.forEach(heart => {
-      // heart.outline도 있다면 함께 제거
-      if ((heart as any).outline) {
-        (heart as any).outline.destroy();
-      }
-      heart.destroy();
-    });
+    // 기존 하트 삭제
+    this.healthHearts.forEach(heart => heart.destroy());
     this.healthHearts = [];
     
+    // 테두리만 먼저 생성
     for (let i = 0; i < this.player.stats.maxHealth; i++) {
-      // 테두리 스프라이트를 먼저 생성 (하트 뒤에 위치하도록)
       const outline = this.add.sprite(
         left + i * this.HEART_SPACING,
         top,
         'ui',
-        'heart-outline' // 새로운 테두리 스프라이트 사용
+        'heart-outline'
       );
       
       outline.setScrollFactor(0)
              .setScale(1)
              .setOrigin(0, 0)
-             .setDepth(9998);
+             .setDepth(9998)
+             .setVisible(true)
+             .setAlpha(1);
       
-      // UI 레이어에 추가
       this.layers.ui.add(outline);
     }
 
+    // 하트 생성
     for (let i = 0; i < this.player.stats.maxHealth; i++) {
-      // 하트 스프라이트 생성
+      // 하트 텍스처 확인
+      let fullHeartFrame = 'heart-full';
+      let emptyHeartFrame = 'heart-empty';
+      
+      // 텍스처 확인
+      const frames = this.textures.get('ui').getFrameNames();
+      if (frames.includes('heartfull')) {
+        fullHeartFrame = 'heartfull';
+        emptyHeartFrame = 'heartempty';
+      } else if (frames.includes('heart_full')) {
+        fullHeartFrame = 'heart_full';
+        emptyHeartFrame = 'heart_empty';
+      }
+      
+      // 하트 생성
       const heart = this.add.sprite(
         left + i * this.HEART_SPACING,
         top,
         'ui',
-        'heart-full'
+        i < this.player.health ? fullHeartFrame : emptyHeartFrame
       );
       
+      // 명시적으로 모든 속성 설정
       heart.setScrollFactor(0)
            .setScale(1)
            .setOrigin(0, 0)
-           .setDepth(9999);
+           .setDepth(9999)
+           .setAlpha(1)
+           .setVisible(true);
+      
+      // 디버깅용 테두리 추가 (보이는지 확인용)
+      heart.setTint(0xffffff);
       
       this.healthHearts.push(heart);
       this.layers.ui.add(heart);
@@ -319,25 +395,76 @@ class GameScene extends Phaser.Scene {
     
     this.updateHealthUI();
   }
-  
+
   updateHealthUI(): void {
     if (!this.player) return;
     
     const currentHealth = this.player.health;
-    const maxHealth = this.player.stats.health;
+    const maxHealth = this.player.stats.maxHealth;
     
-    const previousHealth = this.previousHealth || maxHealth;
-    this.previousHealth = currentHealth;
+    // 이전 체력과 최대 체력 값
+    const previousHealth = this.previousHealth !== undefined ? this.previousHealth : currentHealth;
+    const previousMaxHealth = this.previousMaxHealth !== undefined ? this.previousMaxHealth : this.healthHearts.length;
     
+    // 변경사항 감지
     const damageReceived = previousHealth > currentHealth;
+    const healthRecovered = previousHealth < currentHealth;
+    const maxHealthIncreased = maxHealth > previousMaxHealth;
     
+    // 현재 값 저장
+    this.previousHealth = currentHealth;
+    this.previousMaxHealth = maxHealth;
+    
+    // 텍스처 프레임 확인
+    let fullHeartFrame = 'heart-full';
+    let emptyHeartFrame = 'heart-empty';
+    
+    // 텍스처 확인
+    const frames = this.textures.get('ui').getFrameNames();
+    if (frames.includes('heartfull')) {
+      fullHeartFrame = 'heartfull';
+      emptyHeartFrame = 'heartempty';
+    } else if (frames.includes('heart_full')) {
+      fullHeartFrame = 'heart_full';
+      emptyHeartFrame = 'heart_empty';
+    }
+    
+    // 최대 체력이 증가한 경우 하트 UI 재생성
+    if (maxHealthIncreased) {
+      this.createHealthUI(); // 하트 UI를 완전히 새로 생성
+      return;
+    }
+    
+    // 기존 하트들의 상태 업데이트
     this.healthHearts.forEach((heart, index) => {
+      // 모든 하트가 보이게 설정
+      heart.setVisible(true);
+      heart.setAlpha(1);
+      
       if (index < currentHealth) {
-        heart.setTexture('ui', 'heart-full');
+        // 체력 회복 효과
+        if (healthRecovered && index >= previousHealth && index < currentHealth) {
+          heart.setTexture('ui', fullHeartFrame);
+          this.tweens.add({
+            targets: heart,
+            scaleX: { from: 1.5, to: 1 },
+            scaleY: { from: 1.5, to: 1 },
+            alpha: { from: 0.6, to: 1 },
+            duration: 250,
+            ease: 'Back.easeOut',
+            onStart: () => {
+              heart.setTint(0x8cff9b); // 녹색 틴트 효과
+            },
+            onComplete: () => {
+              heart.clearTint(); // 틴트 제거
+            }
+          });
+        } else {
+          heart.setTexture('ui', fullHeartFrame);
+        }
       } else {
-        // 빈 하트
-        // heart.setTexture('ui', 'heart-empty');
-        
+        heart.setTexture('ui', emptyHeartFrame);
+        // 체력 감소 효과
         if (damageReceived && index >= currentHealth && index < previousHealth) {
           this.tweens.add({
             targets: heart,
@@ -345,22 +472,21 @@ class GameScene extends Phaser.Scene {
             duration: 125,
             yoyo: false,
             repeat: 1,
-            
-            onStart: () => {
-              heart.setTexture('ui', 'heart-empty');
-            },
             onUpdate: (tween) => {
+              if (!heart) {
+                tween.stop();
+                return;
+              }
+
               const progress = tween.getValue();
-              
-              if ((progress > 25 && progress < 50) || 
-                  (progress > 75 && progress < 100)) {
-                heart.setTexture('ui', 'heart-full'); 
+              if ((progress > 25 && progress < 50) || (progress > 75 && progress < 100)) {
+                heart.setTexture('ui', fullHeartFrame); 
               } else {
-                heart.setTexture('ui', 'heart-empty');
+                heart.setTexture('ui', emptyHeartFrame);
               }
             },
             onComplete: () => {
-              heart.setTexture('ui', 'heart-empty'); // 최종 상태
+              heart.setTexture('ui', emptyHeartFrame);
             }
           });
         }
@@ -419,6 +545,10 @@ class GameScene extends Phaser.Scene {
         this.hitEnemies = [];
       }
 
+      if (this.player.evadeEffect) {
+        this.player.evadeEffect.setPosition(this.player.x, this.player.y - 2);
+      }
+
       if (body.blocked.up || body.blocked.down) {
         this.player.removeState('jump');
         this.player.addState('stun');
@@ -460,6 +590,9 @@ class GameScene extends Phaser.Scene {
       if (enemy.health <= 0) {
         enemy.dead();
         enemy.isDead = true;
+
+        // 경험치 획득
+        this.player.exp += this.player.stats.expGain;
       }
       
       if (
@@ -472,6 +605,20 @@ class GameScene extends Phaser.Scene {
         this.enemies = this.enemies.filter(e => e !== enemy);
       }
     }
+
+    this.layers.item.list.forEach((item: any) => {
+      const dist = Phaser.Math.Distance.Between(
+        this.player.x, this.player.y,
+        item.x, item.y
+      );
+
+      if (dist <= this.player.stats.magnet) {
+        this.physics.moveToObject(item,
+          this.player,
+          ((1 - dist / this.player.stats.magnet) * 500) + this.player.stats.speed,
+        );
+      }
+    });
     
     // 화면 밖으로 나간 총알 제거
     if (this.bulletGroup) {
@@ -483,6 +630,34 @@ class GameScene extends Phaser.Scene {
         }
       });
     }
+  }
+
+  updateExpBar() {
+    const width = 104;
+    const height = 5;
+
+    const right = this.cameras.main.width / 2 - width / 2;
+    const bottom = 16;
+
+    const x = this.cameras.main.width - width - right;
+    const y = this.cameras.main.height - height - bottom;
+
+    this.expBar.clear();
+    this.expBar.fillStyle(0xfffffff);
+    this.expBar.fillRoundedRect(x, y, width + 6, height + 8, 4);
+
+    this.expBar.fillStyle(0x0a2a33);
+    this.expBar.fillRoundedRect(x + 1, y + 1, width + 4, height + 6, 2);
+
+    this.expBar.fillStyle(0x22896e);
+    this.expBar.fillRoundedRect(x + 3, y + 3, width, height, 2);
+
+    this.expBar.fillStyle(0x8cff9b);
+    this.expBar.fillRoundedRect(x + 3, y + 3, 4 + width * (this.player.exp / this.player.needExp), height, 2);
+
+    // level
+    this.levelText.setText(`Lv.${this.player.level}`);
+    this.levelText.setPosition(x + (width + 6) / 2, y - 14);
   }
   
   checkEnemyHits(player: any, enemy: any): void {
@@ -506,7 +681,10 @@ class GameScene extends Phaser.Scene {
       }
       
       if (this.physics.world.overlap(attackBody, enemy.body!)) {
-        const damageDealt = enemy.takeDamage(this.player.attack || 1);
+        const isCritcal = Math.random() < (this.player.stats.criticalChance / 100);
+        const damage = isCritcal ? this.player.attack * 2 : this.player.attack;
+        const damageDealt = enemy.takeDamage(damage, isCritcal);
+
         this.playSound('attack', {
           volume: 0.8
         })
@@ -515,6 +693,10 @@ class GameScene extends Phaser.Scene {
     
     // 임시 바디 제거
     attackBody.destroy();
+  }
+
+  spawn() {
+
   }
 
   getPlayer(): Player {
@@ -585,7 +767,7 @@ class GameScene extends Phaser.Scene {
     try {
       // 배경음악 생성 및 설정
       this.bgMusic = this.sound.add('bgm', {
-        volume: 0.7,
+        volume: 0.6,
         loop: true,
         delay: 0
       });

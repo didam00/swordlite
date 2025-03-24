@@ -30,7 +30,7 @@ export default class RedMushroom extends Enemy {
 
     this.createAnimations();
     this.updateAnimation();
-    this.setVelocityX(10);
+    // this.setVelocityX(10);
   }
 
   createAnimations(): void {
@@ -38,13 +38,12 @@ export default class RedMushroom extends Enemy {
 
     this.createAnimation('red_mushroom_idle', [0, 5], 12);
     this.createAnimation('red_mushroom_charging', [0, 2], 4, 0);
-    this.createAnimation('red_mushroom_charge', [0, 1]);
-    
+    this.createAnimation('red_mushroom_charge', [0, 1]); 
   }
 
   update(delta: number) {
     if (this.hasState('charge')) {
-      let speed = 200;
+      let speed = 250;
       const dist = this.getDist(this.scene.player);
       if (dist > 120) {
         this.rotation = Phaser.Math.Angle.Between(this.x, this.y, this.scene.getPlayer().x, this.scene.getPlayer().y) + Math.PI / 2;
@@ -58,7 +57,7 @@ export default class RedMushroom extends Enemy {
       this.vy = -Math.sin(this.rotation - Math.PI / 2) * speed;
       this.rotation = Phaser.Math.Angle.Between(this.x, this.y, this.scene.getPlayer().x, this.scene.getPlayer().y) + Math.PI / 2;
     } else { // idle
-      this.vx = 15;
+      this.vx = 0;
       this.vy = 0;
       this.rotation += (Math.PI * delta / 25000) * this.rotationClockwise;
       this.isPlayerInSight(this.scene.getPlayer())
@@ -67,8 +66,8 @@ export default class RedMushroom extends Enemy {
 
   isPlayerInSight(player: Player): boolean {
     if (
-      this.x > this.scene.cameras.main.width - 20 || 
-      this.x < 60 || 
+      this.x > this.scene.cameras.main.width - 120 || 
+      this.x < 80 || 
       this.scene.time.now - this.lastChargeTime < this.stats.chargeCoolDown
     ) {
       return false;
@@ -76,7 +75,7 @@ export default class RedMushroom extends Enemy {
 
     const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y) + Math.PI / 2;
     const angleDiff = Phaser.Math.Angle.Wrap(angle - this.rotation);
-    const inSight = Math.abs(angleDiff) < Math.PI / 16;
+    const inSight = Math.abs(angleDiff) < Math.PI / 12;
 
     if (inSight) {
       const chargingSound = this.scene.playSound('charging', {

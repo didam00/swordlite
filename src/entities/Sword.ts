@@ -50,7 +50,7 @@ class Sword extends Phaser.GameObjects.Sprite {
     if (!this.scene.anims.exists('attack_effect')) {
       const attack_effect = this.scene.anims.create({
         key: 'attack_effect',
-        frames: this.scene.anims.generateFrameNames('big_effects', {
+        frames: this.scene.anims.generateFrameNames('effects', {
           prefix: 'attack-',
           start: 0,
           end: 4,  // 프레임 범위는 실제 이미지에 맞게 조정
@@ -104,7 +104,7 @@ class Sword extends Phaser.GameObjects.Sprite {
     this.attackEffect = this.scene.add.sprite(
       x,  // 플레이어의 x 위치
       y,  // 플레이어의 y 위치
-      'big_effects',
+      'effects',
       'attack-0'
     );
     
