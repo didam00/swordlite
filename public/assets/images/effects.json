@@ -286,6 +286,30 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
     "sourceSize": { "w": 128, "h": 128 },
     "duration": 100
+   },
+   "light_attack-0": {
+    "frame": { "x": 0, "y": 768, "w": 128, "h": 128 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 100
+   },
+   "light_attack-1": {
+    "frame": { "x": 128, "y": 768, "w": 128, "h": 128 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 100
+   },
+   "light_attack-2": {
+    "frame": { "x": 256, "y": 768, "w": 128, "h": 128 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 100
    }
  },
  "meta": {
@@ -293,7 +317,7 @@
   "version": "1.x-dev",
   "image": "effects.png",
   "format": "RGBA8888",
-  "size": { "w": 1024, "h": 768 },
+  "size": { "w": 1024, "h": 896 },
   "scale": "1",
   "frameTags": [
    { "name": "attack", "from": 0, "to": 4, "direction": "forward", "color": "#000000ff" },
@@ -301,7 +325,8 @@
    { "name": "hit", "from": 10, "to": 14, "direction": "forward", "color": "#000000ff" },
    { "name": "critical_hit", "from": 15, "to": 22, "direction": "forward", "color": "#000000ff" },
    { "name": "collect_item", "from": 23, "to": 29, "direction": "forward", "color": "#000000ff" },
-   { "name": "evade_shield", "from": 30, "to": 35, "direction": "forward", "color": "#000000ff" }
+   { "name": "evade_shield", "from": 30, "to": 35, "direction": "forward", "color": "#000000ff" },
+   { "name": "light_attack", "from": 36, "to": 38, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "bottom", "opacity": 128, "blendMode": "normal" },

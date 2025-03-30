@@ -10,8 +10,6 @@ export default class PurpleMushroom extends Enemy {
     health: 1,
     attack: 1,
     speed: 0,
-    // scale: Math.random() * 0.4 + 0.8,
-    // chargeCoolDown: 2000,
     scale: 1,
   }
 
@@ -34,6 +32,7 @@ export default class PurpleMushroom extends Enemy {
   }
 
   update(delta: number) {
+    this.velocity = {x: 0, y: 0};
     this.rotation += (Math.PI * delta / 5000) * this.rotationClockwise;
   }
 
@@ -55,8 +54,8 @@ export default class PurpleMushroom extends Enemy {
         const vx = (bullet as any)._ovx
         const vy = (bullet as any)._ovy;
         
-        bullet.body.setVelocityX(vx - player.speed);
-        bullet.body.setVelocityY(vy - 10);
+        bullet.body?.setVelocityX(vx - player.speed);
+        bullet.body?.setVelocityY(vy - 10);
       }
 
       bullet.body.setDamping(true);

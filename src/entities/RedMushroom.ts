@@ -7,6 +7,9 @@ export default class RedMushroom extends Enemy {
   entityName = 'red_mushroom';
   rotationClockwise = 1;
   lastChargeTime: number = 0;
+  chargingTime: number = 2000;
+  chargeSpeed: number = 250;
+  chargeDuration: number = 750;
 
   stats = {
     health: 1,
@@ -43,7 +46,7 @@ export default class RedMushroom extends Enemy {
 
   update(delta: number) {
     if (this.hasState('charge')) {
-      let speed = 250;
+      let speed = this.chargeSpeed;
       const dist = this.getDist(this.scene.player);
       if (dist > 120) {
         this.rotation = Phaser.Math.Angle.Between(this.x, this.y, this.scene.getPlayer().x, this.scene.getPlayer().y) + Math.PI / 2;
@@ -66,8 +69,8 @@ export default class RedMushroom extends Enemy {
 
   isPlayerInSight(player: Player): boolean {
     if (
-      this.x > this.scene.cameras.main.width - 120 || 
-      this.x < 80 || 
+      this.x > this.scene.cameras.main.width - 80 || 
+      this.x < 60 || 
       this.scene.time.now - this.lastChargeTime < this.stats.chargeCoolDown
     ) {
       return false;
@@ -77,14 +80,14 @@ export default class RedMushroom extends Enemy {
     const angleDiff = Phaser.Math.Angle.Wrap(angle - this.rotation);
     const inSight = Math.abs(angleDiff) < Math.PI / 12;
 
-    if (inSight) {
+    if (inSight || this.hasState('charging')) {
       const chargingSound = this.scene.playSound('charging', {
         volume: 0.4,
         loop: true,
         rate: 2,
       })
       this.addState('charging');
-      this.scene.time.delayedCall(2000, () => {
+      this.scene.time.delayedCall(this.chargingTime, () => {
         chargingSound?.destroy();
 
         if (!this.isDestroyed) {
@@ -96,7 +99,7 @@ export default class RedMushroom extends Enemy {
             detune: 1000,
           });
           
-          this.scene.time.delayedCall(750, () => {
+          this.scene.time.delayedCall(this.chargeDuration, () => {
             if (!this.isDestroyed) {
               this.removeState('charge');
               this.lastChargeTime = this.scene.time.now;

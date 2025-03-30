@@ -14,6 +14,13 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
   readonly scene: GameScene = null!;
   isDead: boolean = false;
   isDestroyed: boolean = false;
+  
+  // 화면 밖을 나가면 사라지는 옵션
+  destroyOnScreenOut: boolean = true;
+
+  static loadedAnimation: string[] = [];
+  
+  readonly isFollowCamera: boolean = false;
 
   abstract stats: {
     health: number,
@@ -42,6 +49,12 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
   createAnimation(key: string, atlasFrameNameOrPrefix?: string | [number, number], rangeOrFrameRate?: number | [number, number], frameRateOrRepeat?: number, repeat?: number): void;
 
   createAnimation(key: string, atlasFrameNameOrPrefix?: string | [number, number], rangeOrFrameRate?: number | [number, number], frameRateOrRepeat?: number, repeatParam?: number): void {
+    if (Entity.loadedAnimation.includes(key)) {
+      return;
+    } else {
+      Entity.loadedAnimation.push(key);
+    }
+
     if (Array.isArray(atlasFrameNameOrPrefix)) {
       const range = atlasFrameNameOrPrefix;
       const frameRate = typeof rangeOrFrameRate === 'number' ? rangeOrFrameRate : 24;
@@ -136,6 +149,18 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
     return Boolean(this.states[state]);
   }
 
+  getStates(): string[] {
+    return Object.keys(this.states).filter(state => this.states[state]);
+  }
+
+  getAllStates(): EntityState {
+    return this.states;
+  }
+
+  getAllStateKeys(): string[] {
+    return Object.keys(this.states);
+  }
+
   /** 처음에 states를 override하여 지정할 때, 처음에 올 수록 우선순위가 낮음 */
   getHightestPriorityState(): string {
     for (const state of Object.keys(this.states).reverse()) {
@@ -182,6 +207,14 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  stopBlink(): void {
+    if (this.blinkTween) {
+      this.blinkTween.stop();
+      this.blinkTween = undefined;
+    }
+    this.setAlpha(1);
+  }
+
   dead(): void {
     
   }
@@ -212,5 +245,9 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
 
   getDist(other: Entity): number {
     return Phaser.Math.Distance.Between(this.x, this.y, other.x, other.y);
+  }
+
+  getAngle(other: Entity): number {
+    return Phaser.Math.Angle.Between(this.x, this.y, other.x, other.y);
   }
 }

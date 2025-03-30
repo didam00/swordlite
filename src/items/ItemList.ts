@@ -4,9 +4,9 @@ export interface ItemDefinition {
   id: string;
   name: string;
   description: string;
-  rarity: "common" | "magic" | "unique";
+  rarity: "common" | "epic" | "unique";
   effect: (scene: GameScene) => void;
-  type: "normal" | "active" | "consumable" | "passive" | "cooldown";
+  type: "normal" | "dash" | "magic" | "attack";
 }
 
 const itemList: ItemDefinition[] = [
@@ -38,74 +38,43 @@ const itemList: ItemDefinition[] = [
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.maxHealth += 1;
-      scene.player.scale += 0.1;
-      scene.player.range += 1.2;
+      scene.player.scale += 0.2;
+      scene.player.range += 2.4;
     }
   },
-  // {
-  //   id: "wind_mushroom",
-  //   name: "Wind Mushroom",
-  //   description: "when attack give poison",
-  //   rarity: "common",
-  //   type: "normal",
-  //   effect: (scene: GameScene): void => {
-      
-  //   }
-  // },
-  // {
-  //   id: "ninja_potion",
-  //   name: "Ninja Potion",
-  //   description: "dash upgrade",
-  //   rarity: "common",
-  //   type: "normal",
-  //   effect: (scene: GameScene): void => {
-  //     scene.player.stats.dashCoolDown -= 100;
-  //     scene.player.stats.dashDistance += 5;
-  //   }
-  // },
   {
     id: "strategy_book",
     name: "Strategy Book",
-    description: "exp gain +10%",
+    description: "exp gain +20%",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.expGain += 1;
+      scene.player.stats.expGain += 20;
+    }
+  },
+  {
+    id: "wind_mushroom",
+    name: "Wind Mushroom",
+    description: "speed +25%",
+    rarity: "common",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.speed += 20;
     }
   },
   {
     id: "great_magnet",
     name: "Great Magnet",
-    description: "item magnet +40%",
+    description: "item magnet +100%",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.magnet += 8;
-    }
-  },
-  {
-    id: "black_cloak",
-    name: "black cloak",
-    description: "evade chance *10%",
-    rarity: "common",
-    type: "normal",
-    effect: (scene: GameScene): void => {
-      scene.player.stats.evade += (100 - scene.player.stats.evade) * 0.1;
-    }
-  },
-  {
-    id: "black_cloak",
-    name: "black cloak",
-    description: "evade chance *10%",
-    rarity: "common",
-    type: "normal",
-    effect: (scene: GameScene): void => {
-      scene.player.stats.evade += (100 - scene.player.stats.evade) * 0.1;
+      scene.player.stats.magnet += 20;
     }
   },
   // {
-  //   id: "shadow_bottle",
-  //   name: "Shadow Bottle",
+  //   id: "black_cloak",
+  //   name: "black cloak",
   //   description: "evade chance *10%",
   //   rarity: "common",
   //   type: "normal",
@@ -113,24 +82,56 @@ const itemList: ItemDefinition[] = [
   //     scene.player.stats.evade += (100 - scene.player.stats.evade) * 0.1;
   //   }
   // },
-  // {
-  //   id: "shadow_bottle",
-  //   name: "Shadow Bottle",
-  //   description: "can use dash",
-  //   rarity: "epic",
-  //   type: "normal",
-  //   effect: (scene: GameScene): void => {
-  //     scene.player.stats.evade += (100 - scene.player.stats.evade) * 0.1;
-  //   }
-  // },
   {
-    id: "shadow_bottle",
-    name: "Shadow Bottle",
-    description: "can use dash",
+    id: "sugar_cube",
+    name: "Sugar Cube",
+    description: "evade cooldown -1s",
+    rarity: "common",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.evadeCoolDown -= 1000;
+    }
+  },
+  {
+    id: "cracker",
+    name: "Cracker",
+    description: "collision damage +1",
+    rarity: "common",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.collisionDamage += 1;
+    }
+  },
+  {
+    id: "weight",
+    name: "Weight",
+    description: "graivty +40%",
+    rarity: "common",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.gravity += 0.4;
+      scene.player.jumpPower += 30;
+    }
+  },
+  {
+    id: "black_coffee",
+    name: "Black Coffee",
+    description: "upgrade dash",
     rarity: "epic",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.evade += (100 - scene.player.stats.evade) * 0.1;
+      scene.player.stats.dashDistance += 80;
+      scene.player.stats.dashCoolDown *= 0.5;
+    }
+  },
+  {
+    id: "light_rod",
+    name: "Light Rod",
+    description: "upgrade shoot light attack",
+    rarity: "epic",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.lightAttackSize += 100;
     }
   },
 ]

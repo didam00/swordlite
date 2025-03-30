@@ -12,6 +12,10 @@ export default abstract class Enemy extends Entity {
 
   private _vx: number = 0;
   private _vy: number = 0;
+  exp: number = 10;
+  untargetability: boolean = false;
+
+  isFollowCamera: boolean = false;
 
   constructor(states: string[], scene: GameScene, x: number, y: number) {
     super(states, scene, x, y);
@@ -20,9 +24,12 @@ export default abstract class Enemy extends Entity {
   
   set vx(value: number) {
     // if (value === this._vx) return;
-    
     this._vx = value;
-    this.setVelocityX(-this.scene.getPlayer().speed + value);
+    if (this.isFollowCamera) {
+      this.setVelocityX(value);
+    } else {
+      this.setVelocityX(-this.scene.getPlayer().speed + value);
+    }
   }
   
   get vx(): number {
@@ -55,10 +62,9 @@ export default abstract class Enemy extends Entity {
    * @returns 데미지 처리 여부
    */
   takeDamage(amount: number, isCritical: boolean = false): boolean {
-    // 데미지 처리
+    if (amount <= 0) return false;
+
     this.health -= amount;
-    
-    // 피해 효과 표시 등의 작업이 있다면 여기서 처리
     this.onDamaged(amount, isCritical);
     
     return true;
@@ -147,5 +153,10 @@ export default abstract class Enemy extends Entity {
     }
 
     return bullet;
+  }
+
+  // when player speed updated
+  playerSpeedUpdated(diff: number): void {
+
   }
 }

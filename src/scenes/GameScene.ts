@@ -13,9 +13,12 @@ import RedMushroom from '../entities/RedMushroom';
 import BlueMushroom from '../entities/BlueMushroom';
 import itemList from '../items/ItemList';
 import { createItem } from '../items/Item';
+import DreamOfMushroom from '../entities/DreamOfMushroom';
+import CRTFilter from '..';
+import FakeRedMushroom from '../entities/FakeRedMushroom';
 
 class GameScene extends Phaser.Scene {
-  private layers: {
+  readonly layers: {
     [key: string]: Phaser.GameObjects.Container
   } = {
     background: null!,
@@ -31,19 +34,23 @@ class GameScene extends Phaser.Scene {
     jump: 3,
     hit: 4,
     attack: 3,
-    charging: 3,
+    shotCharging: 1,
+    charging: 2,
     charge: 2,
     rocket$mp3: 1,
     hurt: 1,
     collectItem: 1,
     evade: 1,
+    dash: 2,
   };
+
+  debugMode: boolean = false;
   
   player: Player = null!;
   
   private obstacles: Entity[] = [];
-  private enemyGroup: Phaser.Physics.Arcade.Group = null!;
-  private enemies: Enemy[] = [];
+  enemyGroup: Phaser.Physics.Arcade.Group = null!;
+  enemies: Enemy[] = [];
   private meterText: Phaser.GameObjects.Text = null!;
   
   private sword: Sword = null!;
@@ -72,6 +79,9 @@ class GameScene extends Phaser.Scene {
 
   private expBar: Phaser.GameObjects.Graphics = null!;
   private levelText: Phaser.GameObjects.Text = null!;
+
+  private clearBoss: number = 0;
+  bossIsDead: boolean = true;
   
   constructor() {
     super('GameScene')
@@ -94,6 +104,16 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    // // 필터
+    // const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+    // if (!renderer.pipelines.has('CRTFilter')) {
+    //   renderer.pipelines.addPostPipeline('CRTFilter', CRTFilter);
+    // }
+    // this.cameras.main.setPostPipeline('CRTFilter');
+
+    // debug functions
+    this.createDebugFunction();
+
     this.initLayers();
     this.cameras.main.setBackgroundColor('#66334b');
     
@@ -125,6 +145,7 @@ class GameScene extends Phaser.Scene {
     // 디버그 모드 토글 키 설정 (D 키)
     this.input.keyboard?.addKey('D').on('down', () => {
       this.physics.world.drawDebug = !this.physics.world.drawDebug;
+      this.debugMode = !this.debugMode;
 
       if (this.physics.world.drawDebug) {
         if (!this.physics.world.debugGraphic) {
@@ -175,6 +196,12 @@ class GameScene extends Phaser.Scene {
     this.layers.ui.add(this.levelText);
     this.layers.ui.add(this.expBar);
 
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.player.hasItem("black_coffee") && pointer.rightButtonDown()) {
+        this.player.dash();
+      }
+    });
+
     this.startGame();
   }
 
@@ -192,26 +219,65 @@ class GameScene extends Phaser.Scene {
     );
   }
   
-  spawnEnemy(): void {
-    if (this.isGameOver) return;
+  spawnEnemy(id: string | null = null): Enemy | null {
+    if (this.isGameOver) return null;
 
-    let enemy: Enemy;
-    switch (Phaser.Math.Between(0, 2)) {
-      case 0: enemy = new PurpleMushroom(
-        this,
-        this.cameras.main.width + 20,
-        Phaser.Math.Between(10, this.cameras.main.height - 10)
-      ); break;
-      case 1: enemy = new BlueMushroom(
-        this,
-        this.cameras.main.width + 20,
-        Phaser.Math.Between(10, this.cameras.main.height - 10)
-      ); break;
-      default: enemy = new RedMushroom(
-        this,
-        this.cameras.main.width + 20,
-        Phaser.Math.Between(10, this.cameras.main.height - 10)
-      ); break;
+    let enemy: Enemy = null!;
+
+    if (!id) {
+      id = Phaser.Utils.Array.GetRandom([
+        'purple_mushroom',
+        'blue_mushroom',
+        'red_mushroom',
+      ]);
+    }
+
+    if (id !== null) {
+      switch (id) {
+        case 'purple_mushroom':
+          enemy = new PurpleMushroom(
+            this,
+            this.cameras.main.width + 20,
+            Phaser.Math.Between(10, this.cameras.main.height - 10)
+          );
+          break;
+        case 'blue_mushroom':
+          enemy = new BlueMushroom(
+            this,
+            this.cameras.main.width + 20,
+            Phaser.Math.Between(10, this.cameras.main.height - 10)
+          );
+          break;
+        case 'dream_of_mushroom':
+          enemy = new DreamOfMushroom(
+            this,
+            this.cameras.main.width + 20,
+            this.cameras.main.height / 2
+          );
+          break;
+        case 'red_mushroom':
+          enemy = new RedMushroom(
+            this,
+            this.cameras.main.width + 20,
+            Phaser.Math.Between(10, this.cameras.main.height - 10)
+          );
+          break;
+        case 'fake_red_mushroom':
+          enemy = new FakeRedMushroom(
+            this,
+            this.cameras.main.width + 20,
+            Phaser.Math.Between(10, this.cameras.main.height - 10)
+          );
+          break;
+
+        default:
+          enemy = new DreamOfMushroom(
+            this,
+            this.cameras.main.width + 20,
+            this.cameras.main.height / 2
+          );
+          break;
+        }
     }
 
     this.enemies.push(enemy);
@@ -219,11 +285,13 @@ class GameScene extends Phaser.Scene {
     this.enemyGroup.add(enemy);
     
     enemy.velocity = {x: 0, y: 0};
+
+    return enemy;
   }
 
-  spawnItem(): void {
+  spawnItem(rarity: string): void {
     // 무작위 기본 아이템 생성
-    const normalItems = itemList.filter(item => item.type === 'normal');
+    const normalItems = itemList.filter(item => item.rarity === rarity);
     const randomItem = normalItems[Math.floor(Math.random() * normalItems.length)];
 
     const item = createItem(
@@ -277,7 +345,14 @@ class GameScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
 
     this.player.events.on('healthChanged', this.updateHealthUI, this);
-    this.player.events.on('levelUp', this.spawnItem, this);
+    this.player.events.on('levelUp', () => {
+      let rarity: string = "common";
+      if (this.player.level % 10 === 5) {
+        rarity = "epic";
+      }
+      this.spawnItem(rarity);
+    });
+    this.player.events.on('speedChanged', this.playerSpeedUpdated, this);
   }
 
   createSword(): void {
@@ -315,7 +390,7 @@ class GameScene extends Phaser.Scene {
       });
     }
     
-    jumpEffect.setScale((this.player.jumpPower / 300) + 0.5);
+    // jumpEffect.setScale((this.player.jumpPower / 300) + 0.5);
 
     if (this.layers.particle) {
       this.layers.particle.add(jumpEffect);
@@ -478,11 +553,15 @@ class GameScene extends Phaser.Scene {
                 return;
               }
 
-              const progress = tween.getValue();
-              if ((progress > 25 && progress < 50) || (progress > 75 && progress < 100)) {
-                heart.setTexture('ui', fullHeartFrame); 
-              } else {
-                heart.setTexture('ui', emptyHeartFrame);
+              try {
+                const progress = tween.getValue();
+                if ((progress > 25 && progress < 50) || (progress > 75 && progress < 100)) {
+                  heart.setTexture('ui', fullHeartFrame); 
+                } else {
+                  heart.setTexture('ui', emptyHeartFrame);
+                }
+              } catch {
+                console.error('Heart tween error');
               }
             },
             onComplete: () => {
@@ -499,22 +578,39 @@ class GameScene extends Phaser.Scene {
     this.isGameOver = false;
 
     this.lastSpawnTime = 0;
-    this.spawnEnemy();
+    // this.spawnEnemy("dream_of_mushroom");
 
-    // this.time.addEvent({
-    //   delay: 2000 * 30 / this.player.stats.speed,
-    //   loop: true,
-    //   callbackScope: this,
-    //   callback: () => {
-    //     this.spawnEnemy();
-    //   }
-    // });
+    // ! CUSTOM
+    this.player.collectItem("black_coffee");
+    // this.player.collectItem("light_rod");
+  }
+
+  playerSpeedUpdated(diff: number) {
+    // 모든 요소의 속도를 재조정
+    this.enemies.forEach(enemy => {
+      if (!enemy.isFollowCamera) {
+        // enemy.velocity.x += diff;
+        console.log(-diff + enemy.velocity.x);
+        enemy.setVelocityX(-diff + enemy.velocity.x);
+        if (enemy.entityName === 'purple_mushroom') {
+          console.log(enemy.velocity.x);
+        }
+      }
+
+      enemy.playerSpeedUpdated(diff);
+    });
+
+    this.layers.item.list.forEach((item: any) => {
+      item.body.setVelocityX(item.body.velocity.x - diff);
+    });
+
+    this.bulletGroup.getChildren().forEach((bullet: any) => {
+      bullet.body.setVelocityX(bullet.body.velocity.x - diff);
+    });
   }
   
   update(time: number, delta: number): void {
-    // 배경 스크롤 업데이트
     if (this.background && this.player) {
-      // 플레이어 속도의 절반으로 배경 스크롤
       this.background.tilePositionX += (this.player.speed * 0.75) * delta / 1000;
     }
     
@@ -522,6 +618,7 @@ class GameScene extends Phaser.Scene {
       if (this.isGameOver) return;
 
       this.player.update(delta);
+      this.player.exp += 0.00002 * this.player.speed * delta;
 
       const body = this.player.body as Phaser.Physics.Arcade.Body;
 
@@ -529,14 +626,13 @@ class GameScene extends Phaser.Scene {
       this.meterText.setText(`${Math.floor(this.meter)}M`);
       
       if (Phaser.Input.Keyboard.JustDown(this.cursors.space)) {
-        if (!this.player.hasState('stun') || this.isGameOver) {
+        if (!this.player.hasState('stun') && !this.player.hasState('attack') && !this.isGameOver) {
           this.player.jump();
           // 점프(공격) 시작 시 타격된 적 목록 초기화
           this.hitEnemies = [];
         }
       }
       
-      // 플레이어가 점프 중(공격 중)일 때 검 범위 내 적 감지 및 데미지 처리
       if (this.player.hasState('attack')) {
         this.checkSwordHits();
       } else if (this.attackRangeGraphics) {
@@ -545,14 +641,14 @@ class GameScene extends Phaser.Scene {
         this.hitEnemies = [];
       }
 
-      if (this.player.evadeEffect) {
-        this.player.evadeEffect.setPosition(this.player.x, this.player.y - 2);
+      for (const followEffect of this.player.followEffects) {
+        followEffect.setPosition(this.player.x, this.player.y - 2);
       }
 
       if (body.blocked.up || body.blocked.down) {
         this.player.removeState('jump');
         this.player.addState('stun');
-        this.player.takeDamage(1);
+        this.player.takeDamage(1, "wall");
 
         this.time.delayedCall(body.blocked.up ? 600 : 500, () => {
           this.player.removeState('stun');
@@ -560,7 +656,7 @@ class GameScene extends Phaser.Scene {
       }
 
       if (body.blocked.down) {
-        this.player.jump(200);
+        this.player.jump(this.player.jumpPower * 1.5);
       }
 
       if (this.player.stats.health <= 0) {
@@ -580,9 +676,16 @@ class GameScene extends Phaser.Scene {
 
     const spawnCooldown = 2000 * 30 / this.player.stats.speed;
 
-    if (time - this.lastSpawnTime > spawnCooldown) {
+    // * 몹 스폰
+    if (this.bossIsDead && time - this.lastSpawnTime > spawnCooldown) {
       this.spawnEnemy();
       this.lastSpawnTime = time;
+    }
+
+    if (Math.floor(this.meter / 10000) > this.clearBoss) {
+      this.clearBoss = Math.floor(this.meter / 10000);
+      const boss = this.spawnEnemy("dream_of_mushroom");
+      this.bossIsDead = false;
     }
 
     for (const enemy of this.enemies) {
@@ -590,15 +693,18 @@ class GameScene extends Phaser.Scene {
       if (enemy.health <= 0) {
         enemy.dead();
         enemy.isDead = true;
-
+        
         // 경험치 획득
-        this.player.exp += this.player.stats.expGain;
-      }
-      
-      if (
-        (enemy.x < -30) || (enemy.y < -30)
+        enemy.destroy();
+
+        enemy.isDestroyed = true;
+        this.enemies = this.enemies.filter(e => e !== enemy);
+        this.player.exp += enemy.exp;
+      } else if (
+        ((enemy.x < -100) || (enemy.y < -30)
         || (enemy.y > this.cameras.main.height + 30)
-        || (enemy.health <= 0)
+        || (enemy.x > this.cameras.main.width + 100))
+        && enemy.destroyOnScreenOut
       ) {
         enemy.destroy();
         enemy.isDestroyed = true;
@@ -621,15 +727,18 @@ class GameScene extends Phaser.Scene {
     });
     
     // 화면 밖으로 나간 총알 제거
-    if (this.bulletGroup) {
-      this.bulletGroup.getChildren().forEach((bullet: Phaser.GameObjects.GameObject) => {
-        const b = bullet as Phaser.Physics.Arcade.Sprite;
-        if (b.x < -20 || b.x > this.cameras.main.width + 20 || 
-            b.y < -20 || b.y > this.cameras.main.height + 20) {
-          b.destroy();
-        }
-      });
-    }
+    this.layers.effect.list.forEach((effect: any) => {
+      if (
+        effect.y < -40
+        || effect.y > this.cameras.main.height + 40
+        || effect.x < -40
+        || effect.x > this.cameras.main.width + 40
+      ) {
+        effect.destroy();
+      }
+
+      effect.update(delta);
+    });
   }
 
   updateExpBar() {
@@ -653,7 +762,7 @@ class GameScene extends Phaser.Scene {
     this.expBar.fillRoundedRect(x + 3, y + 3, width, height, 2);
 
     this.expBar.fillStyle(0x8cff9b);
-    this.expBar.fillRoundedRect(x + 3, y + 3, 4 + width * (this.player.exp / this.player.needExp), height, 2);
+    this.expBar.fillRoundedRect(x + 3, y + 3, 4 + (width - 4) * (this.player.exp / this.player.needExp), height, 2);
 
     // level
     this.levelText.setText(`Lv.${this.player.level}`);
@@ -663,11 +772,12 @@ class GameScene extends Phaser.Scene {
   checkEnemyHits(player: any, enemy: any): void {
     if (enemy instanceof Enemy && enemy.attack > 0) {
       this.player.takeDamage(enemy.attack);
+      enemy.takeDamage(this.player.stats.collisionDamage);
     }
   }
 
   checkSwordHits(): void {
-    if (!this.sword || !this.player || !this.player.hasState('attack')) return;
+    if (!this.sword || !this.player) return;
     
     const radius = this.player.getRealRange();
 
@@ -676,7 +786,7 @@ class GameScene extends Phaser.Scene {
     ).setCircle(radius);
     
     for (const enemy of this.enemies) {
-      if (this.hitEnemies.includes(enemy)) {
+      if (this.hitEnemies.includes(enemy) || enemy.untargetability) {
         continue;
       }
       
@@ -684,6 +794,7 @@ class GameScene extends Phaser.Scene {
         const isCritcal = Math.random() < (this.player.stats.criticalChance / 100);
         const damage = isCritcal ? this.player.attack * 2 : this.player.attack;
         const damageDealt = enemy.takeDamage(damage, isCritcal);
+        this.hitEnemies.push(enemy);
 
         this.playSound('attack', {
           volume: 0.8
@@ -827,7 +938,20 @@ class GameScene extends Phaser.Scene {
     }
   }
 
+  createDebugFunction() {
+    // 디버그용 함수
+    (globalThis as any).getPlayer = () => {
+      if (this.debugMode) {
+        return this.player;
+      }
+    }
 
+    (globalThis as any).immuneMode = () => {
+      if (this.debugMode) {
+        this.player.stats.evade = 100;
+      }
+    }
+  }
 }
 
 export default GameScene;

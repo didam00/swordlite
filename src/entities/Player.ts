@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import Entity from './Entity';
 import GameScene from '../scenes/GameScene';
 import itemList from '../items/ItemList';
-import { Item } from '../items/Item';
+import { createItem, Item } from '../items/Item';
 
 class Player extends Entity {
   entityName = 'player';
@@ -20,10 +20,13 @@ class Player extends Entity {
     criticalChance: 0,
     criticalDamage: 2,
     magnet: 20,
-    expGain: 10,
+    expGain: 100,
     evade: 0,
-    dashCoolDown: 1000,
-    dashDistance: 50
+    evadeCoolDown: 11000,
+    dashCoolDown: 4000,
+    dashDistance: 0,
+    lightAttackSize: 0,
+    collisionDamage: 0,
   }
 
   items: {
@@ -33,18 +36,23 @@ class Player extends Entity {
   level: number = 1;
   private _exp: number = 0;
   needExp: number = 40;
-  evadeEffect: Phaser.GameObjects.Sprite | null = null;
+  followEffects: Phaser.GameObjects.Sprite[] = [];
+  private _o__gravity: number = 300;
+  private _gravity: number = 1;
   
   private lastJumpTime: number = 0;
   private lastDamagedTime: number = 0;
+  private lastDashTime: number = 0;
+  readonly isFollowCamera: boolean = true;
+  private lastEvadeTime: number = 0;
   
   constructor(scene: GameScene, x: number, y: number) {
     super([
-       "stun", "attack", "idle", "jump", "fall"
+       "dash", "stun", "attack", "idle", "jump", "fall"
     ], scene, x, y);
 
     this.body!.setSize(6, 9);
-    this.setGravityY(300);
+    this.setGravityY(this._o__gravity);
     
     this.createAnimations();
     this.updateAnimation();
@@ -79,6 +87,10 @@ class Player extends Entity {
       isPlayerJumping: true
     });
 
+    if (this.hasItem("light_rod")) {
+      this.lightAttack();
+    }
+
     this.scene.playSound('jump', {
       volume: 0.8
     });
@@ -110,21 +122,35 @@ class Player extends Entity {
     this.events.emit('healthChanged', this.stats.health);
   }
 
-  takeDamage(amount: number): void {
+  takeDamage(amount: number, type: "enemy" | "wall" = "enemy"): void {
+    if (amount <= 0) return;
+
     if (this.scene.time.now - this.lastDamagedTime < this.stats.immuneTime) {
       return;
     }
-
-    this.blink(this.stats.immuneTime);
-
-    this.lastDamagedTime = this.scene.time.now;
     
-    const isEvade = Math.random() < this.stats.evade / 100;
+    let isSugarCube = false;
+    const SUGAR_CUBE_TIME = 150;
+
+    if (
+      this.hasItem("sugar_cube")
+      && this.scene.time.now - this.lastEvadeTime > this.stats.evadeCoolDown
+      && type != "wall"
+    ) {
+      isSugarCube = true;
+      this.lastEvadeTime = this.scene.time.now;
+    }
+
+    this.blink(isSugarCube ? SUGAR_CUBE_TIME : this.stats.immuneTime);
+    this.lastDamagedTime = isSugarCube ? (this.scene.time.now - this.stats.immuneTime + SUGAR_CUBE_TIME) : this.scene.time.now;
+    
+    const isEvade = isSugarCube || (Math.random() < this.stats.evade / 100);
     
     // evade
     if (isEvade) {
-      this.evadeEffect = this.scene.add.sprite(this.x, this.y, 'effects', 'evade_shield-0');
-      this.scene.getEffectLayer().add(this.evadeEffect);
+      const evadeEffect = this.scene.add.sprite(this.x, this.y, 'effects', 'evade_shield-0');
+      this.followEffects.push(evadeEffect);
+      this.scene.getEffectLayer().add(evadeEffect);
 
       if (!this.scene.anims.exists('evade_shield')) {
         this.scene.anims.create({
@@ -140,13 +166,14 @@ class Player extends Entity {
       }
 
       // evadeEfffect follow player
-      this.evadeEffect.setOrigin(0.5, 0.5);
-      this.evadeEffect.setScale(this.scene.player.scale);
-      this.evadeEffect.setRotation(Phaser.Math.Between(0, 360));
+      evadeEffect.setOrigin(0.5, 0.5);
+      evadeEffect.setScale(this.scene.player.scale);
+      evadeEffect.setRotation(Phaser.Math.Between(0, 360));
 
-      this.evadeEffect.play('evade_shield');
-      this.evadeEffect.on('animationcomplete', () => {
-        this.evadeEffect!.destroy();
+      evadeEffect.play('evade_shield');
+      evadeEffect.on('animationcomplete', () => {
+        evadeEffect!.destroy();
+        this.followEffects = this.followEffects.filter(e => e !== evadeEffect);
       });
 
       this.scene.playSound('evade', {
@@ -161,6 +188,95 @@ class Player extends Entity {
         volume: 0.8
       })
     }
+  }
+
+  dash(): void {
+    // if (!this.checkItem('shadow_water')) return;
+    const now = this.scene.time.now;
+
+    if (now - this.lastDashTime < this.stats.dashCoolDown) {
+      return;
+    }
+
+    this.lastDashTime = now;
+
+    this.scene.playSound('dash', {
+      volume: 0.8,
+      detune: 1000
+    });
+    
+    this.addState('stun');
+    this.addState('dash');
+
+    const dashSpeed = 100;
+    const dashDistance = this.stats.dashDistance * this.speed / 80;
+
+    this.speed += dashDistance * Math.floor(1000 / dashSpeed);
+    const prevGravity = this.gravity;
+    this.gravity = 0;
+
+    // 플레이어의 현재 위치에 잔상을 남김
+    const trail = this.scene.add.sprite(this.x, this.y, 'atlas', `player_${this.getHightestPriorityState()}-0`);
+    // trail.setAlpha(0.5);
+
+    trail.setScale(this.scale);
+    trail.setOrigin(0.5, 0.5);
+    
+    this.scene.tweens.add({
+      targets: trail,
+      alpha: 0,
+      x: this.x - dashDistance,
+      duration: dashSpeed,
+      onComplete: () => {
+        trail.destroy();
+      }
+    });
+    
+    this.scene.time.delayedCall(dashSpeed, () => {
+      this.removeState('stun');
+      this.removeState('dash');
+      this.speed -= dashDistance * Math.floor(1000 / dashSpeed);
+      this.gravity = prevGravity;
+    });
+    
+    this.lastDamagedTime = now - this.stats.immuneTime + dashSpeed;
+    this.blink(dashSpeed);
+  }
+
+  lightAttack(): void {
+    const scene = this.scene;
+
+    // 플레이어 방향으로 빛을 발사
+    if (!scene.anims.exists("light_attack")) {
+      scene.anims.create({
+        key: "light_attack",
+        frames: scene.anims.generateFrameNames('effects', {
+          prefix: "light_attack-", start: 0, end: 2
+        }),
+        frameRate: 24,
+        repeat: -1
+      });
+    }
+
+    // 빛 공격을 발사
+    const light_attack = scene.add.sprite(
+      scene.player.x, scene.player.y - 8, 'effects', 'light_attack-0'
+    ).play('light_attack');
+    scene.physics.add.existing(light_attack);
+    light_attack.setOrigin(0.5, 0.5);
+
+    const body = light_attack.body as Phaser.Physics.Arcade.Body;
+    light_attack.setScale(1, scene.player.range / 120 * (this.stats.lightAttackSize / 100));
+    body.setSize(32, 64);
+    body.setVelocityX(600 - scene.player.stats.speed);
+
+    // 엔티티와 충돌하면 사라지고 플레이어 공격력만큼 데미지
+    scene.physics.add.collider(light_attack, scene.enemyGroup, (light, enemy) => {
+      (enemy as any).takeDamage(scene.player.stats.attack);
+      light.destroy();
+    });
+
+    scene.getEffectLayer().add(light_attack);
   }
 
   set jumpCoolDown(value: number) {
@@ -192,7 +308,9 @@ class Player extends Entity {
   }
 
   set speed(value: number) {
+    const prevSpeed = this.stats.speed;
     this.stats.speed = value;
+    this.events.emit("speedChanged", value - prevSpeed);
   }
 
   get speed(): number {
@@ -213,12 +331,13 @@ class Player extends Entity {
   }
 
   set exp(value: number) {
-    this._exp = value;
+    const diff = value - this._exp;
+    this._exp += diff * (this.stats.expGain / 100);
 
-    if (this._exp >= this.needExp) {
+    while (this._exp >= this.needExp) {
       this._exp -= this.needExp;
       this.level += 1;
-      this.needExp = Math.floor(this.needExp * 1.5);
+      this.needExp = this.needExp + 20;
 
       // level up event
       this.events.emit('levelUp', this.level);
@@ -226,7 +345,19 @@ class Player extends Entity {
     this.scene.updateExpBar();
   }
 
-  collectItem(item: Item): void {
+  get evadeCoolDown(): number {
+    return this.stats.evadeCoolDown;
+  }
+
+  set evadeCoolDown(value: number) {
+    this.stats.evadeCoolDown = value > 1000 ? value : 1000;
+  }
+
+  collectItem(item: Item | string): void {
+    if (typeof item === 'string') {
+      item = createItem(item, 0, 0, this.scene)!;
+    }
+
     this.items[item.id] = this.items[item.id] ? this.items[item.id] + 1 : 1;
     item.onCollect();
 
@@ -235,9 +366,97 @@ class Player extends Entity {
     });
   }
 
-  getItem(id: string): number {
+  hasItem(id: string): number {
     return this.items[id] || 0;
   }
+
+  get gravity(): number { 
+    return this._gravity;
+  }
+
+  set gravity(value: number) {
+    this._gravity = value;
+    this.setGravityY(this._o__gravity * value);
+  }
+
+  createBullet(color: number = 0x00ffff, size: number = 3, life: number = 5000, damage?: number, shadowConfig?: ShadowConfig): Phaser.GameObjects.Arc & {
+    body: Phaser.Physics.Arcade.Body
+  } | null {
+    const scene = this.scene as GameScene;
+    const player = scene.getPlayer();
+    if (!scene || !scene.getBulletGroup) return null;
+
+    if (damage === null || damage === undefined) {
+      damage = this.stats.attack;
+    }
+    
+    const bullet = scene.add.circle(this.x, this.y, size, color) as unknown as Phaser.GameObjects.Arc & { body: Phaser.Physics.Arcade.Body };
+    scene.physics.add.existing(bullet);
+    bullet.body.setCircle(size);
+    
+    if (scene.getBulletGroup()) {
+      scene.getBulletGroup().add(bullet);
+    }
+    
+    scene.getEffectLayer().add(bullet);
+    scene.physics.add.overlap(bullet, scene.enemyGroup, (bullet: any, enemy: any) => {
+      console.log("bullet hit enemy", bullet, enemy);
+      enemy.takeDamage(damage);
+      bullet.destroy();
+    });
+
+    // 잔상이 남음. shadowLife 이후에 destroy됨. alpha만큼 점점 투명해짐
+    if (shadowConfig != undefined) {
+      shadowConfig = {
+        display: true,
+        life: 500,
+        alpha: 0.5,
+        interval: 100,
+        ...shadowConfig
+      };
+
+      const createShadow = (x: number, y: number) => {
+        const shadow = scene.add.circle(x, y, size, color);
+        scene.tweens.add({
+          targets: shadow,
+          alpha: shadowConfig!.alpha,
+          duration: shadowConfig!.life!,
+          onComplete: () => {
+            if (shadow && shadow.active) {
+              console.log("check");
+              shadow.destroy()
+            };
+          }
+        });
+      }
+
+      scene.time.addEvent({
+        delay: shadowConfig.interval,
+        repeat: -1,
+        callback: () => {
+          createShadow(bullet.x, bullet.y);
+        },
+        callbackScope: this
+      })
+    }
+    
+    if (life > 0) {
+      scene.time.delayedCall(life, () => {
+        if (bullet && bullet.active) {
+          bullet.destroy();
+        }
+      });
+    }
+
+    return bullet;
+  }
+}
+
+interface ShadowConfig {
+  display?: boolean;
+  life?: number;
+  alpha?: number;
+  interval?: number;
 }
 
 export default Player;

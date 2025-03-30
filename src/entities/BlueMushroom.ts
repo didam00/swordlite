@@ -6,7 +6,9 @@ import Player from './Player';
 export default class BlueMushroom extends Enemy {
   entityName = 'blue_mushroom';
   rotationClockwise = 1;
-  private bulletTimer: Phaser.Time.TimerEvent | null = null;
+  // private bulletTimer: Phaser.Time.TimerEvent | null = null;
+  bulletCooldown: number = 0;
+  lastShotTime: number = 0;
 
   stats = {
     health: 1,
@@ -30,22 +32,30 @@ export default class BlueMushroom extends Enemy {
     this.updateAnimation();
     // this.setVelocityX(10);
 
-    const delay = (Math.random() * 1750 + 2000) * 80 / (this.scene.player.speed);
+    // const delay = (Math.random() * 1500 + 2500) * 80 / (this.scene.player.speed);
     
-    this.bulletTimer = scene.time.addEvent({
-      delay: delay,
-      callback: this.setShotMode,
-      callbackScope: this,
-      loop: true
-    });
+    // this.bulletTimer = scene.time.addEvent({
+    //   delay: delay,
+    //   callback: this.setShotMode,
+    //   callbackScope: this,
+    //   loop: true
+    // });
+
+    // this.playerSpeedUpdated(0);
+    this.bulletCooldown = Math.random() * 1700 + 3000;
   }
 
   createAnimations(): void {
     const scene = this.scene;
 
     this.createAnimation('blue_mushroom_idle', [0, 0], 12);
-    this.createAnimation('blue_mushroom_shot', [0, 3], 2, 0); 
+    this.createAnimation('blue_mushroom_shot', [0, 3], 3, 0); 
   }
+
+  // playerSpeedUpdated(diff: number): void {
+  //   // this.bulletCooldown = (Math.random() * 1500 + 2500) * 80 / (this.scene.player.speed);
+  //   this.bulletCooldown = Math.random() * 1500 + 2500;
+  // }
 
   update(delta: number) {
     if (this.hasState('shot')) {
@@ -69,6 +79,11 @@ export default class BlueMushroom extends Enemy {
       : angleDiff;
 
       this.rotation = Phaser.Math.Angle.Wrap(this.rotation + rotation);
+
+      if (this.x >= 100 && this.scene.time.now - this.lastShotTime >= this.bulletCooldown) {
+        this.setShotMode();
+        this.lastShotTime = this.scene.time.now;
+      }
     }
     
     // 상태가 변경되면 애니메이션 업데이트
@@ -76,11 +91,7 @@ export default class BlueMushroom extends Enemy {
   }
 
   setShotMode(): void {
-    if (this.x < 100) {
-      return;
-    }
-
-    const charingSound = this.scene.playSound('charging', {
+    const charingSound = this.scene.playSound('shotCharging', {
       volume: 0.4,
       loop: true,
       detune: 500,
@@ -88,7 +99,7 @@ export default class BlueMushroom extends Enemy {
     })
     
     this.addState('shot');
-    this.scene.time.delayedCall(500 * 3, () => {
+    this.scene.time.delayedCall(333 * 3, () => {
       charingSound?.destroy();
       if (this.isDestroyed) return;
 
@@ -99,14 +110,16 @@ export default class BlueMushroom extends Enemy {
 
       for (let i = 0; i < 10; i++) {
         this.shotToPlayer(
-          this.rotation - Math.PI / 20 + Math.PI / 10 * Math.random(),
+          this.rotation - Math.PI / 32 + Math.PI / 16 * Math.random(),
           Math.random() * 4 + 2,
           Math.random() * 60 + 120,
           Math.random() * 3500 + 200
         );
       }
     });
-    this.scene.time.delayedCall(2000, () => {
+    this.scene.time.delayedCall(1000, () => {
+      if (this.isDestroyed) return;
+
       this.removeState('shot');
     });
   }
@@ -116,10 +129,6 @@ export default class BlueMushroom extends Enemy {
    */
   shotToPlayer(toRotate: number, size: number, speed: number, life: number): void {
     if (this.health <= 0 || !this.active) {
-      if (this.bulletTimer) {
-        this.bulletTimer.destroy();
-        this.bulletTimer = null;
-      }
       return;
     }
     
@@ -132,11 +141,7 @@ export default class BlueMushroom extends Enemy {
     bullet?.body.setGravityY(20);
   }
   
-  destroy(fromScene?: boolean): void {
-    if (this.bulletTimer) {
-      this.bulletTimer.destroy();
-      this.bulletTimer = null;
-    }
-    super.destroy(fromScene);
-  }
+  // destroy(fromScene?: boolean): void {
+  //   super.destroy(fromScene);
+  // }
 }

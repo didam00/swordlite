@@ -31,7 +31,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "ninja_potion-0": {
+   "strategy_book-0": {
     "frame": { "x": 0, "y": 64, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -39,7 +39,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "strategy_book-0": {
+   "great_magnet-0": {
     "frame": { "x": 0, "y": 80, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -47,7 +47,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "great_magnet-0": {
+   "black_cloak-0": {
     "frame": { "x": 0, "y": 96, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -55,7 +55,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "black_cloak-0": {
+   "bug_boots-0": {
     "frame": { "x": 0, "y": 112, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -63,8 +63,48 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "bug_boots-0": {
+   "weight-0": {
     "frame": { "x": 0, "y": 128, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "shadow_water-0": {
+    "frame": { "x": 0, "y": 144, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "light_rod-0": {
+    "frame": { "x": 0, "y": 160, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "black_coffee-0": {
+    "frame": { "x": 0, "y": 176, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "sugar_cube-0": {
+    "frame": { "x": 0, "y": 192, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "cracker-0": {
+    "frame": { "x": 0, "y": 208, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
@@ -77,18 +117,23 @@
   "version": "1.x-dev",
   "image": "items.png",
   "format": "RGBA8888",
-  "size": { "w": 16, "h": 144 },
+  "size": { "w": 16, "h": 224 },
   "scale": "1",
   "frameTags": [
    { "name": "giant_sword", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
    { "name": "green_heart", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" },
    { "name": "big_mushroom", "from": 2, "to": 2, "direction": "forward", "color": "#000000ff" },
    { "name": "wind_mushroom", "from": 3, "to": 3, "direction": "forward", "color": "#000000ff" },
-   { "name": "ninja_potion", "from": 4, "to": 4, "direction": "forward", "color": "#000000ff" },
-   { "name": "strategy_book", "from": 5, "to": 5, "direction": "forward", "color": "#000000ff" },
-   { "name": "great_magnet", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
-   { "name": "black_cloak", "from": 7, "to": 7, "direction": "forward", "color": "#000000ff" },
-   { "name": "bug_boots", "from": 8, "to": 8, "direction": "forward", "color": "#000000ff" }
+   { "name": "strategy_book", "from": 4, "to": 4, "direction": "forward", "color": "#000000ff" },
+   { "name": "great_magnet", "from": 5, "to": 5, "direction": "forward", "color": "#000000ff" },
+   { "name": "black_cloak", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
+   { "name": "bug_boots", "from": 7, "to": 7, "direction": "forward", "color": "#000000ff" },
+   { "name": "weight", "from": 8, "to": 8, "direction": "forward", "color": "#000000ff" },
+   { "name": "shadow_water", "from": 9, "to": 9, "direction": "forward", "color": "#000000ff" },
+   { "name": "light_rod", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
+   { "name": "black_coffee", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
+   { "name": "sugar_cube", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
+   { "name": "cracker", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "Layer", "opacity": 255, "blendMode": "normal" }

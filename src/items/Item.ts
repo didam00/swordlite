@@ -17,7 +17,7 @@ export abstract class Item extends Phaser.Physics.Arcade.Sprite {
   }
 
   onCollect(): void {
-
+    this.destroy();
   };
 
   update(): void {
@@ -32,7 +32,18 @@ class NormalItem extends Item {
 
   onCollect(): void {
     this.item.effect(this.scene);
-    console.log("아이템 효과 발동!");
+    this.destroy();
+  }
+}
+
+class MagicItem extends Item {
+  constructor(item: ItemDefinition, x: number, y: number, scene: GameScene) {
+    super(item, x, y, scene);
+  }
+
+  /** cursor x, y */
+  onClick(x: number, y: number): void {
+    this.item.effect(this.scene);
     this.destroy();
   }
 }
@@ -48,6 +59,9 @@ export function createItem(id: string, x: number, y: number, scene: GameScene): 
   switch (item.type) {
     case "normal":
       itemEntity = new NormalItem(item, x, y, scene);
+      break;
+    case "magic":
+      itemEntity = new MagicItem(item, x, y, scene);
       break;
     default:
       throw new Error(`알 수 없는 아이템 타입입니다: ${item.type}`);
