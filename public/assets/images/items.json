@@ -110,6 +110,14 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
+   },
+   "double_giant_swords-0": {
+    "frame": { "x": 0, "y": 224, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
    }
  },
  "meta": {
@@ -117,7 +125,7 @@
   "version": "1.x-dev",
   "image": "items.png",
   "format": "RGBA8888",
-  "size": { "w": 16, "h": 224 },
+  "size": { "w": 16, "h": 240 },
   "scale": "1",
   "frameTags": [
    { "name": "giant_sword", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
@@ -133,7 +141,8 @@
    { "name": "light_rod", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
    { "name": "black_coffee", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
    { "name": "sugar_cube", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
-   { "name": "cracker", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" }
+   { "name": "cracker", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
+   { "name": "double_giant_swords", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "Layer", "opacity": 255, "blendMode": "normal" }

@@ -581,8 +581,9 @@ class GameScene extends Phaser.Scene {
     // this.spawnEnemy("dream_of_mushroom");
 
     // ! CUSTOM
-    this.player.collectItem("black_coffee");
+    // this.player.collectItem("black_coffee");
     // this.player.collectItem("light_rod");
+    this.player.collectItem("double_giant_swords");
   }
 
   playerSpeedUpdated(diff: number) {

@@ -95,6 +95,7 @@ export default class DreamOfMushroom extends Enemy {
     
     if (this.mode === "spawn_red_mushrooms") {
       if (this.prevMode != "spawn_red_mushrooms") {
+        this.untargetability = true;
         this.scene.tweens.add({
           targets: this,
           alpha: 0,
@@ -138,6 +139,7 @@ export default class DreamOfMushroom extends Enemy {
 
     if (this.mode === "spawn_red_mushrooms" && now - this.lastCoolTime > 1500) {
       this.isFollowCamera = false;
+      this.untargetability = false;
 
       this.setPosition(
         this.scene.cameras.main.width - (Math.random() * 50 + 50),

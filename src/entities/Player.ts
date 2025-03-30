@@ -23,10 +23,11 @@ class Player extends Entity {
     expGain: 100,
     evade: 0,
     evadeCoolDown: 11000,
-    dashCoolDown: 4000,
+    dashCoolDown: 5000,
     dashDistance: 0,
     lightAttackSize: 0,
     collisionDamage: 0,
+    sword: 1
   }
 
   items: {
@@ -129,22 +130,22 @@ class Player extends Entity {
       return;
     }
     
-    let isSugarCube = false;
-    const SUGAR_CUBE_TIME = 150;
+    // let isSugarCube = false;
+    // const SUGAR_CUBE_TIME = 150;
 
-    if (
-      this.hasItem("sugar_cube")
-      && this.scene.time.now - this.lastEvadeTime > this.stats.evadeCoolDown
-      && type != "wall"
-    ) {
-      isSugarCube = true;
-      this.lastEvadeTime = this.scene.time.now;
-    }
+    // if (
+    //   this.hasItem("sugar_cube")
+    //   && this.scene.time.now - this.lastEvadeTime > this.stats.evadeCoolDown
+    //   && type != "wall"
+    // ) {
+    //   isSugarCube = true;
+    //   this.lastEvadeTime = this.scene.time.now;
+    // }
 
-    this.blink(isSugarCube ? SUGAR_CUBE_TIME : this.stats.immuneTime);
-    this.lastDamagedTime = isSugarCube ? (this.scene.time.now - this.stats.immuneTime + SUGAR_CUBE_TIME) : this.scene.time.now;
+    this.blink(this.stats.immuneTime);
+    this.lastDamagedTime = this.scene.time.now;
     
-    const isEvade = isSugarCube || (Math.random() < this.stats.evade / 100);
+    const isEvade = (Math.random() < this.stats.evade / 100);
     
     // evade
     if (isEvade) {
@@ -239,8 +240,8 @@ class Player extends Entity {
       this.gravity = prevGravity;
     });
     
-    this.lastDamagedTime = now - this.stats.immuneTime + dashSpeed;
-    this.blink(dashSpeed);
+    this.lastDamagedTime = now - this.stats.immuneTime + dashSpeed + 250;
+    this.blink(dashSpeed + 250);
   }
 
   lightAttack(): void {

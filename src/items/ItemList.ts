@@ -85,12 +85,12 @@ const itemList: ItemDefinition[] = [
   {
     id: "sugar_cube",
     name: "Sugar Cube",
-    description: "evade cooldown -1s",
-    rarity: "common",
-    type: "normal",
-    effect: (scene: GameScene): void => {
-      scene.player.stats.evadeCoolDown -= 1000;
-    }
+      description: "evade chance *10%",
+      rarity: "common",
+      type: "normal",
+      effect: (scene: GameScene): void => {
+        scene.player.stats.evade += (100 - scene.player.stats.evade) * 0.15;
+      }
   },
   {
     id: "cracker",
@@ -132,6 +132,19 @@ const itemList: ItemDefinition[] = [
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.stats.lightAttackSize += 100;
+    }
+  },
+  {
+    id: "double_giant_swords",
+    name: "Double Giant Swords",
+    description: "sword +1 and range +50%",
+    rarity: "epic",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.sword += 1;
+      scene.player.stats.range += 10;
+
+      
     }
   },
 ]

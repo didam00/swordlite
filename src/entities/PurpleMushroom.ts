@@ -37,10 +37,10 @@ export default class PurpleMushroom extends Enemy {
   }
 
   dead(): void {
-    const cnt = 40;
+    const cnt = 50;
     for (let i = 0; i < cnt; i++) {
       const bullet = this.createBullet(0x643499, Math.random() * 5 + 2, Math.random() * 2000 + 500)!;
-      const speed = 50 * Math.random() + 50;
+      const speed = 120 * Math.random() + 80;
       bullet.rotation = Math.PI / (cnt / 2) * i;
       
       (bullet as any)._ovx = Math.cos(bullet.rotation) * speed;

@@ -12,7 +12,7 @@ export default abstract class Enemy extends Entity {
 
   private _vx: number = 0;
   private _vy: number = 0;
-  exp: number = 10;
+  exp: number = 20;
   untargetability: boolean = false;
 
   isFollowCamera: boolean = false;
