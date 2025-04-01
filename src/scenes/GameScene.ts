@@ -80,6 +80,8 @@ class GameScene extends Phaser.Scene {
   private expBar: Phaser.GameObjects.Graphics = null!;
   private levelText: Phaser.GameObjects.Text = null!;
 
+  private itemListContainer: Phaser.GameObjects.Container = null!;
+
   private clearBoss: number = 0;
   bossIsDead: boolean = true;
   
@@ -202,6 +204,10 @@ class GameScene extends Phaser.Scene {
       }
     });
 
+    this.itemListContainer = this.add.container(this.cameras.main.width - 14, 32);
+    this.itemListContainer.setScrollFactor(0);
+    this.layers.ui.add(this.itemListContainer);
+
     this.startGame();
   }
 
@@ -285,7 +291,7 @@ class GameScene extends Phaser.Scene {
     this.enemyGroup.add(enemy);
     
     enemy.velocity = {x: 0, y: 0};
-    enemy.health = Math.floor(enemy.stats.health * (this.meter / 10000)) + 1;
+    enemy.health = Math.floor(enemy.stats.health * (this.meter / 8000)) + 1;
 
     return enemy;
   }
@@ -354,6 +360,7 @@ class GameScene extends Phaser.Scene {
       this.spawnItem(rarity);
     });
     this.player.events.on('speedChanged', this.playerSpeedUpdated, this);
+    this.player.events.on('itemCollected', this.updateItemList, this);
   }
 
   createSword(): void {
@@ -365,8 +372,6 @@ class GameScene extends Phaser.Scene {
     );
 
     this.swords.push(sword);
-    
-    sword.setAttackCooldown(this.player.jumpCoolDown);
     
     if (this.layers.weapon) {
       this.layers.weapon.add(sword);
@@ -577,17 +582,38 @@ class GameScene extends Phaser.Scene {
     });
   }
 
+  updateItemList(): void {
+    let i = 0;
+    this.itemListContainer.removeAll(true);
+    for (const item of Object.keys(this.player.items)) {
+      const itemData = itemList.find(i => i.id === item)!;
+
+      if (!itemData.displayOnList) continue;
+
+      const itemSprite = this.add.sprite(0, i * 14, 'items', `${item}-0`);
+      itemSprite.setOrigin(0.5, 0.5).setAlpha(0.5);
+      this.itemListContainer.add(itemSprite);
+
+      if (this.player.items[item] > 1) {
+        const countText = this.add.bitmapText(4, i * 14 + 2, 'mini', `${this.player.items[item]}`);
+        countText.setOrigin(0.5, 0.5).setTint(0xffe091).setAlpha(0.75);
+        this.itemListContainer.add(countText);
+      }
+
+      i++;
+    }
+  }
+
   startGame() {
     this.meter = 0;
     this.isGameOver = false;
 
     this.lastSpawnTime = 0;
     // this.spawnEnemy("dream_of_mushroom");
-
+    
     // ! CUSTOM
-    // this.player.collectItem("black_coffee");
-    // this.player.collectItem("light_rod");
-    // this.player.collectItem("double_giant_swords");
+    // this.player.collectItem("double_daggers");
+    this.player.collectItem("windy_fan");
   }
 
   playerSpeedUpdated(diff: number) {
@@ -664,7 +690,7 @@ class GameScene extends Phaser.Scene {
         this.player.jump(this.player.jumpPower * 1.5);
       }
 
-      if (this.player.stats.health <= 0) {
+      if (this.player.health <= 0) {
         // 기존 코드
         this.isGameOver = true;
         this.player.speed = 0;
@@ -921,8 +947,6 @@ class GameScene extends Phaser.Scene {
         }
       });
     }
-    
-    // 기타 게임오버 처리...
   }
 
   playSound(key: string, config?: Phaser.Types.Sound.SoundConfig): Phaser.Sound.BaseSound | undefined {

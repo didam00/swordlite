@@ -118,6 +118,54 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
+   },
+   "black_pearl-0": {
+    "frame": { "x": 0, "y": 240, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "double_daggers-0": {
+    "frame": { "x": 0, "y": 256, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "windy_fan-0": {
+    "frame": { "x": 0, "y": 272, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "magic_crystal-0": {
+    "frame": { "x": 0, "y": 288, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "pale_whetstone-0": {
+    "frame": { "x": 0, "y": 304, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "shiny_sandclock-0": {
+    "frame": { "x": 0, "y": 320, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
    }
  },
  "meta": {
@@ -125,7 +173,7 @@
   "version": "1.x-dev",
   "image": "items.png",
   "format": "RGBA8888",
-  "size": { "w": 16, "h": 240 },
+  "size": { "w": 16, "h": 336 },
   "scale": "1",
   "frameTags": [
    { "name": "giant_sword", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
@@ -142,10 +190,17 @@
    { "name": "black_coffee", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
    { "name": "sugar_cube", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
    { "name": "cracker", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
-   { "name": "double_giant_swords", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" }
+   { "name": "double_giant_swords", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "black_pearl", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
+   { "name": "double_daggers", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
+   { "name": "windy_fan", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
+   { "name": "magic_crystal", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
+   { "name": "pale_whetstone", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
+   { "name": "shiny_sandclock", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
-   { "name": "Layer", "opacity": 255, "blendMode": "normal" }
+   { "name": "Layer", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 1", "opacity": 38, "blendMode": "normal" }
   ],
   "slices": [
   ]

@@ -7,18 +7,32 @@ export interface ItemDefinition {
   rarity: "common" | "epic" | "unique";
   effect: (scene: GameScene) => void;
   type: "normal" | "dash" | "magic" | "attack";
+  displayOnList: boolean;
 }
 
 const itemList: ItemDefinition[] = [
   {
     id: "giant_sword",
     name: "Giant Sword",
-    description: "critical chance +20%",
+    description: "range +15% and damage +2",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.criticalChance += 20;
-    }
+      scene.player.stats.range += 3;
+      scene.player.stats.attack += 2;
+    },
+    displayOnList: true,
+  },
+  {
+    id: "pale_whetstone",
+    name: "Pale Whetstone",
+    description: "critical chance +10%",
+    rarity: "common",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.criticalChance += 10;
+    },
+    displayOnList: true,
   },
   {
     id: "green_heart",
@@ -28,7 +42,8 @@ const itemList: ItemDefinition[] = [
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.heal(2)
-    }
+    },
+    displayOnList: false,
   },
   {
     id: "big_mushroom",
@@ -38,29 +53,34 @@ const itemList: ItemDefinition[] = [
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.maxHealth += 1;
-      scene.player.scale += 0.3;
-      scene.player.range += 2.85;
-    }
+      scene.player.heal(1);
+      scene.player.scale += 0.2;
+      scene.player.range += 1.9;
+    },
+    displayOnList: true,
   },
   {
     id: "strategy_book",
     name: "Strategy Book",
-    description: "exp gain +20%",
+    description: "exp gain +25%",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.expGain += 20;
-    }
+      scene.player.stats.expGain += 25;
+    },
+    displayOnList: true,
   },
   {
-    id: "wind_mushroom",
-    name: "Wind Mushroom",
-    description: "speed +25%",
+    id: "bug_boots",
+    name: "Bug Boots",
+    description: "speed +15% and spawn rate x80%",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.speed += 20;
-    }
+      scene.player.stats.speed += 12;
+      scene.spawnCooldown *= 0.8;
+    },
+    displayOnList: true,
   },
   {
     id: "great_magnet",
@@ -70,7 +90,8 @@ const itemList: ItemDefinition[] = [
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.stats.magnet += 20;
-    }
+    },
+    displayOnList: true,
   },
   // {
   //   id: "black_cloak",
@@ -85,22 +106,24 @@ const itemList: ItemDefinition[] = [
   {
     id: "sugar_cube",
     name: "Sugar Cube",
-      description: "evade chance *10%",
-      rarity: "common",
-      type: "normal",
-      effect: (scene: GameScene): void => {
-        scene.player.stats.evade += (100 - scene.player.stats.evade) * 0.15;
-      }
+    description: "evade chance *10%",
+    rarity: "common",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.evade += (100 - scene.player.stats.evade) * 0.15;
+    },
+    displayOnList: true,
   },
   {
     id: "cracker",
     name: "Cracker",
-    description: "collision damage +1",
+    description: "collision damage +5",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.collisionDamage += 1;
-    }
+      scene.player.stats.collisionDamage += 5;
+    },
+    displayOnList: true,
   },
   {
     id: "weight",
@@ -111,39 +134,67 @@ const itemList: ItemDefinition[] = [
     effect: (scene: GameScene): void => {
       scene.player.gravity += 0.4;
       scene.player.jumpPower += 30;
-    }
+    },
+    displayOnList: true,
   },
   {
     id: "black_coffee",
     name: "Black Coffee",
-    description: "upgrade dash",
+    description: "upgrade dash, collistion damage +20",
     rarity: "epic",
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.stats.dashDistance += 80;
       scene.player.stats.dashCoolDown *= 0.5;
-    }
+      scene.player.stats.collisionDamage += 20;
+    },
+    displayOnList: true,
   },
   {
-    id: "light_rod",
-    name: "Light Rod",
-    description: "upgrade shoot light attack",
+    id: "windy_fan",
+    name: "Windy Fan",
+    description: "upgrade shoot windy attack",
     rarity: "epic",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.lightAttackSize += 100;
-    }
+      scene.player.stats.windyAttackSize += 150;
+    },
+    displayOnList: true,
   },
   {
-    id: "double_giant_swords",
+    id: "double_daggers",
     name: "Double Giant Swords",
-    description: "sword +1 and range +25%",
+    description: "sword +1 and range -15%",
     rarity: "epic",
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.addSword();
-      scene.player.stats.range += 5;
-    }
+      scene.player.stats.range -= 3;
+      scene.player.stats.jumpCoolDown -= 125;
+    },
+    displayOnList: true,
+  },
+  {
+    id: "magic_crystal",
+    name: "Magic Crystal",
+    description: "magic damage +25%",
+    rarity: "common",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.magic += 25;
+    },
+    displayOnList: true,
+  },
+  {
+    id: "shiny_sandclock",
+    name: "Shiny Sandclock",
+    description: "cooldown x80%",
+    rarity: "common",
+    type: "normal",
+    effect: (scene: GameScene): void => {
+      scene.player.stats.coolDown = scene.player.stats.coolDown * 0.8;
+    },
+    displayOnList: true,
   },
 ]
 

@@ -287,7 +287,7 @@
     "sourceSize": { "w": 128, "h": 128 },
     "duration": 100
    },
-   "light_attack-0": {
+   "windy_attack-0": {
     "frame": { "x": 0, "y": 768, "w": 128, "h": 128 },
     "rotated": false,
     "trimmed": false,
@@ -295,7 +295,7 @@
     "sourceSize": { "w": 128, "h": 128 },
     "duration": 100
    },
-   "light_attack-1": {
+   "windy_attack-1": {
     "frame": { "x": 128, "y": 768, "w": 128, "h": 128 },
     "rotated": false,
     "trimmed": false,
@@ -303,7 +303,7 @@
     "sourceSize": { "w": 128, "h": 128 },
     "duration": 100
    },
-   "light_attack-2": {
+   "windy_attack-2": {
     "frame": { "x": 256, "y": 768, "w": 128, "h": 128 },
     "rotated": false,
     "trimmed": false,
@@ -326,7 +326,7 @@
    { "name": "critical_hit", "from": 15, "to": 22, "direction": "forward", "color": "#000000ff" },
    { "name": "collect_item", "from": 23, "to": 29, "direction": "forward", "color": "#000000ff" },
    { "name": "evade_shield", "from": 30, "to": 35, "direction": "forward", "color": "#000000ff" },
-   { "name": "light_attack", "from": 36, "to": 38, "direction": "forward", "color": "#000000ff" }
+   { "name": "windy_attack", "from": 36, "to": 38, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "bottom", "opacity": 128, "blendMode": "normal" },

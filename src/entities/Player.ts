@@ -12,10 +12,12 @@ class Player extends Entity {
     health: 5,
     attack: 10,
     defense: 2,
+    magic: 0,
     speed: 80,
     jumpPower: 150,
     range: 20,
     jumpCoolDown: 250,
+    attackCoolDown: 0,
     immuneTime: 1000,
     criticalChance: 0,
     criticalDamage: 2,
@@ -25,8 +27,9 @@ class Player extends Entity {
     evadeCoolDown: 11000,
     dashCoolDown: 5000,
     dashDistance: 0,
-    lightAttackSize: 0,
+    windyAttackSize: 0,
     collisionDamage: 0,
+    coolDown: 100,
   }
 
   items: {
@@ -89,15 +92,15 @@ class Player extends Entity {
       isPlayerJumping: true
     });
 
-    if (this.hasItem("light_rod")) {
-      this.lightAttack();
+    if (this.hasItem("windy_fan")) {
+      this.windyAttack();
 
       if (this.swordCount > 1) {
         this.scene.time.addEvent({
           repeat: this.swordCount - 2,
           delay: 50,
           callback: () => {
-            this.lightAttack();
+            this.windyAttack();
           },
           callbackScope: this
         })
@@ -197,7 +200,11 @@ class Player extends Entity {
       this.stats.health -= amount;
       this.events.emit('healthChanged', this.stats.health);
       
-      this.scene.cameras.main.shake(100, 0.01);
+      if (this.stats.health > 0) {
+        this.scene.cameras.main.shake(100, 0.01);
+      } else {
+        this.scene.cameras.main.shake(200, 0.025);
+      }
 
       this.scene.playSound('hurt', {
         volume: 0.8
@@ -258,15 +265,15 @@ class Player extends Entity {
     this.blink(dashSpeed + 250);
   }
 
-  lightAttack(): void {
+  windyAttack(): void {
     const scene = this.scene;
 
     // 플레이어 방향으로 빛을 발사
-    if (!scene.anims.exists("light_attack")) {
+    if (!scene.anims.exists("windy_attack")) {
       scene.anims.create({
-        key: "light_attack",
+        key: "windy_attack",
         frames: scene.anims.generateFrameNames('effects', {
-          prefix: "light_attack-", start: 0, end: 2
+          prefix: "windy_attack-", start: 0, end: 2
         }),
         frameRate: 24,
         repeat: -1
@@ -274,24 +281,30 @@ class Player extends Entity {
     }
 
     // 빛 공격을 발사
-    const light_attack = scene.add.sprite(
-      scene.player.x, scene.player.y - 8, 'effects', 'light_attack-0'
-    ).play('light_attack');
-    scene.physics.add.existing(light_attack);
-    light_attack.setOrigin(0.5, 0.5);
+    const windy_attack = scene.add.sprite(
+      scene.player.x, scene.player.y - 8, 'effects', 'windy_attack-0'
+    ).play('windy_attack');
+    scene.physics.add.existing(windy_attack);
+    windy_attack.setOrigin(0.5, 0.5);
 
-    const body = light_attack.body as Phaser.Physics.Arcade.Body;
-    light_attack.setScale(1, scene.player.range / 120 * (this.stats.lightAttackSize / 100));
+    const body = windy_attack.body as Phaser.Physics.Arcade.Body;
+    windy_attack.setScale(1, scene.player.range / 160 * (this.stats.windyAttackSize / 100));
     body.setSize(32, 64);
     body.setVelocityX(600 - scene.player.stats.speed);
 
     // 엔티티와 충돌하면 사라지고 플레이어 공격력만큼 데미지
-    scene.physics.add.collider(light_attack, scene.enemyGroup, (light, enemy) => {
+    scene.physics.add.collider(windy_attack, scene.enemyGroup, (light, enemy) => {
       (enemy as any).takeDamage(scene.player.stats.attack);
       light.destroy();
     });
 
-    scene.getEffectLayer().add(light_attack);
+    this.scene.time.delayedCall(this.hasItem("windy_fan") * 200, () => {
+      if (windy_attack && windy_attack.active) {
+        windy_attack.destroy();
+      }
+    });
+
+    scene.getEffectLayer().add(windy_attack);
   }
 
   set jumpCoolDown(value: number) {
@@ -404,6 +417,7 @@ class Player extends Entity {
     })
 
     this.scene.getEffectLayer().add(itemName);
+    this.events.emit('itemCollected');
 
     console.log(item.name);
   }

@@ -12,7 +12,6 @@ class Sword extends Phaser.GameObjects.Sprite {
   private attackEffect: Phaser.GameObjects.Sprite | null = null;
   private isAttacking: boolean = false;
   private lastAttackTime: number = 0;
-  private attackCooldown: number = 200;
   
   // 이펙트 레이어 참조 추가
   private effectLayer: Phaser.GameObjects.Container | null = null;
@@ -70,7 +69,7 @@ class Sword extends Phaser.GameObjects.Sprite {
     const currentTime = this.scene.time.now;
     
     // 공격 쿨타임 체크
-    if (currentTime - this.lastAttackTime < this.attackCooldown) {
+    if (currentTime - this.lastAttackTime < this.owner.stats.attackCoolDown) {
       return;
     }
     
@@ -224,7 +223,7 @@ class Sword extends Phaser.GameObjects.Sprite {
   
   // 공격 쿨타임 설정
   setAttackCooldown(cooldown: number): this {
-    this.attackCooldown = cooldown;
+    this.owner.stats.attackCoolDown = cooldown;
     return this;
   }
 }

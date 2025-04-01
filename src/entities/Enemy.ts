@@ -56,11 +56,6 @@ export default abstract class Enemy extends Entity {
     return { x: this.vx, y: this.vy };
   }
 
-  /**
-   * 데미지를 받는 메서드 - 무적 상태 체크 없이 단순화
-   * @param amount 데미지 양
-   * @returns 데미지 처리 여부
-   */
   takeDamage(amount: number, isCritical: boolean = false): number {
     if (amount <= 0) return 0;
 

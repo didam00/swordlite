@@ -11,7 +11,7 @@ export default class BlueMushroom extends Enemy {
   lastShotTime: number = 0;
 
   stats = {
-    health: 4,
+    health: 10,
     attack: 1,
     speed: 0,
     scale: 1,
@@ -48,7 +48,7 @@ export default class BlueMushroom extends Enemy {
   createAnimations(): void {
     const scene = this.scene;
 
-    this.createAnimation('blue_mushroom_idle', [0, 0], 12);
+    this.createAnimation('blue_mushroom_idle', [0, 3], 8);
     this.createAnimation('blue_mushroom_shot', [0, 3], 3, 0); 
   }
 

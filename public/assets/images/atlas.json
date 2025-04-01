@@ -247,6 +247,30 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 50
    },
+   "blue_mushroom_idle-1": {
+    "frame": { "x": 64, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_idle-2": {
+    "frame": { "x": 128, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_idle-3": {
+    "frame": { "x": 192, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
    "blue_mushroom_shot-0": {
     "frame": { "x": 0, "y": 768, "w": 64, "h": 64 },
     "rotated": false,
@@ -371,10 +395,10 @@
    { "name": "red_mushroom_idle", "from": 19, "to": 24, "direction": "forward", "color": "#000000ff" },
    { "name": "red_mushroom_charging", "from": 25, "to": 27, "direction": "forward", "color": "#000000ff" },
    { "name": "red_mushroom_charge", "from": 28, "to": 29, "direction": "forward", "color": "#000000ff" },
-   { "name": "blue_mushroom_idle", "from": 30, "to": 30, "direction": "forward", "color": "#000000ff" },
-   { "name": "blue_mushroom_shot", "from": 31, "to": 34, "direction": "forward", "color": "#000000ff" },
-   { "name": "dream_of_mushroom_idle", "from": 35, "to": 39, "direction": "forward", "color": "#000000ff" },
-   { "name": "dream_of_mushroom_shot", "from": 40, "to": 43, "direction": "forward", "color": "#000000ff" }
+   { "name": "blue_mushroom_idle", "from": 30, "to": 33, "direction": "forward", "color": "#000000ff" },
+   { "name": "blue_mushroom_shot", "from": 34, "to": 37, "direction": "forward", "color": "#000000ff" },
+   { "name": "dream_of_mushroom_idle", "from": 38, "to": 42, "direction": "forward", "color": "#000000ff" },
+   { "name": "dream_of_mushroom_shot", "from": 43, "to": 46, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "Layer 3", "opacity": 255, "blendMode": "normal" },

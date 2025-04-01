@@ -7,7 +7,7 @@ export default class PurpleMushroom extends Enemy {
   rotationClockwise = 1;
 
   stats = {
-    health: 10,
+    health: 15,
     attack: 1,
     speed: 0,
     scale: 1,
