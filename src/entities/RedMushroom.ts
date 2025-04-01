@@ -12,7 +12,7 @@ export default class RedMushroom extends Enemy {
   chargeDuration: number = 750;
 
   stats = {
-    health: 1,
+    health: 2,
     attack: 1,
     speed: 0,
     scale: 1,

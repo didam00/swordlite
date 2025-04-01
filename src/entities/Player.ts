@@ -10,7 +10,7 @@ class Player extends Entity {
   stats = {
     maxHealth: 5,
     health: 5,
-    attack: 1,
+    attack: 10,
     defense: 2,
     speed: 80,
     jumpPower: 150,
@@ -27,7 +27,6 @@ class Player extends Entity {
     dashDistance: 0,
     lightAttackSize: 0,
     collisionDamage: 0,
-    sword: 1
   }
 
   items: {
@@ -46,6 +45,8 @@ class Player extends Entity {
   private lastDashTime: number = 0;
   readonly isFollowCamera: boolean = true;
   private lastEvadeTime: number = 0;
+
+  swordCount: number = 1;
   
   constructor(scene: GameScene, x: number, y: number) {
     super([
@@ -90,6 +91,17 @@ class Player extends Entity {
 
     if (this.hasItem("light_rod")) {
       this.lightAttack();
+
+      if (this.swordCount > 1) {
+        this.scene.time.addEvent({
+          repeat: this.swordCount - 2,
+          delay: 50,
+          callback: () => {
+            this.lightAttack();
+          },
+          callbackScope: this
+        })
+      }
     }
 
     this.scene.playSound('jump', {
@@ -184,6 +196,8 @@ class Player extends Entity {
     } else {
       this.stats.health -= amount;
       this.events.emit('healthChanged', this.stats.health);
+      
+      this.scene.cameras.main.shake(100, 0.01);
 
       this.scene.playSound('hurt', {
         volume: 0.8
@@ -237,7 +251,7 @@ class Player extends Entity {
       this.removeState('stun');
       this.removeState('dash');
       this.speed -= dashDistance * Math.floor(1000 / dashSpeed);
-      this.gravity = prevGravity;
+      this.gravity += prevGravity;
     });
     
     this.lastDamagedTime = now - this.stats.immuneTime + dashSpeed + 250;
@@ -365,6 +379,33 @@ class Player extends Entity {
     this.scene.playSound('collectItem', {
       volume: 0.25
     });
+
+    // 아이템 이름 및 효과 출력
+    const itemName = this.scene.add.bitmapText(
+      this.scene.cameras.main.width / 2, this.scene.cameras.main.height - 68, "mini",
+      `${item.itemData.name}`
+    ).setCenterAlign().setOrigin(0.5, 0.5);
+
+    const itemDesc = this.scene.add.bitmapText(
+      this.scene.cameras.main.width / 2, this.scene.cameras.main.height - 60, "mini",
+      `${item.itemData.description}`
+    ).setCenterAlign().setOrigin(0.5, 0.5).setAlpha(0.75);
+
+    this.scene.time.delayedCall(2500, () => {
+      this.scene.tweens.add({
+        targets: [itemName, itemDesc],
+        alpha: 0,
+        y: "-=8",
+        duration: 500,
+        onComplete: () => {
+          itemName.destroy();
+        }
+      })
+    })
+
+    this.scene.getEffectLayer().add(itemName);
+
+    console.log(item.name);
   }
 
   hasItem(id: string): number {
@@ -450,6 +491,11 @@ class Player extends Entity {
     }
 
     return bullet;
+  }
+
+  addSword() {
+    this.swordCount += 1;
+    this.scene.createSword();
   }
 }
 

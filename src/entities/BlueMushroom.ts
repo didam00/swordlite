@@ -11,7 +11,7 @@ export default class BlueMushroom extends Enemy {
   lastShotTime: number = 0;
 
   stats = {
-    health: 1,
+    health: 4,
     attack: 1,
     speed: 0,
     scale: 1,
@@ -108,12 +108,12 @@ export default class BlueMushroom extends Enemy {
         detune: -500,
       })
 
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 16; i++) {
         this.shotToPlayer(
-          this.rotation - Math.PI / 32 + Math.PI / 16 * Math.random(),
+          this.rotation - Math.PI / 40 + Math.PI / 20 * Math.random(),
           Math.random() * 4 + 2,
-          Math.random() * 60 + 120,
-          Math.random() * 3500 + 200
+          Math.random() * 100 + 100,
+          Math.random() * 400 + 200
         );
       }
     });
@@ -133,6 +133,10 @@ export default class BlueMushroom extends Enemy {
     }
     
     const bullet = this.createBullet(0x6b74b2, size, life);
+    bullet?.setPosition(
+      this.x + Math.cos(toRotate - Math.PI / 2) * 12,
+      this.y + Math.sin(toRotate - Math.PI / 2) * 12
+    )
     bullet?.body.setVelocity(
       Math.cos(toRotate - Math.PI / 2) * speed,
       Math.sin(toRotate - Math.PI / 2) * speed

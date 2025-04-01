@@ -3,14 +3,14 @@ import itemList, { ItemDefinition } from "./ItemList";
 
 export abstract class Item extends Phaser.Physics.Arcade.Sprite {
   id: string = "";
-  item: ItemDefinition = null!;
+  itemData: ItemDefinition = null!;
   scene: GameScene = null!;
 
   constructor(item: ItemDefinition, x: number, y: number, scene: GameScene) {
     super(scene, x, y, "items", `${item.id}-0`);
     this.scene = scene;
 
-    this.item = item;
+    this.itemData = item;
     this.id = item.id;
     
     scene.add.existing(this);
@@ -31,7 +31,7 @@ class NormalItem extends Item {
   }
 
   onCollect(): void {
-    this.item.effect(this.scene);
+    this.itemData.effect(this.scene);
     this.destroy();
   }
 }
@@ -43,7 +43,7 @@ class MagicItem extends Item {
 
   /** cursor x, y */
   onClick(x: number, y: number): void {
-    this.item.effect(this.scene);
+    this.itemData.effect(this.scene);
     this.destroy();
   }
 }

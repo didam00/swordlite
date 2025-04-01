@@ -53,7 +53,7 @@ class GameScene extends Phaser.Scene {
   enemies: Enemy[] = [];
   private meterText: Phaser.GameObjects.Text = null!;
   
-  private sword: Sword = null!;
+  private swords: Sword[] = [];
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   
   private isGameOver: boolean = false;
@@ -115,7 +115,7 @@ class GameScene extends Phaser.Scene {
     this.createDebugFunction();
 
     this.initLayers();
-    this.cameras.main.setBackgroundColor('#66334b');
+    this.cameras.main.setBackgroundColor('#000000');
     
     // 배경 생성 및 설정
     this.createBackground();
@@ -285,6 +285,7 @@ class GameScene extends Phaser.Scene {
     this.enemyGroup.add(enemy);
     
     enemy.velocity = {x: 0, y: 0};
+    enemy.health = Math.floor(enemy.stats.health * (this.meter / 10000)) + 1;
 
     return enemy;
   }
@@ -356,21 +357,24 @@ class GameScene extends Phaser.Scene {
   }
 
   createSword(): void {
-    this.sword = new Sword(
+    const sword = new Sword(
       this, 
       this.player, 
-      this.layers.effect
+      this.layers.effect,
+      this.swords.length
     );
+
+    this.swords.push(sword);
     
-    this.sword.setAttackCooldown(this.player.jumpCoolDown);
+    sword.setAttackCooldown(this.player.jumpCoolDown);
     
     if (this.layers.weapon) {
-      this.layers.weapon.add(this.sword);
+      this.layers.weapon.add(sword);
     }
 
-    this.sword.setDepth(999);
+    // this.sword.setDepth(999);
     
-    this.add.existing(this.sword);
+    this.add.existing(sword);
   }
 
   createJumpEffect(data: { x: number, y: number }): void {
@@ -583,7 +587,7 @@ class GameScene extends Phaser.Scene {
     // ! CUSTOM
     // this.player.collectItem("black_coffee");
     // this.player.collectItem("light_rod");
-    this.player.collectItem("double_giant_swords");
+    // this.player.collectItem("double_giant_swords");
   }
 
   playerSpeedUpdated(diff: number) {
@@ -671,8 +675,8 @@ class GameScene extends Phaser.Scene {
       }
     }
     
-    if (this.sword) {
-      this.sword.update();
+    for (const sword of this.swords) {
+      sword.update();
     }
 
     const spawnCooldown = 2000 * 30 / this.player.stats.speed;
@@ -746,7 +750,7 @@ class GameScene extends Phaser.Scene {
     const width = 104;
     const height = 5;
 
-    const right = this.cameras.main.width / 2 - width / 2;
+    const right = this.cameras.main.width / 2 - width / 2 + 3;
     const bottom = 16;
 
     const x = this.cameras.main.width - width - right;
@@ -767,7 +771,7 @@ class GameScene extends Phaser.Scene {
 
     // level
     this.levelText.setText(`Lv.${this.player.level}`);
-    this.levelText.setPosition(x + (width + 6) / 2, y - 14);
+    this.levelText.setPosition(this.cameras.main.width / 2, y - 14);
   }
   
   checkEnemyHits(player: any, enemy: any): void {
@@ -778,7 +782,7 @@ class GameScene extends Phaser.Scene {
   }
 
   checkSwordHits(): void {
-    if (!this.sword || !this.player) return;
+    if (!this.swords || !this.player) return;
     
     const radius = this.player.getRealRange();
 
@@ -794,9 +798,12 @@ class GameScene extends Phaser.Scene {
       if (this.physics.world.overlap(attackBody, enemy.body!)) {
         const isCritcal = Math.random() < (this.player.stats.criticalChance / 100);
         const damage = isCritcal ? this.player.attack * 2 : this.player.attack;
-        const damageDealt = enemy.takeDamage(damage, isCritcal);
+        let damageDealt = 0;
+        for (let i = 0; i < this.player.swordCount; i++) {
+          damageDealt += enemy.takeDamage(damage, isCritcal)
+        }
         this.hitEnemies.push(enemy);
-
+        
         this.playSound('attack', {
           volume: 0.8
         })

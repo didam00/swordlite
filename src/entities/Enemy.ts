@@ -61,13 +61,13 @@ export default abstract class Enemy extends Entity {
    * @param amount 데미지 양
    * @returns 데미지 처리 여부
    */
-  takeDamage(amount: number, isCritical: boolean = false): boolean {
-    if (amount <= 0) return false;
+  takeDamage(amount: number, isCritical: boolean = false): number {
+    if (amount <= 0) return 0;
 
     this.health -= amount;
     this.onDamaged(amount, isCritical);
     
-    return true;
+    return amount;
   }
   
   protected onDamaged(amount: number, isCritical: boolean): void {
@@ -91,9 +91,12 @@ export default abstract class Enemy extends Entity {
   private createHitEffect(amount: number, isCritical: boolean): void {
     const scene = this.scene as GameScene;
     const texture = isCritical ? 'critical_hit' : 'hit';
+
+    const x = this.x + Math.random() * this.body!.width - this.body!.width / 2;
+    const y = this.y + Math.random() * this.body!.height - this.body!.height / 2;
     
     // 적 위치에 히트 이펙트 생성
-    const hitEffect = scene.add.sprite(this.x, this.y, 'effects', texture + '-0');
+    const hitEffect = scene.add.sprite(x, y, 'effects', texture + '-0');
     
     // 이펙트를 적절한 레이어에 추가
     scene.getEffectLayer()?.add(hitEffect);

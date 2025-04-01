@@ -66,6 +66,8 @@ export default class DreamOfMushroom extends Enemy {
       this.mode = this.prevMode;
       
       this.scene.time.delayedCall(1500, () => {
+        if (this.isDestroyed) return;
+
         this.removeState("charging");
         this.removeState("charge");
 
@@ -217,6 +219,8 @@ export default class DreamOfMushroom extends Enemy {
       }
       this.lastCoolTime = now;
       this.scene.time.delayedCall(125 * 3, () => {
+        if (this.isDestroyed) return;
+
         for (let i = 0; i < 3; i++) {
           const angle = this.rotation - Math.PI / 16 + Math.PI / 16 * i;
           

@@ -6,6 +6,7 @@ class Sword extends Phaser.GameObjects.Sprite {
   private offset: number = 24;
   private angleOffset: number = 0;
   private currentAngleIndex: number = 0;
+  private index: number = 0;
   
   // 공격 이펙트 관련 속성
   private attackEffect: Phaser.GameObjects.Sprite | null = null;
@@ -19,12 +20,13 @@ class Sword extends Phaser.GameObjects.Sprite {
   // 현재 마우스 위치 추적을 위한 변수 추가
   private lastMousePosition: {x: number, y: number} = {x: 0, y: 0};
   
-  constructor(scene: Phaser.Scene, owner: Player, effectLayer: Phaser.GameObjects.Container) {
+  constructor(scene: Phaser.Scene, owner: Player, effectLayer: Phaser.GameObjects.Container, index: number) {
     super(scene, owner.x, owner.y, 'atlas', 'sword-0');
     
     this.owner = owner;
     this.effectLayer = effectLayer;
     this.offset = owner.stats.range;  // 초기 offset을 플레이어의 range로 설정
+    this.index = index;
     
     this.setOrigin(0.5, 0.5);
     
@@ -89,6 +91,8 @@ class Sword extends Phaser.GameObjects.Sprite {
   
   // 공격 이펙트 시작 - 크기를 range와 연동
   startAttackEffect(angle: number, x: number, y: number): void {
+    angle += (this.index / this.owner.swordCount) * Math.PI * 2;
+
     // 이미 공격 중이면 이전 이펙트 제거
     if (this.attackEffect) {
       this.attackEffect.destroy();
@@ -150,10 +154,12 @@ class Sword extends Phaser.GameObjects.Sprite {
   
   // 검 방향과 위치 업데이트 메서드 (분리하여 재사용 가능하게)
   updateSwordDirection(): void {
+    const swordCount = this.owner.swordCount;
+
     const dx = this.lastMousePosition.x - this.owner.x;
     const dy = this.lastMousePosition.y - this.owner.y;
     
-    const angle = Math.atan2(dy, dx);
+    const angle = Math.atan2(dy, dx) + (this.index / swordCount) * Math.PI * 2;
     
     const degrees = Phaser.Math.RadToDeg(angle);
     const normalizedDegrees = (degrees + 360) % 360;

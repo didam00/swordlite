@@ -23,11 +23,11 @@ const itemList: ItemDefinition[] = [
   {
     id: "green_heart",
     name: "Green Heart",
-    description: "heal +1",
+    description: "heal +2",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.heal(1)
+      scene.player.heal(2)
     }
   },
   {
@@ -38,8 +38,8 @@ const itemList: ItemDefinition[] = [
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.maxHealth += 1;
-      scene.player.scale += 0.2;
-      scene.player.range += 2.4;
+      scene.player.scale += 0.3;
+      scene.player.range += 2.85;
     }
   },
   {
@@ -137,14 +137,12 @@ const itemList: ItemDefinition[] = [
   {
     id: "double_giant_swords",
     name: "Double Giant Swords",
-    description: "sword +1 and range +50%",
+    description: "sword +1 and range +25%",
     rarity: "epic",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.sword += 1;
-      scene.player.stats.range += 10;
-
-      
+      scene.player.addSword();
+      scene.player.stats.range += 5;
     }
   },
 ]

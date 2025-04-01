@@ -27,10 +27,15 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/images/ui.json'
     );
 
-    // this.load.bitmapFont('font',
-    //   'assets/fonts/font.png',
-    //   'assets/fonts/font.fnt'
-    // );
+    this.load.bitmapFont('font',
+      'assets/fonts/font.png',
+      'assets/fonts/font.fnt'
+    );
+
+    this.load.bitmapFont('mini',
+      'assets/fonts/mini.png',
+      'assets/fonts/mini.fnt'
+    );
     
     this.load.image('mushroom-bg', 'assets/images/mushroom-background.png');
     
