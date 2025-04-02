@@ -12,7 +12,7 @@ class Player extends Entity {
     health: 5,
     attack: 10,
     defense: 2,
-    magic: 0,
+    mana: 0,
     speed: 80,
     jumpPower: 150,
     range: 20,
@@ -26,7 +26,7 @@ class Player extends Entity {
     evade: 0,
     evadeCoolDown: 11000,
     dashCoolDown: 5000,
-    dashDistance: 0,
+    dashDistance: 60,
     windyAttackSize: 0,
     collisionDamage: 0,
     coolDown: 100,
@@ -36,6 +36,7 @@ class Player extends Entity {
     [key: string]: number;
   } = {};
 
+  karma: number = 0;
   level: number = 1;
   private _exp: number = 0;
   needExp: number = 40;
@@ -50,6 +51,8 @@ class Player extends Entity {
   private lastEvadeTime: number = 0;
 
   swordCount: number = 1;
+  itemNameText: Phaser.GameObjects.BitmapText | null = null;
+  itemDescText: Phaser.GameObjects.BitmapText | null = null;
   
   constructor(scene: GameScene, x: number, y: number) {
     super([
@@ -365,10 +368,32 @@ class Player extends Entity {
     while (this._exp >= this.needExp) {
       this._exp -= this.needExp;
       this.level += 1;
-      this.needExp = this.needExp + 20;
+      this.needExp = this.needExp + 10;
 
       // level up event
       this.events.emit('levelUp', this.level);
+      this.scene.playSound('levelup', {
+        volume: 0.6,
+        detune: 500,
+        // rate: 1.5,
+      });
+
+      // level up effect
+      const levelupText = this.scene.add.bitmapText(
+        this.x, this.y - this.body!.height / 2 - 24, "mini",
+        `LEVEL UP`
+      ).setCenterAlign().setOrigin(0.5, 0.5).setTint(0xffe091);
+
+      this.scene.tweens.add({
+        targets: levelupText,
+        alpha: 0,
+        y: "-=18",
+        duration: 500,
+        onComplete: () => {
+          levelupText.destroy();
+        }
+      });
+      this.scene.layers.ui.add(levelupText);
     }
     this.scene.updateExpBar();
   }
@@ -394,29 +419,46 @@ class Player extends Entity {
     });
 
     // 아이템 이름 및 효과 출력
-    const itemName = this.scene.add.bitmapText(
+    if (this.itemNameText && this.itemDescText) {
+      const itemNameText = this.itemNameText;
+      const itemDescText = this.itemDescText;
+
+      this.scene.tweens.add({
+        targets: [itemNameText, itemDescText],
+        alpha: 0,
+        y: "-=8",
+        duration: 500,
+        onComplete: () => {
+          itemNameText.destroy();
+          itemDescText.destroy();
+        }
+      })
+    }
+
+    const itemNameText = this.itemNameText = this.scene.add.bitmapText(
       this.scene.cameras.main.width / 2, this.scene.cameras.main.height - 68, "mini",
       `${item.itemData.name}`
     ).setCenterAlign().setOrigin(0.5, 0.5);
 
-    const itemDesc = this.scene.add.bitmapText(
+    const itemDescText = this.itemDescText = this.scene.add.bitmapText(
       this.scene.cameras.main.width / 2, this.scene.cameras.main.height - 60, "mini",
       `${item.itemData.description}`
     ).setCenterAlign().setOrigin(0.5, 0.5).setAlpha(0.75);
 
     this.scene.time.delayedCall(2500, () => {
       this.scene.tweens.add({
-        targets: [itemName, itemDesc],
+        targets: [this.itemNameText, this.itemDescText],
         alpha: 0,
         y: "-=8",
         duration: 500,
         onComplete: () => {
-          itemName.destroy();
+          itemNameText.destroy();
+          itemDescText.destroy();
         }
       })
     })
 
-    this.scene.getEffectLayer().add(itemName);
+    this.scene.layers.ui.add(this.itemNameText);
     this.events.emit('itemCollected');
 
     console.log(item.name);

@@ -73,12 +73,12 @@ const itemList: ItemDefinition[] = [
   {
     id: "bug_boots",
     name: "Bug Boots",
-    description: "speed +15% and spawn rate x80%",
+    description: "speed +15% and spawn rate x90%",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.stats.speed += 12;
-      scene.spawnCooldown *= 0.8;
+      scene.spawnCooldown *= 0.9;
     },
     displayOnList: true,
   },
@@ -144,7 +144,7 @@ const itemList: ItemDefinition[] = [
     rarity: "epic",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.dashDistance += 80;
+      scene.player.stats.dashDistance += 20;
       scene.player.stats.dashCoolDown *= 0.5;
       scene.player.stats.collisionDamage += 20;
     },
@@ -177,22 +177,24 @@ const itemList: ItemDefinition[] = [
   {
     id: "magic_crystal",
     name: "Magic Crystal",
-    description: "magic damage +25%",
+    description: "damage +1 and mana +20%",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
-      scene.player.stats.magic += 25;
+      scene.player.stats.attack += 1;
+      scene.player.stats.mana += 20;
     },
     displayOnList: true,
   },
   {
     id: "shiny_sandclock",
     name: "Shiny Sandclock",
-    description: "cooldown x80%",
+    description: "cooldown x80% and mana +10%",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene): void => {
       scene.player.stats.coolDown = scene.player.stats.coolDown * 0.8;
+      scene.player.stats.mana += 10;
     },
     displayOnList: true,
   },

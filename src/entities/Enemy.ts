@@ -13,6 +13,7 @@ export default abstract class Enemy extends Entity {
   private _vx: number = 0;
   private _vy: number = 0;
   exp: number = 20;
+  level: number = 1;
   untargetability: boolean = false;
 
   isFollowCamera: boolean = false;
@@ -57,6 +58,7 @@ export default abstract class Enemy extends Entity {
   }
 
   takeDamage(amount: number, isCritical: boolean = false): number {
+    if (this.untargetability) return 0;
     if (amount <= 0) return 0;
 
     this.health -= amount;
@@ -92,6 +94,7 @@ export default abstract class Enemy extends Entity {
     
     // 적 위치에 히트 이펙트 생성
     const hitEffect = scene.add.sprite(x, y, 'effects', texture + '-0');
+    hitEffect.setScale(isCritical ? 0.75 : 1);
     
     // 이펙트를 적절한 레이어에 추가
     scene.getEffectLayer()?.add(hitEffect);

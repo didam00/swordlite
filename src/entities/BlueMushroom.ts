@@ -11,7 +11,7 @@ export default class BlueMushroom extends Enemy {
   lastShotTime: number = 0;
 
   stats = {
-    health: 10,
+    health: 4,
     attack: 1,
     speed: 0,
     scale: 1,

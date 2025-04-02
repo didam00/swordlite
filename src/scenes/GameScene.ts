@@ -40,6 +40,7 @@ class GameScene extends Phaser.Scene {
     rocket$mp3: 1,
     hurt: 1,
     collectItem: 1,
+    levelup: 1,
     evade: 1,
     dash: 2,
   };
@@ -59,7 +60,7 @@ class GameScene extends Phaser.Scene {
   private isGameOver: boolean = false;
   private meter: number = 0;
   
-  spawnCooldown: number = 1500;
+  spawnCooldown: number = 2000;
   lastSpawnTime: number = 0;
   
   private healthHearts: Phaser.GameObjects.Sprite[] = [];
@@ -225,10 +226,11 @@ class GameScene extends Phaser.Scene {
     );
   }
   
-  spawnEnemy(id: string | null = null): Enemy | null {
+  spawnEnemy(id: string | null = null, level?: number): Enemy | null {
     if (this.isGameOver) return null;
 
     let enemy: Enemy = null!;
+    level = level || Math.floor(this.meter / 10000 + 1);
 
     if (!id) {
       id = Phaser.Utils.Array.GetRandom([
@@ -291,7 +293,8 @@ class GameScene extends Phaser.Scene {
     this.enemyGroup.add(enemy);
     
     enemy.velocity = {x: 0, y: 0};
-    enemy.health = Math.floor(enemy.stats.health * (this.meter / 8000)) + 1;
+    enemy.health = enemy.stats.health * level;
+    enemy.level = level;
 
     return enemy;
   }
@@ -303,10 +306,12 @@ class GameScene extends Phaser.Scene {
 
     const item = createItem(
       randomItem.id,
-      this.cameras.main.width + 20,
-      this.player.y,
+      this.cameras.main.width + 16 + Math.random() * 16,
+      this.player.y - 16 + Math.random() * 32,
       this
     );
+
+    // item?.setTint(0xb991f2);
 
     if (item) {
       this.physics.world.enable(item);
@@ -613,7 +618,8 @@ class GameScene extends Phaser.Scene {
     
     // ! CUSTOM
     // this.player.collectItem("double_daggers");
-    this.player.collectItem("windy_fan");
+    // this.player.collectItem("windy_fan");
+    // this.player.collectItem("bug_boots");
   }
 
   playerSpeedUpdated(diff: number) {
@@ -705,7 +711,7 @@ class GameScene extends Phaser.Scene {
       sword.update();
     }
 
-    const spawnCooldown = 2000 * 30 / this.player.stats.speed;
+    const spawnCooldown = this.spawnCooldown * 30 / this.player.stats.speed;
 
     // * 몹 스폰
     if (this.bossIsDead && time - this.lastSpawnTime > spawnCooldown) {
@@ -968,6 +974,10 @@ class GameScene extends Phaser.Scene {
       console.error(`효과음 재생 실패: ${soundKey}`, error);
       return;
     }
+  }
+
+  getExpBar(): Phaser.GameObjects.Graphics {
+    return this.expBar;
   }
 
   createDebugFunction() {

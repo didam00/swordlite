@@ -20,9 +20,8 @@ export default class DreamOfMushroom extends Enemy {
   exp: number = 500;
 
   stats = {
-    health: 100,
-    maxhealth: 100,
-    attack: 1,
+    health: 200,
+    attack: 2,
     speed: 40,
     scale: 1,
   }

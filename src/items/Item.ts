@@ -36,13 +36,13 @@ class NormalItem extends Item {
   }
 }
 
-class MagicItem extends Item {
+class CursedItem extends Item {
   constructor(item: ItemDefinition, x: number, y: number, scene: GameScene) {
     super(item, x, y, scene);
   }
 
-  /** cursor x, y */
-  onClick(x: number, y: number): void {
+  onCollect(): void {
+    this.itemData.effect(this.scene);
     this.itemData.effect(this.scene);
     this.destroy();
   }
@@ -56,16 +56,18 @@ export function createItem(id: string, x: number, y: number, scene: GameScene): 
     throw new Error(`${id}을 찾을 수 없습니다!`);
   }
 
-  switch (item.type) {
-    case "normal":
-      itemEntity = new NormalItem(item, x, y, scene);
-      break;
-    case "magic":
-      itemEntity = new MagicItem(item, x, y, scene);
-      break;
-    default:
-      throw new Error(`알 수 없는 아이템 타입입니다: ${item.type}`);
-  }
+  itemEntity = new NormalItem(item, x, y, scene);
+
+  // switch (item.type) {
+  //   case "normal":
+  //     itemEntity = new NormalItem(item, x, y, scene);
+  //     break;
+  //   case "magic":
+  //     itemEntity = new MagicItem(item, x, y, scene);
+  //     break;
+  //   default:
+  //     throw new Error(`알 수 없는 아이템 타입입니다: ${item.type}`);
+  // }
 
   return itemEntity
 }
