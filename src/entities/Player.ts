@@ -1,8 +1,14 @@
 import Phaser from 'phaser';
 import Entity from './Entity';
 import GameScene from '../scenes/GameScene';
-import itemList from '../items/ItemList';
-import { createItem, Item } from '../items/Item';
+import { createItem, CursedItem, Item, MagicCrystal as MagicCrystal } from '../items/Item';
+import Sword from '../weapons/Sword';
+import Weapon from '../weapons/Weapon';
+import Enemy, { SpriteBullet } from './Enemy';
+import CopperSword from '../weapons/CopperSword';
+import Pickaxe from '../weapons/Pickaxe';
+import { Magic } from '../types';
+import Boomerang from '../weapons/Boomerang';
 
 class Player extends Entity {
   entityName = 'player';
@@ -10,49 +16,59 @@ class Player extends Entity {
   stats = {
     maxHealth: 5,
     health: 5,
-    attack: 10,
+    damage: 10,
+    trueAttack: 0,
+    magicDamage: 0,
     defense: 2,
     mana: 0,
-    speed: 80,
+    speed: 60,
     jumpPower: 150,
-    range: 20,
+    range: 15,
     jumpCoolDown: 250,
     attackCoolDown: 0,
     immuneTime: 1000,
     criticalChance: 0,
-    criticalDamage: 2,
+    criticalDamage: 1.5,
     magnet: 20,
     expGain: 100,
     evade: 0,
     evadeCoolDown: 11000,
     dashCoolDown: 5000,
-    dashDistance: 60,
+    dashDistance: 40,
     windyAttackSize: 0,
     collisionDamage: 0,
     coolDown: 100,
+    glideTime: 0,
+    luck: 100,
+    debuffTime: 100, /** 디버프 부여시 지속 시간 */
   }
 
   items: {
     [key: string]: number;
   } = {};
 
-  karma: number = 0;
+  curse: number = 0;
   level: number = 1;
   private _exp: number = 0;
-  needExp: number = 40;
+  needExp: number = 60;
   followEffects: Phaser.GameObjects.Sprite[] = [];
   private _o__gravity: number = 300;
   private _gravity: number = 1;
   
   private lastJumpTime: number = 0;
-  private lastDamagedTime: number = 0;
+  lastDamagedTime: number = 0;
   private lastDashTime: number = 0;
   readonly isFollowCamera: boolean = true;
   private lastEvadeTime: number = 0;
+  private magics: Magic[] = [];
+  readonly weapons: Weapon[] = [];
 
-  swordCount: number = 1;
+  isGodMode: boolean = false;
+
   itemNameText: Phaser.GameObjects.BitmapText | null = null;
   itemDescText: Phaser.GameObjects.BitmapText | null = null;
+  lastNinjaBananaActive: number = 0;
+  isThrowingBoomerang: boolean = false;
   
   constructor(scene: GameScene, x: number, y: number) {
     super([
@@ -75,7 +91,7 @@ class Player extends Entity {
   }
   
   jump(power?: number): void {
-    const currentTime = this.scene.time.now;
+    const currentTime = this.scene.now;
     power = power || this.stats.jumpPower;
     
     if (currentTime - this.lastJumpTime < this.stats.jumpCoolDown) {
@@ -95,33 +111,146 @@ class Player extends Entity {
       isPlayerJumping: true
     });
 
-    if (this.hasItem("windy_fan")) {
-      this.windyAttack();
+    if (this.hasItem("ninja_banana")) {
+      this.lastNinjaBananaActive = this.scene.now;
+      const particles = this.scene.add.particles(0, 0, 'rect-particle', {
+        x: 0,
+        y: 0,
+        follow: this,
+        lifespan: { min: 200, max: 500 },
+        speed: { min: 10, max: 30 },
+        scale: { start: 4, end: 0 },
+        alpha: 1,
+        quantity: 16,
+        frequency: 50,
+        tint: [0x000000],
+        duration: 250,
+        followOffset: { x: -2, y: -12 },
+      });
+      this.scene.layers.bottom.add(particles);
+      this.setTint(0x000000);
+      this.delayedCall(200, () => {
+        this.clearTint();
+      })
+      this.delayedCall(750, () => {
+        particles.destroy();
+      })
+    }
 
-      if (this.swordCount > 1) {
-        this.scene.time.addEvent({
-          repeat: this.swordCount - 2,
-          delay: 50,
-          callback: () => {
-            this.windyAttack();
-          },
-          callbackScope: this
-        })
+    const boomerangCount = this.hasItem("boomerang");
+    const boomerangAngle = Math.PI / 64;
+    const totalAngle = boomerangCount * boomerangAngle;
+
+    if (!this.isThrowingBoomerang) {
+      this.isThrowingBoomerang = true;
+
+      for (let i = 0; i < boomerangCount; i++) {
+        this.createBoomerang(boomerangAngle * i - totalAngle / 2);
       }
     }
 
-    this.scene.playSound('jump', {
+    this.createJumpEffect();
+  }
+
+  createJumpEffect(): void {
+    const jumpEffect = this.scene.add.sprite(this.x, this.y + 4, 'effects', 'jump-0');
+    this.scene.layers.effect.add(jumpEffect);
+
+    if (this.scene.layers.particle) {
+      this.scene.layers.particle.add(jumpEffect);
+    }
+
+    jumpEffect.play('jump');
+    jumpEffect.on('animationcomplete', () => {
+      jumpEffect.destroy();
+    });
+
+    this.playSound('jump', {
       volume: 0.8
     });
   }
 
+  createBoomerang(angleAlpha: number = 0, customSpeed: number = 0): void {
+    const boomerang = this.scene.add.sprite(this.x, this.y, 'effects', 'boomerang-0');
+    (boomerang as any).isBoomerang = true;
+    this.scene.physics.add.existing(boomerang);
+    const body = boomerang.body as Phaser.Physics.Arcade.Body;
+
+    body.setSize(32, 32);
+    boomerang.setScale(this.range / 35 - 0.1);
+    
+    const pointer = this.scene.input.activePointer;
+    let targetAngle = Phaser.Math.Angle.Between(this.x, this.y, pointer.worldX, pointer.worldY);
+    const dist = Phaser.Math.Distance.Between(this.x, this.y, pointer.worldX, pointer.worldY);
+    let boomerangSpeed = customSpeed || dist * 1.5;
+    boomerangSpeed *= 1 + (1 - this.stats.coolDown / 100) * 3;
+    targetAngle += angleAlpha;
+    let isTurn = false;
+
+    let boomerangHits: Enemy[] = [];
+
+    const update = (time: number, delta: number) => {
+      if (isTurn) {
+        targetAngle = Phaser.Math.Angle.Between(this.x, this.y, boomerang.x, boomerang.y);
+        
+        if (Phaser.Math.Distance.Between(this.x, this.y, boomerang.x, boomerang.y) < this.body!.width * 2) {
+          boomerang.destroy();
+          this.scene.events.off('update', update);
+          this.isThrowingBoomerang = false;
+          return;
+        }
+      }
+
+      if (boomerangSpeed < 0 && !isTurn) {
+        boomerangHits = [];
+        isTurn = true;
+      }
+
+      const times = (1 + (1 - this.stats.coolDown / 100) * 3) ** 2;
+      boomerangSpeed -= delta * 0.25 * times;
+      boomerang.rotation += boomerangSpeed * 0.00025 * times * delta;
+
+      body.setVelocity(
+        Math.cos(targetAngle) * boomerangSpeed - this.speed,
+        Math.sin(targetAngle) * boomerangSpeed
+      );
+
+      this.scene.physics.world.overlap(boomerang, this.scene.enemyGroup, (boomerang, enemy) => {
+        if (enemy instanceof Enemy && !boomerangHits.includes(enemy)) {
+          enemy.takeDamage(this.stats.damage, false, ["attack"]);
+          boomerangHits.push(enemy);
+        }
+      });
+    }
+
+    this.scene.events.on('update', update);
+    
+    this.scene.layers.effect.add(boomerang);
+  }
+
   onJump(callback: Function, context?: any): this {
     this.events.on('jump', callback, context);
+
     return this;
   }
   
   update(delta: number): void {
+    if (this.isDead) return;
+
+    for (const magic of this.magics) {
+      if (magic.cooldown > 0) {
+        magic.cooldown -= delta;
+      } else {
+        magic.cooldown = magic.cooltime * this.stats.coolDown / 100;
+        magic.effect?.(this.scene, magic.level);
+      }
+    }
+
     // 상태 업데이트
+    this.updateState();
+  }
+  
+  updateState(): void {
     if ((this.body as Phaser.Physics.Arcade.Body).velocity.y < 0) {
       this.removeState("fall");
       this.addState("jump");
@@ -144,24 +273,69 @@ class Player extends Entity {
   takeDamage(amount: number, type: "enemy" | "wall" = "enemy"): void {
     if (amount <= 0) return;
 
-    if (this.scene.time.now - this.lastDamagedTime < this.stats.immuneTime) {
+    const now = this.scene.now;
+    const ninjaBanana = this.hasItem("ninja_banana");
+    if (ninjaBanana && now - this.lastNinjaBananaActive < 200 && type != "wall") {
+      let prevEnemy: Phaser.GameObjects.Sprite = this;
+      this.setVisible(false);
+
+      this.scene.time.addEvent({
+        delay: 25,
+        repeat: ninjaBanana - 1,
+        callback: () => {
+          // 플레이어와 가장 가까운 적에게 데미지
+          const enemies = this.scene.enemyGroup.getChildren().filter(e => !(e as Enemy).isDead) as Phaser.Physics.Arcade.Sprite[];
+          if (enemies.length === 0) return;
+          const closestEnemy = enemies.reduce((prev, curr) => {
+            return Phaser.Math.Distance.Between(this.x, this.y, prev.x, prev.y) < Phaser.Math.Distance.Between(this.x, this.y, curr.x, curr.y) ? prev : curr;
+          }) as Enemy;
+          if (closestEnemy) {
+            closestEnemy.takeDamage((this.stats.trueAttack + this.stats.damage) * this.stats.criticalDamage, true, ["attack"]);
+            this.playSound('hit', {
+              volume: 0.8
+            });
+            
+            // banana ninja 이펙트
+            const bananaNinjaEffect = this.scene.add.sprite(
+              closestEnemy.x,
+              closestEnemy.y,
+              'effects',
+              'ninja_banana-0'
+            ).play('ninja_banana');
+            bananaNinjaEffect.setOrigin(0.5, 0.5);
+            
+            const angle = Phaser.Math.Angle.Between(prevEnemy.x, prevEnemy.y, closestEnemy.x, closestEnemy.y);
+            bananaNinjaEffect.setRotation(angle);
+
+            prevEnemy = closestEnemy;
+            this.scene.cameras.main.shake(50, 0.01);
+          }
+        },
+      })
+
+      this.blink(this.stats.immuneTime);
+      this.lastDamagedTime = now;
+      this.lastNinjaBananaActive = 0;
+      this.delayedCall(25 * ninjaBanana + 50, () => {
+        this.setVisible(true);
+      });
+
+      if (this.hasItem("boomerang")) {
+        const count = 18;
+        for (let i = 0; i < count; i++) {
+          this.createBoomerang(i * 2 * Math.PI / count, 300);
+        }
+      }
+
       return;
     }
-    
-    // let isSugarCube = false;
-    // const SUGAR_CUBE_TIME = 150;
 
-    // if (
-    //   this.hasItem("sugar_cube")
-    //   && this.scene.time.now - this.lastEvadeTime > this.stats.evadeCoolDown
-    //   && type != "wall"
-    // ) {
-    //   isSugarCube = true;
-    //   this.lastEvadeTime = this.scene.time.now;
-    // }
+    if (now - this.lastDamagedTime < this.stats.immuneTime) {
+      return;
+    }
 
     this.blink(this.stats.immuneTime);
-    this.lastDamagedTime = this.scene.time.now;
+    this.lastDamagedTime = now;
     
     const isEvade = (Math.random() < this.stats.evade / 100);
     
@@ -195,13 +369,15 @@ class Player extends Entity {
         this.followEffects = this.followEffects.filter(e => e !== evadeEffect);
       });
 
-      this.scene.playSound('evade', {
+      this.playSound('evade', {
         volume: 0.8,
         detune: 1000
       });
     } else {
-      this.stats.health -= amount;
-      this.events.emit('healthChanged', this.stats.health);
+      if (!this.isGodMode) {
+        this.stats.health -= amount;
+        this.events.emit('healthChanged', this.stats.health);
+      }
       
       if (this.stats.health > 0) {
         this.scene.cameras.main.shake(100, 0.01);
@@ -209,15 +385,14 @@ class Player extends Entity {
         this.scene.cameras.main.shake(200, 0.025);
       }
 
-      this.scene.playSound('hurt', {
+      this.playSound('hurt', {
         volume: 0.8
       })
     }
   }
 
   dash(): void {
-    // if (!this.checkItem('shadow_water')) return;
-    const now = this.scene.time.now;
+    const now = this.scene.now;
 
     if (now - this.lastDashTime < this.stats.dashCoolDown) {
       return;
@@ -225,7 +400,7 @@ class Player extends Entity {
 
     this.lastDashTime = now;
 
-    this.scene.playSound('dash', {
+    this.playSound('dash', {
       volume: 0.8,
       detune: 1000
     });
@@ -242,7 +417,6 @@ class Player extends Entity {
 
     // 플레이어의 현재 위치에 잔상을 남김
     const trail = this.scene.add.sprite(this.x, this.y, 'atlas', `player_${this.getHightestPriorityState()}-0`);
-    // trail.setAlpha(0.5);
 
     trail.setScale(this.scale);
     trail.setOrigin(0.5, 0.5);
@@ -264,50 +438,36 @@ class Player extends Entity {
       this.gravity += prevGravity;
     });
     
-    this.lastDamagedTime = now - this.stats.immuneTime + dashSpeed + 250;
-    this.blink(dashSpeed + 250);
-  }
+    const immuneTime = dashSpeed + this.stats.immuneTime / 10;
 
-  windyAttack(): void {
-    const scene = this.scene;
+    this.lastDamagedTime = now - this.stats.immuneTime + immuneTime;
+    this.blink(immuneTime);
 
-    // 플레이어 방향으로 빛을 발사
-    if (!scene.anims.exists("windy_attack")) {
-      scene.anims.create({
-        key: "windy_attack",
-        frames: scene.anims.generateFrameNames('effects', {
-          prefix: "windy_attack-", start: 0, end: 2
-        }),
-        frameRate: 24,
-        repeat: -1
+    if (this.hasItem("ninja_banana")) {
+      this.lastNinjaBananaActive = this.scene.now;
+      const particles = this.scene.add.particles(0, 0, 'rect-particle', {
+        x: 0,
+        y: 0,
+        follow: this,
+        lifespan: { min: 100, max: 200 },
+        speed: { min: 10, max: 30 },
+        scale: { start: 4, end: 0 },
+        alpha: 1,
+        quantity: 16,
+        frequency: 50,
+        tint: [0x000000],
+        duration: 100,
+        followOffset: { x: 0, y: 0 },
       });
+      this.scene.layers.bottom.add(particles);
+      this.setTint(0x000000);
+      this.delayedCall(200, () => {
+        this.clearTint();
+      })
+      this.delayedCall(750, () => {
+        particles.destroy();
+      })
     }
-
-    // 빛 공격을 발사
-    const windy_attack = scene.add.sprite(
-      scene.player.x, scene.player.y - 8, 'effects', 'windy_attack-0'
-    ).play('windy_attack');
-    scene.physics.add.existing(windy_attack);
-    windy_attack.setOrigin(0.5, 0.5);
-
-    const body = windy_attack.body as Phaser.Physics.Arcade.Body;
-    windy_attack.setScale(1, scene.player.range / 160 * (this.stats.windyAttackSize / 100));
-    body.setSize(32, 64);
-    body.setVelocityX(600 - scene.player.stats.speed);
-
-    // 엔티티와 충돌하면 사라지고 플레이어 공격력만큼 데미지
-    scene.physics.add.collider(windy_attack, scene.enemyGroup, (light, enemy) => {
-      (enemy as any).takeDamage(scene.player.stats.attack);
-      light.destroy();
-    });
-
-    this.scene.time.delayedCall(this.hasItem("windy_fan") * 200, () => {
-      if (windy_attack && windy_attack.active) {
-        windy_attack.destroy();
-      }
-    });
-
-    scene.getEffectLayer().add(windy_attack);
   }
 
   set jumpCoolDown(value: number) {
@@ -327,7 +487,7 @@ class Player extends Entity {
   }
 
   set range(value: number) {
-    this.stats.range = value;
+    this.stats.range = Math.max(value, 0);
   }
 
   get range(): number {
@@ -335,7 +495,7 @@ class Player extends Entity {
   }
 
   getRealRange(): number {
-    return this.stats.range * 1.125 + 2.5;
+    return this.body!.height + this.stats.range;
   }
 
   set speed(value: number) {
@@ -352,12 +512,22 @@ class Player extends Entity {
     return this._exp;
   }
 
+  changeScale(value: number) {
+    this.scale = value;
+    this.weapons.forEach(weapon => {
+      (weapon as Weapon).setScale(this.scale);
+    });
+  }
+
   get maxHealth(): number {
     return this.stats.maxHealth;
   }
 
   set maxHealth(value: number) {
     this.stats.maxHealth = value;
+    if (this.stats.maxHealth < 1) {
+      this.stats.maxHealth = 1;
+    }
     this.scene.updateHealthUI();
   }
 
@@ -372,10 +542,9 @@ class Player extends Entity {
 
       // level up event
       this.events.emit('levelUp', this.level);
-      this.scene.playSound('levelup', {
+      this.playSound('levelup', {
         volume: 0.6,
         detune: 500,
-        // rate: 1.5,
       });
 
       // level up effect
@@ -406,19 +575,30 @@ class Player extends Entity {
     this.stats.evadeCoolDown = value > 1000 ? value : 1000;
   }
 
-  collectItem(item: Item | string): void {
+  collectItem(item: string, isCursed?: boolean): void;
+  collectItem(item: Item): void;
+
+  collectItem(item: Item | string, isCursed: boolean = false, showEffect: boolean = true): void {
     if (typeof item === 'string') {
-      item = createItem(item, 0, 0, this.scene)!;
+      item = createItem(item, 0, 0, this.scene, isCursed)!;
     }
 
     this.items[item.id] = this.items[item.id] ? this.items[item.id] + 1 : 1;
     item.onCollect();
+    
+    if (item instanceof CursedItem) {
+      this.curse += 1;
+      isCursed = true;
+    }
 
-    this.scene.playSound('collectItem', {
+    this.events.emit('itemCollected');
+
+    if (!showEffect) return;
+
+    this.playSound('collectItem', {
       volume: 0.25
     });
 
-    // 아이템 이름 및 효과 출력
     if (this.itemNameText && this.itemDescText) {
       const itemNameText = this.itemNameText;
       const itemDescText = this.itemDescText;
@@ -445,7 +625,14 @@ class Player extends Entity {
       `${item.itemData.description}`
     ).setCenterAlign().setOrigin(0.5, 0.5).setAlpha(0.75);
 
-    this.scene.time.delayedCall(2500, () => {
+    if (isCursed) {
+      itemNameText.setTint(0xff6866);
+      itemNameText.text = `Cursed ${item.itemData.name}`;
+      itemDescText.setTint(0xff6866);
+      itemDescText.text = `${item.itemData.description} and curse +1`;
+    }
+
+    this.scene.time.delayedCall(4500, () => {
       this.scene.tweens.add({
         targets: [this.itemNameText, this.itemDescText],
         alpha: 0,
@@ -459,9 +646,6 @@ class Player extends Entity {
     })
 
     this.scene.layers.ui.add(this.itemNameText);
-    this.events.emit('itemCollected');
-
-    console.log(item.name);
   }
 
   hasItem(id: string): number {
@@ -477,15 +661,15 @@ class Player extends Entity {
     this.setGravityY(this._o__gravity * value);
   }
 
-  createBullet(color: number = 0x00ffff, size: number = 3, life: number = 5000, damage?: number, shadowConfig?: ShadowConfig): Phaser.GameObjects.Arc & {
+  createCircleBullet(color: number = 0x00ffff, size: number = 3, life: number = 5000, damage?: number, shadowConfig?: ShadowConfig): Phaser.GameObjects.Arc & {
     body: Phaser.Physics.Arcade.Body
   } | null {
     const scene = this.scene as GameScene;
-    const player = scene.getPlayer();
+    const player = scene.player;
     if (!scene || !scene.getBulletGroup) return null;
 
     if (damage === null || damage === undefined) {
-      damage = this.stats.attack;
+      damage = this.stats.damage;
     }
     
     const bullet = scene.add.circle(this.x, this.y, size, color) as unknown as Phaser.GameObjects.Arc & { body: Phaser.Physics.Arcade.Body };
@@ -498,7 +682,6 @@ class Player extends Entity {
     
     scene.getEffectLayer().add(bullet);
     scene.physics.add.overlap(bullet, scene.enemyGroup, (bullet: any, enemy: any) => {
-      console.log("bullet hit enemy", bullet, enemy);
       enemy.takeDamage(damage);
       bullet.destroy();
     });
@@ -549,9 +732,74 @@ class Player extends Entity {
     return bullet;
   }
 
-  addSword() {
-    this.swordCount += 1;
-    this.scene.createSword();
+  createSpriteBullet(spriteKey: string, atlasKey: string, damage: number, life?: number): SpriteBullet {
+    const bullet = this.scene.add.sprite(this.x, this.y, atlasKey, spriteKey+"-0") as SpriteBullet;
+    bullet.play(spriteKey);
+    bullet.setOrigin(0.5, 0.5);
+    this.scene.physics.add.existing(bullet);
+    this.scene.getEffectLayer().add(bullet);
+    
+    this.scene.physics.add.overlap(bullet, this.scene.enemyGroup, (bullet: any, enemy: any) => {
+      enemy.takeDamage(damage);
+      bullet.destroy();
+    });
+
+    if (life !== undefined && life > 0) {
+      this.scene.time.delayedCall(life, () => {
+        if (bullet && bullet.active) {
+          bullet.destroy();
+        }
+      });
+    }
+
+    return bullet;
+  }
+
+  addWeapon(weapon: Weapon | string): Weapon | null {
+    if (typeof weapon === "string") {
+      switch (weapon) {
+        case "sword":
+          weapon = new Sword(this.scene, this, this.weaponCount);
+          break;
+        case "copper_sword":
+          weapon = new CopperSword(this.scene, this, this.weaponCount);
+          break;
+        case "pickaxe":
+          weapon = new Pickaxe(this.scene, this, this.weaponCount);
+          break;
+        case "boomerang":
+          weapon = new Boomerang(this.scene, this, this.weaponCount);
+          break;
+        default:
+          return null;
+      }
+    }
+
+    this.weapons.push(weapon);
+    this.scene.layers.weapon.add(weapon);
+
+    return weapon;
+  }
+
+  addMagic(magic: MagicCrystal): void {
+    const hasSkill = this.magics.filter(s => s.id === magic.itemData.id);
+    if (hasSkill.length === 0) {
+      this.magics.push({
+        id: magic.itemData.id,
+        cooldown: magic.itemData.cooldown!,
+        cooltime: magic.itemData.cooldown!,
+        level: 1,
+        effect: magic.itemData.effect,
+      });
+    } else {
+      // 이미 있는 경우
+      hasSkill[0].level += 1;
+      hasSkill[0].cooltime *= magic.itemData.cooldownForLevel ?? 1;
+    }
+  }
+
+  get weaponCount(): number {
+    return this.weapons.length;
   }
 }
 

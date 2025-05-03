@@ -5,28 +5,49 @@
 
 import Phaser from 'phaser';
 import Player from '../entities/Player';
-import Sword from '../entities/Sword';
 import PurpleMushroom from '../entities/PurpleMushroom';
 import Entity from '../entities/Entity';
-import Enemy from '../entities/Enemy';
+import Enemy, { AnyBullet } from '../entities/Enemy';
 import RedMushroom from '../entities/RedMushroom';
 import BlueMushroom from '../entities/BlueMushroom';
 import itemList from '../items/ItemList';
-import { createItem } from '../items/Item';
+import { createItem, Item } from '../items/Item';
 import DreamOfMushroom from '../entities/DreamOfMushroom';
 import CRTFilter from '..';
 import FakeRedMushroom from '../entities/FakeRedMushroom';
+import $s from '../utils/randomSIgn';
+import Weapon from '../weapons/Weapon';
+import Sword from '../weapons/Sword';
+import Spear from '../weapons/Spear';
+import Axe from '../weapons/Axe';
+import { StatusEffect } from '../types';
+import CopperSword from '../weapons/CopperSword';
+import Squid from '../entities/Squid';
+import BlueFish from '../entities/BlueFish';
+import Starfish from '../entities/Starfish';
+import SeaAnemone from '../entities/SeaAnemone';
 
 class GameScene extends Phaser.Scene {
   readonly layers: {
-    [key: string]: Phaser.GameObjects.Container
+    background: Phaser.GameObjects.Container,
+    bottom: Phaser.GameObjects.Container,
+    entity: Phaser.GameObjects.Container,
+    weapon: Phaser.GameObjects.Container,
+    player: Phaser.GameObjects.Container,
+    effect: Phaser.GameObjects.Container,
+    item: Phaser.GameObjects.Container,
+    top: Phaser.GameObjects.Container,
+    ui: Phaser.GameObjects.Container,
+    [key: string]: Phaser.GameObjects.Container,
   } = {
     background: null!,
+    bottom: null!,
     item: null!,
     entity: null!,
     weapon: null!,
     player: null!,
     effect: null!,
+    top: null!,
     ui: null!,
   };
 
@@ -43,6 +64,8 @@ class GameScene extends Phaser.Scene {
     levelup: 1,
     evade: 1,
     dash: 2,
+    bubble: 1,
+    splash: 1,
   };
 
   debugMode: boolean = false;
@@ -54,7 +77,6 @@ class GameScene extends Phaser.Scene {
   enemies: Enemy[] = [];
   private meterText: Phaser.GameObjects.Text = null!;
   
-  private swords: Sword[] = [];
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   
   private isGameOver: boolean = false;
@@ -71,9 +93,6 @@ class GameScene extends Phaser.Scene {
   // 디버그 모드 및 공격 범위 표시를 위한 변수 추가
   private attackRangeGraphics: Phaser.GameObjects.Graphics = null!;
   
-  // 공격 당 한 번만 타격된 적들을 추적하기 위한 배열
-  private hitEnemies: Enemy[] = [];
-  
   private bulletGroup: Phaser.Physics.Arcade.Group = null!;
   private background: Phaser.GameObjects.TileSprite = null!;
   private bgMusic: Phaser.Sound.BaseSound = null!;
@@ -84,7 +103,32 @@ class GameScene extends Phaser.Scene {
   private itemListContainer: Phaser.GameObjects.Container = null!;
 
   private clearBoss: number = 0;
+  private debugModeText: Phaser.GameObjects.Text = null!;
+  private debugTextObject: Phaser.GameObjects.BitmapText = null!;
+  private debugText: string[] = [];
+  private isChangingMap: boolean = false;
+  private allowSpawnEnemy: boolean = true;
+
+  private keyboard: {
+    [key: string]: Phaser.Input.Keyboard.Key
+  } = {};
+  
+  pointer: {
+    x: number;
+    y: number;
+  } = { x: 0, y: 0 };
+
+  cursorSprite: Phaser.GameObjects.Sprite = null!;
+
   bossIsDead: boolean = true;
+  private _now: number = 0;
+  overMaps: string[] = ["void"];
+  map: string = "void";
+  maps: {[key: string]: string[]} = {
+    "void": [],
+    "violet": ["purple_mushroom", "blue_mushroom", "red_mushroom"],
+    "blue": ["squid", "blue_fish", "starfish"],
+  }
   
   constructor() {
     super('GameScene')
@@ -107,6 +151,8 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.cameras.main.preFX?.addColorMatrix
+
     // // 필터
     // const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
     // if (!renderer.pipelines.has('CRTFilter')) {
@@ -118,6 +164,20 @@ class GameScene extends Phaser.Scene {
     this.createDebugFunction();
 
     this.initLayers();
+    this.createAnimations();
+
+    const rectGraphics = this.make.graphics({x: 0, y: 0});
+    rectGraphics.fillStyle(0xffffff);
+    rectGraphics.fillRect(0, 0, 8, 8);
+    rectGraphics.generateTexture('rect-particle', 1, 1);
+    rectGraphics.destroy();
+    
+    const circleGraphics = this.make.graphics({x: 0, y: 0});
+    circleGraphics.fillStyle(0xffffff);
+    circleGraphics.fillCircle(16, 16, 16);
+    circleGraphics.generateTexture('circle-particle', 32, 32);
+    circleGraphics.destroy();
+
     this.cameras.main.setBackgroundColor('#000000');
     
     // 배경 생성 및 설정
@@ -144,11 +204,21 @@ class GameScene extends Phaser.Scene {
 
     this.attackRangeGraphics = this.add.graphics();
     this.layers.effect.add(this.attackRangeGraphics);
+
+    this.debugModeText = this.add.text(10, 10, "", {
+      fontSize: '12px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      fontFamily: 'monospace',
+      resolution: 1,
+    }).setScrollFactor(0);
     
     // 디버그 모드 토글 키 설정 (D 키)
     this.input.keyboard?.addKey('D').on('down', () => {
       this.physics.world.drawDebug = !this.physics.world.drawDebug;
       this.debugMode = !this.debugMode;
+      this.debugTextObject.setVisible(this.debugMode);
+      this.debugTextObject.setText(this.debugText.join('\n'));
 
       if (this.physics.world.drawDebug) {
         if (!this.physics.world.debugGraphic) {
@@ -162,18 +232,28 @@ class GameScene extends Phaser.Scene {
         this.physics.world.drawDebug = false;
       }
 
-      const debugText = this.add.text(10, 10, `Debug Mode:${this.physics.world.drawDebug ? ' ON' : 'OFF'}`, {
-        fontSize: '12px',
-        color: '#ffffff',
-        backgroundColor: '#000000',
-        fontFamily: 'monospace',
-        resolution: 1,
-      }).setScrollFactor(0);
-
-      this.time.delayedCall(1500, () => {
-        debugText.destroy();
-      });
+      this.showDebugModeText(this.debugMode ? 'Debug Mode: ON' : 'Debug Mode: OFF');
     });
+
+    this.input.keyboard?.addKey('G').on('down', () => {
+      if (this.debugMode) {
+        this.player.isGodMode = !this.player.isGodMode;
+        this.showDebugModeText('God Mode: ' + (this.player.isGodMode ? 'ON' : 'OFF'));
+      }
+    })
+
+    this.input.keyboard?.addKey('S').on('down', () => {
+      if (this.debugMode) {
+        this.allowSpawnEnemy = !this.allowSpawnEnemy;
+        this.showDebugModeText('Allow Spawn: ' + (this.player.isGodMode ? 'ON' : 'OFF'));
+      }
+    })
+
+    this.input.keyboard?.addKey('L').on('down', () => {
+      if (this.debugMode) {
+        this.player.exp += this.player.needExp;
+      }
+    })
 
     // 거리 표시
     this.meterText = this.add.text(this.cameras.main.width - 8, 8, '0M', {
@@ -195,9 +275,17 @@ class GameScene extends Phaser.Scene {
     }).setScrollFactor(0).setOrigin(0.5, 0);
     this.expBar = this.add.graphics();
     this.updateExpBar();
+
+    // 디버그 표시
+    this.debugTextObject = this.add.bitmapText(10, 28, 'mini', '', 10)
+    this.debugTextObject
+      .setScrollFactor(0)
+      .setOrigin(0, 0)
+      .setTint(0xffffff);
     
     this.layers.ui.add(this.levelText);
     this.layers.ui.add(this.expBar);
+    this.layers.ui.add(this.debugTextObject);
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       if (this.player.hasItem("black_coffee") && pointer.rightButtonDown()) {
@@ -205,11 +293,38 @@ class GameScene extends Phaser.Scene {
       }
     });
 
+    this.cursorSprite = this.add.sprite(0, 0, 'cursor');
+    this.cursorSprite.setScrollFactor(0);
+    this.layers.ui.add(this.cursorSprite);
+
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      this.pointer.x = pointer.x;
+      this.pointer.y = pointer.y;
+
+      this.cursorSprite.x = pointer.x;
+      this.cursorSprite.y = pointer.y;
+    })
+
     this.itemListContainer = this.add.container(this.cameras.main.width - 14, 32);
     this.itemListContainer.setScrollFactor(0);
     this.layers.ui.add(this.itemListContainer);
 
     this.startGame();
+  }
+
+  createAnimations(): void {
+    this.createAnimation("effects", "blue_spore", [0, 5], 24);
+    this.createAnimation("effects", "item", [0, 6], 24);
+    this.createAnimation("effects", "light_bullet", [0, 1], 24);
+    this.createAnimation("effects", "soul", [0, 1], 24);
+    this.createAnimation("effects", "soul_boom", [0, 9], 40, 0);
+    this.createAnimation("effects", "windy_attack", [0, 1], 24, 0);
+    this.createAnimation("effects", "ninja_banana", [0, 5], 24, 0);
+    this.createAnimation("effects", "jump", [0, 6], 32, 0);
+    this.createAnimation("effects", "lightning", [0, 2], 24);
+    this.createAnimation("effects", "fireball_spawn", [0, 9], 20, 0);
+    this.createAnimation("effects", "fireball_shoot", [0, 7], 24);
+    this.createAnimation("effects", "fireball_boom", [0, 7], 32, 0);
   }
 
   createEnemies(): void {
@@ -230,110 +345,92 @@ class GameScene extends Phaser.Scene {
     if (this.isGameOver) return null;
 
     let enemy: Enemy = null!;
-    level = level || Math.floor(this.meter / 10000 + 1);
+    level = level || (Math.floor(this.meter / 10000 + 1 + this.player.curse / 10));
 
     if (!id) {
-      id = Phaser.Utils.Array.GetRandom([
-        'purple_mushroom',
-        'blue_mushroom',
-        'red_mushroom',
-      ]);
+      id = Phaser.Utils.Array.GetRandom(this.maps[this.map]);
     }
 
     if (id !== null) {
-      switch (id) {
-        case 'purple_mushroom':
-          enemy = new PurpleMushroom(
-            this,
-            this.cameras.main.width + 20,
-            Phaser.Math.Between(10, this.cameras.main.height - 10)
-          );
-          break;
-        case 'blue_mushroom':
-          enemy = new BlueMushroom(
-            this,
-            this.cameras.main.width + 20,
-            Phaser.Math.Between(10, this.cameras.main.height - 10)
-          );
-          break;
-        case 'dream_of_mushroom':
-          enemy = new DreamOfMushroom(
-            this,
-            this.cameras.main.width + 20,
-            this.cameras.main.height / 2
-          );
-          break;
-        case 'red_mushroom':
-          enemy = new RedMushroom(
-            this,
-            this.cameras.main.width + 20,
-            Phaser.Math.Between(10, this.cameras.main.height - 10)
-          );
-          break;
-        case 'fake_red_mushroom':
-          enemy = new FakeRedMushroom(
-            this,
-            this.cameras.main.width + 20,
-            Phaser.Math.Between(10, this.cameras.main.height - 10)
-          );
-          break;
+      const EnemyClass = {
+        'purple_mushroom': PurpleMushroom,
+        'blue_mushroom': BlueMushroom,
+        'red_mushroom': RedMushroom,
+        'dream_of_mushroom': DreamOfMushroom,
+        'fake_red_mushroom': FakeRedMushroom,
 
-        default:
-          enemy = new DreamOfMushroom(
-            this,
-            this.cameras.main.width + 20,
-            this.cameras.main.height / 2
-          );
-          break;
-        }
+        'squid': Squid,
+        'blue_fish': BlueFish,
+        'starfish': Starfish,
+        'sea_anemone': SeaAnemone,
+      }[id] || FakeRedMushroom;
+
+      enemy = new EnemyClass(
+        this,
+        this.cameras.main.width + 20,
+        Phaser.Math.Between(10, this.cameras.main.height - 10)
+      );
     }
 
     this.enemies.push(enemy);
     this.layers.entity.add(enemy);
     this.enemyGroup.add(enemy);
     
-    enemy.velocity = {x: 0, y: 0};
-    enemy.health = enemy.stats.health * level;
+    enemy.velocity = [0, 0];
+    enemy.health = enemy.stats.health * (level * 2 - 1);
+    enemy.stats.defence = enemy.stats.defense * (level * 2 - 1);
     enemy.level = level;
 
+    enemy.onSpawn();
     return enemy;
   }
 
-  spawnItem(rarity: string): void {
+  spawnItem(): Item | null;
+  spawnItem(rarity: "common" | "epic" | "unique", x?: number, y?: number): Item | null;
+  spawnItem(id: string, x?: number, y?: number): Item | null;
+
+  spawnItem(rarityOrId?: string, x?: number, y?: number): Item | null {
     // 무작위 기본 아이템 생성
-    const normalItems = itemList.filter(item => item.rarity === rarity);
-    const randomItem = normalItems[Math.floor(Math.random() * normalItems.length)];
+    const validItems = itemList.filter(item => {
+      if (rarityOrId === "common" || rarityOrId === "epic" || rarityOrId === "unique") {
+        return item.rarity === rarityOrId;
+      } else {
+        if (rarityOrId === undefined) {
+          return true;
+        } else {
+          return item.id === rarityOrId;
+        }
+      }
+    });
+    const randomItem = validItems[Math.floor(Math.random() * validItems.length)];
+
+    if (!x) {
+      x = this.cameras.main.width + 24 + Math.random() * 48;
+    }
+    if (!y) {
+      y = this.player.y - 24 + Math.random() * 48;
+      y = Math.max(24, Math.min(this.cameras.main.height - 24, y));
+    }
 
     const item = createItem(
       randomItem.id,
-      this.cameras.main.width + 16 + Math.random() * 16,
-      this.player.y - 16 + Math.random() * 32,
+      x,
+      y,
       this
-    );
+    );  
 
-    // item?.setTint(0xb991f2);
+    // if (Math.random() < ((this.player.curse + 40) / 100 + 0.1)) {
+    //   const randomItem = validItems[Math.floor(Math.random() * validItems.length)];
+    //   const cursedItem = createItem(
+    //     randomItem.id,
+    //     this.cameras.main.width + 16 + Math.random() * 16,
+    //     (this.cameras.main.height - 40) * Math.random() + 20,
+    //     this,
+    //     true
+    //   )
+    // }
 
-    if (item) {
-      this.physics.world.enable(item);
-
-      item.setOrigin(0.5, 0.5);
-      item.setSize(2, 2);
-      item.setVelocityX(-this.player.speed + 30);
-
-      this.physics.add.overlap(
-        this.player,
-        item,
-        () => {
-          this.player.collectItem(item);
-          // collect_item effect animation
-          
-        },
-        undefined,
-        this
-      )
-
-      this.layers.item.add(item);
-    }
+    return item;
   }
   
   initLayers(): void {
@@ -345,7 +442,7 @@ class GameScene extends Phaser.Scene {
   createPlayer(): void {
     this.player = new Player(
       this, 
-      48,
+      64,
       this.cameras.main.height / 2
     );
     
@@ -353,13 +450,13 @@ class GameScene extends Phaser.Scene {
       this.layers.player.add(this.player);
     }
 
-    this.player.onJump(this.createJumpEffect, this);
     this.player.setCollideWorldBounds(true);
 
     this.player.events.on('healthChanged', this.updateHealthUI, this);
     this.player.events.on('levelUp', () => {
       let rarity: string = "common";
-      if (this.player.level % 10 === 5) {
+      let random = Math.random();
+      if (random < 0.2 * this.player.stats.luck / 100) {
         rarity = "epic";
       }
       this.spawnItem(rarity);
@@ -369,51 +466,8 @@ class GameScene extends Phaser.Scene {
   }
 
   createSword(): void {
-    const sword = new Sword(
-      this, 
-      this.player, 
-      this.layers.effect,
-      this.swords.length
-    );
-
-    this.swords.push(sword);
-    
-    if (this.layers.weapon) {
-      this.layers.weapon.add(sword);
-    }
-
-    // this.sword.setDepth(999);
-    
-    this.add.existing(sword);
-  }
-
-  createJumpEffect(data: { x: number, y: number }): void {
-    const jumpEffect = this.add.sprite(data.x, data.y + 4, 'effects', 'jump-0');
-    this.layers.effect.add(jumpEffect);
-    
-    if (!this.anims.exists('jump')) {
-      this.anims.create({
-        key: 'jump',
-        frames: this.anims.generateFrameNames('effects', {
-          prefix: 'jump-',
-          start: 0,
-          end: 4
-        }),
-        frameRate: 24,
-        repeat: 0
-      });
-    }
-    
-    // jumpEffect.setScale((this.player.jumpPower / 300) + 0.5);
-
-    if (this.layers.particle) {
-      this.layers.particle.add(jumpEffect);
-    }
-
-    jumpEffect.play('jump');
-    jumpEffect.on('animationcomplete', () => {
-      jumpEffect.destroy();
-    });
+    this.player.addWeapon("sword");
+    // this.player.addWeapon("copper_sword");
   }
 
   createHealthUI(): void {
@@ -421,8 +475,13 @@ class GameScene extends Phaser.Scene {
     const top = 8;
     
     // 기존 하트 삭제
-    this.healthHearts.forEach(heart => heart.destroy());
+    this.healthHearts.forEach(heart => {
+      (heart as any).outline.destroy();
+      heart.destroy()
+    });
     this.healthHearts = [];
+
+    const outlines: Phaser.GameObjects.Sprite[] = [];
     
     // 테두리만 먼저 생성
     for (let i = 0; i < this.player.stats.maxHealth; i++) {
@@ -441,6 +500,7 @@ class GameScene extends Phaser.Scene {
              .setAlpha(1);
       
       this.layers.ui.add(outline);
+      outlines.push(outline);
     }
 
     // 하트 생성
@@ -477,6 +537,7 @@ class GameScene extends Phaser.Scene {
       
       // 디버깅용 테두리 추가 (보이는지 확인용)
       heart.setTint(0xffffff);
+      (heart as any).outline = outlines[i]; // 테두리와 연결
       
       this.healthHearts.push(heart);
       this.layers.ui.add(heart);
@@ -499,6 +560,7 @@ class GameScene extends Phaser.Scene {
     const damageReceived = previousHealth > currentHealth;
     const healthRecovered = previousHealth < currentHealth;
     const maxHealthIncreased = maxHealth > previousMaxHealth;
+    const maxHealthDecreased = maxHealth < previousMaxHealth;
     
     // 현재 값 저장
     this.previousHealth = currentHealth;
@@ -519,7 +581,7 @@ class GameScene extends Phaser.Scene {
     }
     
     // 최대 체력이 증가한 경우 하트 UI 재생성
-    if (maxHealthIncreased) {
+    if (maxHealthIncreased || maxHealthDecreased) {
       this.createHealthUI(); // 하트 UI를 완전히 새로 생성
       return;
     }
@@ -579,7 +641,9 @@ class GameScene extends Phaser.Scene {
               }
             },
             onComplete: () => {
-              heart.setTexture('ui', emptyHeartFrame);
+              if (heart && heart.active) {
+                heart.setTexture('ui', emptyHeartFrame);
+              }
             }
           });
         }
@@ -590,6 +654,21 @@ class GameScene extends Phaser.Scene {
   updateItemList(): void {
     let i = 0;
     this.itemListContainer.removeAll(true);
+
+    if (this.player.curse > 0) {
+      const itemSprite = this.add.sprite(0, i * 14, 'items', `curse-0`);
+      itemSprite.setOrigin(0.5, 0.5).setAlpha(0.5);
+      this.itemListContainer.add(itemSprite);
+
+      if (this.player.curse > 1) {
+        const countText = this.add.bitmapText(4, i * 14 + 2, 'mini', this.player.curse.toString());
+        countText.setOrigin(0.5, 0.5).setTint(0xd83843).setAlpha(0.75);
+        this.itemListContainer.add(countText);
+      }
+
+      i++;
+    }
+    
     for (const item of Object.keys(this.player.items)) {
       const itemData = itemList.find(i => i.id === item)!;
 
@@ -614,12 +693,35 @@ class GameScene extends Phaser.Scene {
     this.isGameOver = false;
 
     this.lastSpawnTime = 0;
-    // this.spawnEnemy("dream_of_mushroom");
     
     // ! CUSTOM
-    // this.player.collectItem("double_daggers");
+
     // this.player.collectItem("windy_fan");
-    // this.player.collectItem("bug_boots");
+    // this.player.collectItem("black_coffee");
+    // this.player.collectItem("portable_mirror");
+    // this.player.collectItem("soul_candle");
+    // this.player.collectItem("lightning_rod");
+    // this.player.collectItem("lightning_crystal");
+    // this.player.collectItem("flame_crystal");
+    // this.player.collectItem("shiny_sandclock");
+    // this.player.collectItem("copper_sword");
+    // this.player.collectItem("giant_sword");
+
+    // this.player.collectItem("ninja_banana");
+    // this.player.collectItem("boomerang");
+    this.player.collectItem("pickaxe");
+    this.player.collectItem("boomerang");
+    
+    // this.setMap("violet");
+
+    this.setMap(
+      Phaser.Utils.Array.GetRandom(
+        Object.keys(this.maps).filter(map => map !== "void")
+      )
+    );
+    // this.setMap(
+    //   "blue"
+    // );
   }
 
   playerSpeedUpdated(diff: number) {
@@ -627,10 +729,8 @@ class GameScene extends Phaser.Scene {
     this.enemies.forEach(enemy => {
       if (!enemy.isFollowCamera) {
         // enemy.velocity.x += diff;
-        console.log(-diff + enemy.velocity.x);
         enemy.setVelocityX(-diff + enemy.velocity.x);
         if (enemy.entityName === 'purple_mushroom') {
-          console.log(enemy.velocity.x);
         }
       }
 
@@ -647,35 +747,37 @@ class GameScene extends Phaser.Scene {
   }
   
   update(time: number, delta: number): void {
+    this._now += delta;
+
     if (this.background && this.player) {
-      this.background.tilePositionX += (this.player.speed * 0.75) * delta / 1000;
+      this.background.tilePositionX += (this.player.speed * 0.5) * delta / 1000;
     }
     
     if (this.player) {
       if (this.isGameOver) return;
 
       this.player.update(delta);
-      this.player.exp += 0.00002 * this.player.speed * delta;
+      this.player.exp += 0.00001 * this.player.speed * delta;
 
       const body = this.player.body as Phaser.Physics.Arcade.Body;
 
-      this.meter += delta * this.player.speed / 1000;
+      if (this.bossIsDead) {
+        this.meter += delta * this.player.speed / 1000;
+      }
       this.meterText.setText(`${Math.floor(this.meter)}M`);
       
       if (Phaser.Input.Keyboard.JustDown(this.cursors.space)) {
         if (!this.player.hasState('stun') && !this.player.hasState('attack') && !this.isGameOver) {
           this.player.jump();
           // 점프(공격) 시작 시 타격된 적 목록 초기화
-          this.hitEnemies = [];
         }
       }
       
       if (this.player.hasState('attack')) {
-        this.checkSwordHits();
+        // this.checkSwordHits();
       } else if (this.attackRangeGraphics) {
         this.attackRangeGraphics.clear();
         // 공격 상태가 아니면 타격된 적 목록 초기화
-        this.hitEnemies = [];
       }
 
       for (const followEffect of this.player.followEffects) {
@@ -707,16 +809,17 @@ class GameScene extends Phaser.Scene {
       }
     }
     
-    for (const sword of this.swords) {
-      sword.update();
+    for (const weapon of this.player.weapons) {
+      weapon.update();
     }
 
     const spawnCooldown = this.spawnCooldown * 30 / this.player.stats.speed;
 
     // * 몹 스폰
-    if (this.bossIsDead && time - this.lastSpawnTime > spawnCooldown) {
-      this.spawnEnemy();
+    if (!this.isChangingMap && this.allowSpawnEnemy && this.bossIsDead && time - this.lastSpawnTime > (spawnCooldown * (1 - this.player.curse / 44 + 0.1))) {
+      const enemy = this.spawnEnemy();
       this.lastSpawnTime = time;
+      enemy?.onNaturalSpawn();
     }
 
     if (Math.floor(this.meter / 10000) > this.clearBoss) {
@@ -726,25 +829,94 @@ class GameScene extends Phaser.Scene {
     }
 
     for (const enemy of this.enemies) {
-      enemy.update(delta);
+      enemy.statusEffects.forEach((effect: StatusEffect) => {
+        if (effect.duration > 0) {
+          effect.duration -= delta;
+        } else {
+          enemy.removeStatusEffect(effect.id);
+        }
+      });
+
+      if (!(enemy.isStun || enemy.isFlee)) {
+        enemy.update(delta);
+      }
+      if (enemy.isFlee) {
+        // enemy.rotation = Phaser.Math.Angle.Between(
+        //   this.player.x, this.player.y,
+        //   enemy.x, enemy.y
+        // ) + Math.PI / 2;
+
+        // enemy.vx = Math.cos(enemy.rotation) * this.player.speed;
+        // enemy.vy = Math.sin(enemy.rotation) * this.player.speed;
+
+        enemy.rotation = Math.PI / 2;
+        enemy.vx = this.player.speed + 10;
+      }
       if (enemy.health <= 0) {
-        enemy.dead();
-        enemy.isDead = true;
-        
         // 경험치 획득
-        enemy.destroy();
+        // enemy.destroy();
+        enemy.setTint(0x808080);
+        enemy.setGravityY(500);
+
+        const randAngle = Math.random() * Math.PI - Math.PI / 2;
+        const randX = Math.cos(randAngle) * 200 * (this.player.damage / 10);
+        const randY = Math.sin(randAngle) * 200 * (this.player.damage / 10);
+        enemy.setVelocity(randX, randY);
 
         enemy.isDestroyed = true;
         this.enemies = this.enemies.filter(e => e !== enemy);
         this.player.exp += enemy.exp;
+
+        const soulCandle = this.player.hasItem("soul_candle");
+        // Soul Candle 효과
+        if (Math.random() < (soulCandle / 10) * (this.player.stats.luck / 100)) {
+          const itemId = Phaser.Utils.Array.GetRandom([
+            "soul_of_power",
+            "soul_of_life",
+            "soul_of_knowledge",
+          ]);
+          const item = this.spawnItem(itemId, enemy.x, enemy.y);
+          const direction = Phaser.Math.Angle.Between(this.player.x, this.player.y, enemy.x, enemy.y);
+          item?.setVelocity(
+            Math.cos(direction) * 40 - this.player.stats.speed,
+            Math.sin(direction) * 40
+          );
+          item?.setDamping(true);
+          // item?.setDrag(.5, .5);
+        }
+
+        const conquestFlag = this.player.hasItem("conquest_flag");
+        if (conquestFlag > 0) {
+          // 가까운 엔티티들에게 flee 효과 부여
+          this.enemies.forEach((e: any) => {
+            if (e !== enemy && !e.isFlee) {
+              const dist = Phaser.Math.Distance.Between(
+                enemy.x, enemy.y,
+                e.x, e.y
+              );
+              if (dist < 100) {
+                e.takeFlee(1000);
+              }
+            }
+          });
+        }
+
+        // dead가 먼저 실행되어야함!
+        enemy.onDead();
+        enemy.remove();
+        enemy.isDead = true;
+
+        this.playSound('hit', {
+          volume: 0.4,
+          rate: 1.5,
+        });
       } else if (
         ((enemy.x < -100) || (enemy.y < -30)
         || (enemy.y > this.cameras.main.height + 30)
         || (enemy.x > this.cameras.main.width + 100))
         && enemy.destroyOnScreenOut
       ) {
-        enemy.destroy();
-        enemy.isDestroyed = true;
+        enemy.remove();
         this.enemies = this.enemies.filter(e => e !== enemy);
       }
     }
@@ -761,21 +933,63 @@ class GameScene extends Phaser.Scene {
           ((1 - dist / this.player.stats.magnet) * 500) + this.player.stats.speed,
         );
       }
+
+      if (
+        item.y < -80
+        || item.y > this.cameras.main.height + 80
+        || item.x < -80
+        || item.x > this.cameras.main.width + 80
+      ) {
+        item.remove();
+      }
     });
     
     // 화면 밖으로 나간 총알 제거
     this.layers.effect.list.forEach((effect: any) => {
       if (
-        effect.y < -40
+        (effect.y < -40
         || effect.y > this.cameras.main.height + 40
         || effect.x < -40
-        || effect.x > this.cameras.main.width + 40
+        || effect.x > this.cameras.main.width + 40)
+        && !((effect as any).isBoomerang)
       ) {
         effect.destroy();
       }
 
       effect.update(delta);
     });
+
+    if (this.debugMode) {
+      this.updateDebugText();
+    }
+  }
+
+  updateDebugText(): void {
+    const enemyCount = this.enemies.length;
+    const visibleEnemyCount = this.enemies.filter(enemy => 
+      enemy.x > 0 && enemy.x < this.cameras.main.width &&
+      enemy.y > 0 && enemy.y < this.cameras.main.height
+    ).length;
+
+    const effectCount = this.layers.effect.list.length;
+    const visibleEffectCount = (this.layers.effect.list as any[]).filter(effect =>
+      effect.x > 0 && effect.x < this.cameras.main.width &&
+      effect.y > 0 && effect.y < this.cameras.main.height
+    ).length;
+
+    const itemCount = this.layers.item.list.length;
+    const visibleItemCount = (this.layers.item.list as Item[]).filter(item =>
+      item.x > 0 && item.x < this.cameras.main.width &&
+      item.y > 0 && item.y < this.cameras.main.height
+    ).length;
+
+    this.debugText = [
+      `enemies: ${visibleEnemyCount} / ${enemyCount}`,
+      `effects: ${visibleEffectCount} / ${effectCount}`,
+      `items: ${visibleItemCount} / ${itemCount}`,
+    ]
+
+    this.debugTextObject.setText(this.debugText.join('\n'));
   }
 
   updateExpBar() {
@@ -807,51 +1021,47 @@ class GameScene extends Phaser.Scene {
   }
   
   checkEnemyHits(player: any, enemy: any): void {
-    if (enemy instanceof Enemy && enemy.attack > 0) {
-      this.player.takeDamage(enemy.attack);
+    if (enemy instanceof Enemy && enemy.damage > 0 && !enemy.isDead) {
+      this.player.takeDamage(enemy.damage);
       enemy.takeDamage(this.player.stats.collisionDamage);
     }
   }
 
   checkSwordHits(): void {
-    if (!this.swords || !this.player) return;
+    // if (!this.swords || !this.player) return;
     
-    const radius = this.player.getRealRange();
+    // const radius = this.player.getRealRange();
 
-    const attackBody = this.physics.add.body(
-      this.player.x - radius, this.player.y - radius
-    ).setCircle(radius);
+    // const attackBody = this.physics.add.body(
+    //   this.player.x - radius, this.player.y - radius
+    // ).setCircle(radius);
     
-    for (const enemy of this.enemies) {
-      if (this.hitEnemies.includes(enemy) || enemy.untargetability) {
-        continue;
-      }
+    // for (const enemy of this.enemies) {
+    //   if (this.hitEnemies.includes(enemy) || enemy.untargetability) {
+    //     continue;
+    //   }
       
-      if (this.physics.world.overlap(attackBody, enemy.body!)) {
-        const isCritcal = Math.random() < (this.player.stats.criticalChance / 100);
-        const damage = isCritcal ? this.player.attack * 2 : this.player.attack;
-        let damageDealt = 0;
-        for (let i = 0; i < this.player.swordCount; i++) {
-          damageDealt += enemy.takeDamage(damage, isCritcal)
-        }
-        this.hitEnemies.push(enemy);
+    //   if (this.physics.world.overlap(attackBody, enemy.body!)) {
+    //     const isCritcal = Math.random() < (this.player.stats.criticalChance / 100);
+    //     const damage = isCritcal ? this.player.attack * 2 : this.player.attack;
+    //     let damageDealt = 0;
+    //     for (let i = 0; i < this.player.swordCount; i++) {
+    //       damageDealt += enemy.takeDamage(damage, isCritcal)
+    //     }
+    //     this.hitEnemies.push(enemy);
         
-        this.playSound('attack', {
-          volume: 0.8
-        })
-      }
-    }
+    //     this.playSound('attack', {
+    //       volume: 0.8
+    //     })
+    //   }
+    // }
     
-    // 임시 바디 제거
-    attackBody.destroy();
+    // // 임시 바디 제거
+    // attackBody.destroy();
   }
 
   spawn() {
 
-  }
-
-  getPlayer(): Player {
-    return this.player;
   }
   
   /**
@@ -886,6 +1096,19 @@ class GameScene extends Phaser.Scene {
   getBulletGroup(): Phaser.Physics.Arcade.Group {
     return this.bulletGroup;
   }
+
+  getBulletList(): AnyBullet[] {
+    return this.bulletGroup.getChildren() as AnyBullet[];
+  }
+
+  addInBulletGroup(sprite: Phaser.GameObjects.Sprite, damage: number): void {
+    this.add.existing(sprite);
+    this.physics.add.overlap(sprite, this.player, () => {
+      this.player.takeDamage(damage);
+      sprite.destroy();
+    });
+    this.bulletGroup.add(sprite);
+  }
   
   /**
    * 배경 이미지 생성 및 설정
@@ -896,7 +1119,8 @@ class GameScene extends Phaser.Scene {
       0, 0,
       this.cameras.main.width,
       this.cameras.main.height,
-      'mushroom-bg'
+      'backgrounds',
+      this.map
     );
     
     // 원점을 왼쪽 상단으로 설정
@@ -949,7 +1173,9 @@ class GameScene extends Phaser.Scene {
         volume: 0,
         duration: 1500,
         onComplete: () => {
-          this.bgMusic.stop();
+          if (this.bgMusic) {
+            this.bgMusic.stop();
+          }
         }
       });
     }
@@ -993,6 +1219,133 @@ class GameScene extends Phaser.Scene {
         this.player.stats.evade = 100;
       }
     }
+  }
+
+  showDebugModeText(text: string) {
+    this.debugModeText.setText(text);
+    this.debugModeText.setVisible(true);
+    this.time.delayedCall(2000, () => {
+      this.debugModeText.setVisible(false);
+    });
+  }
+
+  createAnimation(atlasKey: string, animKey: string): void;
+  createAnimation(atlasKey: string, animKey: string, atlasFrameName?: string): void;
+
+  createAnimation(atlasKey: string, animKey: string, range: [number, number], frameRate?: number, repeat?: number): void;
+  createAnimation(atlasKey: string, animKey: string, prefix: string, range: [number, number], frameRate?: number, repeat?: number): void;
+
+  createAnimation(atlasKey: string, animKey: string, atlasFrameNameOrPrefix?: string | [number, number], rangeOrFrameRate?: number | [number, number], frameRateOrRepeat?: number, repeatParam?: number): void {
+    if (this.anims.exists(animKey)) return;
+
+    if (Entity.loadedAnimation.includes(animKey)) {
+      return;
+    } else {
+      Entity.loadedAnimation.push(animKey);
+    }
+
+    if (Array.isArray(atlasFrameNameOrPrefix)) {
+      const range = atlasFrameNameOrPrefix;
+      const frameRate = typeof rangeOrFrameRate === 'number' ? rangeOrFrameRate : 24;
+      const repeat = typeof frameRateOrRepeat === 'number' ? frameRateOrRepeat : -1;
+      
+      if (!this.anims.exists(animKey)) {
+        this.anims.create({
+          key: animKey,
+          frames: this.anims.generateFrameNames(atlasKey, {
+            prefix: animKey + "-",
+            start: range[0],
+            end: range[1]
+          }),
+          frameRate: frameRate,
+          repeat: repeat
+        });
+      }
+      return;
+    }
+    
+    const range = Array.isArray(rangeOrFrameRate) ? rangeOrFrameRate : undefined;
+    const frameRate = typeof frameRateOrRepeat === 'number' ? frameRateOrRepeat : 24;
+    const repeat = typeof repeatParam === 'number' ? repeatParam : -1;
+
+    if (range === undefined) {
+      const atlasFrameName = atlasFrameNameOrPrefix ?? animKey+"-0";
+      
+      if (!this.anims.exists(animKey)) {
+        this.anims.create({
+          key: animKey,
+          frames: [{ key: atlasKey, frame: atlasFrameName }],
+        });
+      }
+    } else {
+      const atlasFrameNamePrefix = atlasFrameNameOrPrefix ?? animKey;
+      
+      if (!this.anims.exists(animKey)) {
+        this.anims.create({
+          key: animKey,
+          frames: this.anims.generateFrameNames(atlasKey, {
+            prefix: atlasFrameNamePrefix + "-",
+            start: range[0],
+            end: range[1]
+          }),
+          frameRate: frameRate,
+          repeat: repeat
+        });
+      }
+    }
+    if (range === undefined) {
+      const atlasFrameName = atlasFrameNameOrPrefix ?? animKey+"-0";
+      
+      if (!this.anims.exists(animKey)) {
+        this.anims.create({
+          key: animKey,
+          frames: [{ key: atlasKey, frame: atlasFrameName }],
+        });
+      }
+    } else {
+      const atlasFrameNamePrefix = atlasFrameNameOrPrefix ?? animKey;
+      
+      if (!this.anims.exists(animKey)) {
+        this.anims.create({
+          key: animKey,
+          frames: this.anims.generateFrameNames(atlasKey, {
+            prefix: atlasFrameNamePrefix + "-",
+            start: range[0],
+            end: range[1]
+          }),
+          frameRate: frameRate,
+          repeat: repeat
+        });
+      }
+    }
+  }
+
+  setMap(key: string): void {
+    if (this.map === key) return;
+    
+    this.map = key;
+    this.isChangingMap = true;
+
+    this.tweens.add({
+      targets: [this.background],
+      alpha: 0,
+      duration: 1000,
+      onComplete: () => {
+        this.background.setTexture('backgrounds', key);
+
+        this.tweens.add({
+          targets: [this.background],
+          alpha: 1,
+          duration: 1000,
+        })
+
+        this.isChangingMap = false;
+      }
+    })
+  }
+
+  get now(): number {
+    return this._now;
   }
 }
 

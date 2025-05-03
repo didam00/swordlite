@@ -37,10 +37,16 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/fonts/mini.fnt'
     );
     
-    this.load.image('mushroom-bg', 'assets/images/mushroom-background.png');
+    this.load.atlas('backgrounds',
+      'assets/images/backgrounds.png',
+      'assets/images/backgrounds.json'
+    );
+
+    this.load.image('cursor', 'assets/images/cursor.png');
     
     // 배경음악 로드
     this.load.audio('bgm', 'assets/music/resolution.wav');
+    // this.load.audio('bgm', 'assets/music/pensive.wav');
   }
 
   create() {

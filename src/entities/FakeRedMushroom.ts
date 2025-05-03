@@ -14,10 +14,11 @@ export default class FakeRedMushroom extends Enemy {
 
   stats = {
     health: 1,
-    attack: 0,
+    damage: 0,
     speed: 0,
     scale: 1,
     chargeCoolDown: 1000,
+    defense: 0,
   }
 
   constructor(scene: GameScene, x: number, y: number) {
@@ -68,25 +69,25 @@ export default class FakeRedMushroom extends Enemy {
   }
 
   isPlayerInSight(player: Player): void {
-    const chargingSound = this.scene.playSound('charging', {
+    const chargingSound = this.playSound('charging', {
       volume: 0.2,
       loop: true,
       rate: 2,
     })
     this.addState('charging');
-    this.scene.time.delayedCall(this.chargingTime, () => {
+    this.delayedCall(this.chargingTime, () => {
       chargingSound?.destroy();
 
       if (!this.isDestroyed) {
         this.removeState('charging');
         this.addState('charge');
 
-        this.scene.playSound('charge', {
+        this.playSound('charge', {
           volume: 0.2,
           detune: 1000,
         });
         
-        this.scene.time.delayedCall(this.chargeDuration, () => {
+        this.delayedCall(this.chargeDuration, () => {
           if (!this.isDestroyed) {
             this.removeState('charge');
           }

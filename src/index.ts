@@ -61,8 +61,8 @@ const SCALE = 28;
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 16*SCALE,
-  height: 9*SCALE,
+  width: 16*SCALE, // 16 * 28 = 448
+  height: 9*SCALE, // 9 * 28 = 252
   pixelArt: true,
   roundPixels: true,
   scale: {

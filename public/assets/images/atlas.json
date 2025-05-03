@@ -119,159 +119,455 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 100
    },
-   "purple_mushroom_idle-0": {
+   "axe-0": {
     "frame": { "x": 0, "y": 320, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "purple_mushroom_idle-1": {
+   "axe-1": {
     "frame": { "x": 64, "y": 320, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "purple_mushroom_charging-0": {
+   "axe-2": {
+    "frame": { "x": 128, "y": 320, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "axe-3": {
+    "frame": { "x": 192, "y": 320, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "axe-4": {
+    "frame": { "x": 256, "y": 320, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "axe-5": {
+    "frame": { "x": 320, "y": 320, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "axe-6": {
+    "frame": { "x": 384, "y": 320, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "axe-7": {
+    "frame": { "x": 448, "y": 320, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "hammer-0": {
     "frame": { "x": 0, "y": 384, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "purple_mushroom_bomb-0": {
+   "hammer-1": {
+    "frame": { "x": 64, "y": 384, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "hammer-2": {
+    "frame": { "x": 128, "y": 384, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "hammer-3": {
+    "frame": { "x": 192, "y": 384, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "hammer-4": {
+    "frame": { "x": 256, "y": 384, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "hammer-5": {
+    "frame": { "x": 320, "y": 384, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "hammer-6": {
+    "frame": { "x": 384, "y": 384, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "hammer-7": {
+    "frame": { "x": 448, "y": 384, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "spear-0": {
     "frame": { "x": 0, "y": 448, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_idle-0": {
+   "spear-1": {
+    "frame": { "x": 64, "y": 448, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "spear-2": {
+    "frame": { "x": 128, "y": 448, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "spear-3": {
+    "frame": { "x": 192, "y": 448, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "spear-4": {
+    "frame": { "x": 256, "y": 448, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "spear-5": {
+    "frame": { "x": 320, "y": 448, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "spear-6": {
+    "frame": { "x": 384, "y": 448, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "spear-7": {
+    "frame": { "x": 448, "y": 448, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "copper_sword-0": {
     "frame": { "x": 0, "y": 512, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_idle-1": {
+   "copper_sword-1": {
     "frame": { "x": 64, "y": 512, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_idle-2": {
+   "copper_sword-2": {
     "frame": { "x": 128, "y": 512, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_idle-3": {
+   "copper_sword-3": {
     "frame": { "x": 192, "y": 512, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_idle-4": {
+   "copper_sword-4": {
     "frame": { "x": 256, "y": 512, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_idle-5": {
+   "copper_sword-5": {
     "frame": { "x": 320, "y": 512, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_charging-0": {
+   "copper_sword-6": {
+    "frame": { "x": 384, "y": 512, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "copper_sword-7": {
+    "frame": { "x": 448, "y": 512, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "death_sword-0": {
     "frame": { "x": 0, "y": 576, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_charging-1": {
+   "death_sword-1": {
     "frame": { "x": 64, "y": 576, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_charging-2": {
+   "death_sword-2": {
     "frame": { "x": 128, "y": 576, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_charge-0": {
+   "death_sword-3": {
+    "frame": { "x": 192, "y": 576, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "death_sword-4": {
+    "frame": { "x": 256, "y": 576, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "death_sword-5": {
+    "frame": { "x": 320, "y": 576, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "death_sword-6": {
+    "frame": { "x": 384, "y": 576, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "death_sword-7": {
+    "frame": { "x": 448, "y": 576, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "pickaxe-0": {
     "frame": { "x": 0, "y": 640, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "red_mushroom_charge-1": {
+   "pickaxe-1": {
     "frame": { "x": 64, "y": 640, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "blue_mushroom_idle-0": {
+   "pickaxe-2": {
+    "frame": { "x": 128, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "pickaxe-3": {
+    "frame": { "x": 192, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "pickaxe-4": {
+    "frame": { "x": 256, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "pickaxe-5": {
+    "frame": { "x": 320, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "pickaxe-6": {
+    "frame": { "x": 384, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "pickaxe-7": {
+    "frame": { "x": 448, "y": 640, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "boomerang-0": {
     "frame": { "x": 0, "y": 704, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "blue_mushroom_idle-1": {
+   "boomerang-1": {
     "frame": { "x": 64, "y": 704, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "blue_mushroom_idle-2": {
+   "boomerang-2": {
     "frame": { "x": 128, "y": 704, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "blue_mushroom_idle-3": {
+   "boomerang-3": {
     "frame": { "x": 192, "y": 704, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
     "sourceSize": { "w": 64, "h": 64 },
-    "duration": 50
+    "duration": 100
    },
-   "blue_mushroom_shot-0": {
+   "boomerang-4": {
+    "frame": { "x": 256, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "boomerang-5": {
+    "frame": { "x": 320, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "boomerang-6": {
+    "frame": { "x": 384, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "boomerang-7": {
+    "frame": { "x": 448, "y": 704, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "purple_mushroom_idle-0": {
     "frame": { "x": 0, "y": 768, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -279,7 +575,7 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 50
    },
-   "blue_mushroom_shot-1": {
+   "purple_mushroom_idle-1": {
     "frame": { "x": 64, "y": 768, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -287,8 +583,160 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 50
    },
+   "purple_mushroom_charging-0": {
+    "frame": { "x": 0, "y": 832, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "purple_mushroom_bomb-0": {
+    "frame": { "x": 0, "y": 896, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-0": {
+    "frame": { "x": 0, "y": 960, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-1": {
+    "frame": { "x": 64, "y": 960, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-2": {
+    "frame": { "x": 128, "y": 960, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-3": {
+    "frame": { "x": 192, "y": 960, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-4": {
+    "frame": { "x": 256, "y": 960, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_idle-5": {
+    "frame": { "x": 320, "y": 960, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charging-0": {
+    "frame": { "x": 0, "y": 1024, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charging-1": {
+    "frame": { "x": 64, "y": 1024, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charging-2": {
+    "frame": { "x": 128, "y": 1024, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charge-0": {
+    "frame": { "x": 0, "y": 1088, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "red_mushroom_charge-1": {
+    "frame": { "x": 64, "y": 1088, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_idle-0": {
+    "frame": { "x": 0, "y": 1152, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_idle-1": {
+    "frame": { "x": 64, "y": 1152, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_idle-2": {
+    "frame": { "x": 128, "y": 1152, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_idle-3": {
+    "frame": { "x": 192, "y": 1152, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_shot-0": {
+    "frame": { "x": 0, "y": 1216, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
+   "blue_mushroom_shot-1": {
+    "frame": { "x": 64, "y": 1216, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 50
+   },
    "blue_mushroom_shot-2": {
-    "frame": { "x": 128, "y": 768, "w": 64, "h": 64 },
+    "frame": { "x": 128, "y": 1216, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -296,7 +744,7 @@
     "duration": 50
    },
    "blue_mushroom_shot-3": {
-    "frame": { "x": 192, "y": 768, "w": 64, "h": 64 },
+    "frame": { "x": 192, "y": 1216, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -304,7 +752,7 @@
     "duration": 50
    },
    "dream_of_mushroom_idle-0": {
-    "frame": { "x": 0, "y": 832, "w": 64, "h": 64 },
+    "frame": { "x": 0, "y": 1280, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -312,7 +760,7 @@
     "duration": 200
    },
    "dream_of_mushroom_idle-1": {
-    "frame": { "x": 64, "y": 832, "w": 64, "h": 64 },
+    "frame": { "x": 64, "y": 1280, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -320,7 +768,7 @@
     "duration": 200
    },
    "dream_of_mushroom_idle-2": {
-    "frame": { "x": 128, "y": 832, "w": 64, "h": 64 },
+    "frame": { "x": 128, "y": 1280, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -328,7 +776,7 @@
     "duration": 200
    },
    "dream_of_mushroom_idle-3": {
-    "frame": { "x": 192, "y": 832, "w": 64, "h": 64 },
+    "frame": { "x": 192, "y": 1280, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -336,7 +784,7 @@
     "duration": 200
    },
    "dream_of_mushroom_idle-4": {
-    "frame": { "x": 256, "y": 832, "w": 64, "h": 64 },
+    "frame": { "x": 256, "y": 1280, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -344,7 +792,7 @@
     "duration": 200
    },
    "dream_of_mushroom_shot-0": {
-    "frame": { "x": 0, "y": 896, "w": 64, "h": 64 },
+    "frame": { "x": 0, "y": 1344, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -352,7 +800,7 @@
     "duration": 200
    },
    "dream_of_mushroom_shot-1": {
-    "frame": { "x": 64, "y": 896, "w": 64, "h": 64 },
+    "frame": { "x": 64, "y": 1344, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -360,7 +808,7 @@
     "duration": 200
    },
    "dream_of_mushroom_shot-2": {
-    "frame": { "x": 128, "y": 896, "w": 64, "h": 64 },
+    "frame": { "x": 128, "y": 1344, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -368,7 +816,335 @@
     "duration": 200
    },
    "dream_of_mushroom_shot-3": {
-    "frame": { "x": 192, "y": 896, "w": 64, "h": 64 },
+    "frame": { "x": 192, "y": 1344, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "squid_idle-0": {
+    "frame": { "x": 0, "y": 1408, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "squid_idle-1": {
+    "frame": { "x": 64, "y": 1408, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "squid_idle-2": {
+    "frame": { "x": 128, "y": 1408, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "squid_idle-3": {
+    "frame": { "x": 192, "y": 1408, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "squid_idle-4": {
+    "frame": { "x": 256, "y": 1408, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "squid_idle-5": {
+    "frame": { "x": 320, "y": 1408, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "squid_idle-6": {
+    "frame": { "x": 384, "y": 1408, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "squid_idle-7": {
+    "frame": { "x": 448, "y": 1408, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 100
+   },
+   "blue_fish_idle-0": {
+    "frame": { "x": 0, "y": 1472, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "blue_fish_idle-1": {
+    "frame": { "x": 64, "y": 1472, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "blue_fish_idle-2": {
+    "frame": { "x": 128, "y": 1472, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "blue_fish_idle-3": {
+    "frame": { "x": 192, "y": 1472, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-0": {
+    "frame": { "x": 0, "y": 1536, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-1": {
+    "frame": { "x": 64, "y": 1536, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-2": {
+    "frame": { "x": 128, "y": 1536, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-3": {
+    "frame": { "x": 192, "y": 1536, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-0": {
+    "frame": { "x": 0, "y": 1600, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-1": {
+    "frame": { "x": 64, "y": 1600, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-2": {
+    "frame": { "x": 128, "y": 1600, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-3": {
+    "frame": { "x": 192, "y": 1600, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-4": {
+    "frame": { "x": 256, "y": 1600, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-5": {
+    "frame": { "x": 320, "y": 1600, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-6": {
+    "frame": { "x": 384, "y": 1600, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-old-0": {
+    "frame": { "x": 0, "y": 1664, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-old-1": {
+    "frame": { "x": 64, "y": 1664, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-old-2": {
+    "frame": { "x": 128, "y": 1664, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-old-3": {
+    "frame": { "x": 192, "y": 1664, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-old-4": {
+    "frame": { "x": 256, "y": 1664, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_idle-old-5": {
+    "frame": { "x": 320, "y": 1664, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-old-0": {
+    "frame": { "x": 0, "y": 1728, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-old-1": {
+    "frame": { "x": 64, "y": 1728, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-old-2": {
+    "frame": { "x": 128, "y": 1728, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "starfish_charge-old-3": {
+    "frame": { "x": 192, "y": 1728, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "coral_idle-0": {
+    "frame": { "x": 0, "y": 1792, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "coral_idle-1": {
+    "frame": { "x": 64, "y": 1792, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "sea_anemone_idle-0": {
+    "frame": { "x": 0, "y": 1856, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "sea_anemone_charge-0": {
+    "frame": { "x": 0, "y": 1920, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "sea_anemone_charge-1": {
+    "frame": { "x": 64, "y": 1920, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "sea_anemone_charge-2": {
+    "frame": { "x": 128, "y": 1920, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "sea_anemone_charge-3": {
+    "frame": { "x": 192, "y": 1920, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 200
+   },
+   "sea_anemone_charge-4": {
+    "frame": { "x": 256, "y": 1920, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
@@ -381,7 +1157,7 @@
   "version": "1.x-dev",
   "image": "atlas.png",
   "format": "RGBA8888",
-  "size": { "w": 512, "h": 960 },
+  "size": { "w": 512, "h": 1984 },
   "scale": "1",
   "frameTags": [
    { "name": "test_idle", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
@@ -389,16 +1165,32 @@
    { "name": "player_fall", "from": 2, "to": 5, "direction": "forward", "color": "#000000ff" },
    { "name": "player_jump", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
    { "name": "sword", "from": 7, "to": 14, "direction": "forward", "color": "#000000ff" },
-   { "name": "purple_mushroom_idle", "from": 15, "to": 16, "direction": "forward", "color": "#000000ff" },
-   { "name": "purple_mushroom_charging", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
-   { "name": "purple_mushroom_bomb", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
-   { "name": "red_mushroom_idle", "from": 19, "to": 24, "direction": "forward", "color": "#000000ff" },
-   { "name": "red_mushroom_charging", "from": 25, "to": 27, "direction": "forward", "color": "#000000ff" },
-   { "name": "red_mushroom_charge", "from": 28, "to": 29, "direction": "forward", "color": "#000000ff" },
-   { "name": "blue_mushroom_idle", "from": 30, "to": 33, "direction": "forward", "color": "#000000ff" },
-   { "name": "blue_mushroom_shot", "from": 34, "to": 37, "direction": "forward", "color": "#000000ff" },
-   { "name": "dream_of_mushroom_idle", "from": 38, "to": 42, "direction": "forward", "color": "#000000ff" },
-   { "name": "dream_of_mushroom_shot", "from": 43, "to": 46, "direction": "forward", "color": "#000000ff" }
+   { "name": "axe", "from": 15, "to": 22, "direction": "forward", "color": "#000000ff" },
+   { "name": "hammer", "from": 23, "to": 30, "direction": "forward", "color": "#000000ff" },
+   { "name": "spear", "from": 31, "to": 38, "direction": "forward", "color": "#000000ff" },
+   { "name": "copper_sword", "from": 39, "to": 46, "direction": "forward", "color": "#000000ff" },
+   { "name": "death_sword", "from": 47, "to": 54, "direction": "forward", "color": "#000000ff" },
+   { "name": "pickaxe", "from": 55, "to": 62, "direction": "forward", "color": "#000000ff" },
+   { "name": "boomerang", "from": 63, "to": 70, "direction": "forward", "color": "#000000ff" },
+   { "name": "purple_mushroom_idle", "from": 71, "to": 72, "direction": "forward", "color": "#000000ff" },
+   { "name": "purple_mushroom_charging", "from": 73, "to": 73, "direction": "forward", "color": "#000000ff" },
+   { "name": "purple_mushroom_bomb", "from": 74, "to": 74, "direction": "forward", "color": "#000000ff" },
+   { "name": "red_mushroom_idle", "from": 75, "to": 80, "direction": "forward", "color": "#000000ff" },
+   { "name": "red_mushroom_charging", "from": 81, "to": 83, "direction": "forward", "color": "#000000ff" },
+   { "name": "red_mushroom_charge", "from": 84, "to": 85, "direction": "forward", "color": "#000000ff" },
+   { "name": "blue_mushroom_idle", "from": 86, "to": 89, "direction": "forward", "color": "#000000ff" },
+   { "name": "blue_mushroom_shot", "from": 90, "to": 93, "direction": "forward", "color": "#000000ff" },
+   { "name": "dream_of_mushroom_idle", "from": 94, "to": 98, "direction": "forward", "color": "#000000ff" },
+   { "name": "dream_of_mushroom_shot", "from": 99, "to": 102, "direction": "forward", "color": "#000000ff" },
+   { "name": "squid_idle", "from": 103, "to": 110, "direction": "forward", "color": "#000000ff" },
+   { "name": "blue_fish_idle", "from": 111, "to": 114, "direction": "forward", "color": "#000000ff" },
+   { "name": "starfish_idle", "from": 115, "to": 118, "direction": "forward", "color": "#000000ff" },
+   { "name": "starfish_charge", "from": 119, "to": 125, "direction": "forward", "color": "#000000ff" },
+   { "name": "starfish_idle-old", "from": 126, "to": 131, "direction": "forward", "color": "#000000ff" },
+   { "name": "starfish_charge-old", "from": 132, "to": 135, "direction": "forward", "color": "#000000ff" },
+   { "name": "coral_idle", "from": 136, "to": 137, "direction": "forward", "color": "#000000ff" },
+   { "name": "sea_anemone_idle", "from": 138, "to": 138, "direction": "forward", "color": "#000000ff" },
+   { "name": "sea_anemone_charge", "from": 139, "to": 143, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "Layer 3", "opacity": 255, "blendMode": "normal" },

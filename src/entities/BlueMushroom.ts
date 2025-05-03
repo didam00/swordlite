@@ -11,10 +11,11 @@ export default class BlueMushroom extends Enemy {
   lastShotTime: number = 0;
 
   stats = {
-    health: 4,
-    attack: 1,
+    health: 7,
+    damage: 1,
     speed: 0,
     scale: 1,
+    defense: 1,
   }
 
   constructor(scene: GameScene, x: number, y: number) {
@@ -42,7 +43,9 @@ export default class BlueMushroom extends Enemy {
     // });
 
     // this.playerSpeedUpdated(0);
-    this.bulletCooldown = Math.random() * 1700 + 3000;
+    this.delayedCall(250 + 2000 * Math.random(), () => {
+      this.bulletCooldown = 6000 / (this.level + 1);
+    })
   }
 
   createAnimations(): void {
@@ -58,6 +61,7 @@ export default class BlueMushroom extends Enemy {
   // }
 
   update(delta: number) {
+    super.update(delta);
     if (this.hasState('shot')) {
       const speed = -20;
       this.vx = Math.cos(this.rotation - Math.PI / 2) * speed;
@@ -80,7 +84,7 @@ export default class BlueMushroom extends Enemy {
 
       this.rotation = Phaser.Math.Angle.Wrap(this.rotation + rotation);
 
-      if (this.x >= 100 && this.scene.time.now - this.lastShotTime >= this.bulletCooldown) {
+      if (this.x >= 100 && this.scene.now - this.lastShotTime >= this.bulletCooldown && this.bulletCooldown != 0) {
         this.setShotMode();
         this.lastShotTime = this.scene.time.now;
       }
@@ -91,7 +95,7 @@ export default class BlueMushroom extends Enemy {
   }
 
   setShotMode(): void {
-    const charingSound = this.scene.playSound('shotCharging', {
+    const charingSound = this.playSound('shotCharging', {
       volume: 0.4,
       loop: true,
       detune: 500,
@@ -99,25 +103,25 @@ export default class BlueMushroom extends Enemy {
     })
     
     this.addState('shot');
-    this.scene.time.delayedCall(333 * 3, () => {
+    this.delayedCall(333 * 3, () => {
       charingSound?.destroy();
       if (this.isDestroyed) return;
 
-      this.scene.playSound('rocket', {
+      this.playSound('rocket', {
         volume: 1,
         detune: -500,
       })
 
-      for (let i = 0; i < 16; i++) {
+      for (let i = 0; i < 24; i++) {
         this.shotToPlayer(
           this.rotation - Math.PI / 40 + Math.PI / 20 * Math.random(),
           Math.random() * 4 + 2,
-          Math.random() * 100 + 100,
-          Math.random() * 400 + 200
+          Math.random() * 80 + 100,
+          Math.random() * 560 + 400
         );
       }
     });
-    this.scene.time.delayedCall(1000, () => {
+    this.delayedCall(1000, () => {
       if (this.isDestroyed) return;
 
       this.removeState('shot');

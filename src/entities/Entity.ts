@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import GameScene from '../scenes/GameScene';
+import { StatusEffect } from '../types';
 
 export interface EntityState {
   [key: string]: boolean
@@ -14,6 +15,10 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
   readonly scene: GameScene = null!;
   isDead: boolean = false;
   isDestroyed: boolean = false;
+  delayEvents: Phaser.Time.TimerEvent[] = [];
+  playingSounds: Phaser.Sound.BaseSound[] = [];
+
+  statusEffects: StatusEffect[] = [];
   
   // 화면 밖을 나가면 사라지는 옵션
   destroyOnScreenOut: boolean = true;
@@ -24,7 +29,7 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
 
   abstract stats: {
     health: number,
-    attack: number,
+    damage: number,
     [key: string]: number
   };
 
@@ -149,6 +154,23 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
     return Boolean(this.states[state]);
   }
 
+  addOnlyState(state: string): void {
+    for (const key in this.states) {
+      if (key === "idle") continue;
+      this.states[key] = false;
+    }
+    this.states[state] = true;
+    this.updateAnimation();
+  }
+
+  removeAllStates(): void {
+    for (const key in this.states) {
+      if (key === "idle") continue;
+      this.states[key] = false;
+    }
+    this.updateAnimation();
+  }
+
   getStates(): string[] {
     return Object.keys(this.states).filter(state => this.states[state]);
   }
@@ -188,10 +210,12 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
 
   abstract update(delta: number): void;
 
-  blink(duration: number = 500, count: number = 3, minAlpha: number = 0): void {
+  blink(duration: number = 500, count?: number, minAlpha: number = 0): void {
     if (this.blinkTween) {
       this.blinkTween.stop();
     }
+
+    count = count ?? duration / 250;
     
     // 트윈 생성하여 저장
     this.blinkTween = this.scene.tweens.add({
@@ -215,8 +239,35 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
     this.setAlpha(1);
   }
 
-  dead(): void {
+  onDead(): void {
     
+  }
+
+  remove(): void {
+    this.delayEvents.forEach(event => {
+      event.remove(false);
+      event.destroy();
+    });
+    this.delayEvents = [];
+    this.playingSounds.forEach(sound => {
+      sound.destroy();
+    });
+    this.playingSounds = [];
+
+    this.stopBlink();
+    this.isDestroyed = true;
+
+    this.scene.time.delayedCall(1000, () => {
+      this.destroy();
+    });
+  }
+
+  playSound(key: string, config?: Phaser.Types.Sound.SoundConfig): Phaser.Sound.BaseSound | undefined {
+    const sound = this.scene.playSound(key, config);
+    if (!sound) return;
+    this.playingSounds.push(sound);
+
+    return sound;
   }
 
   // setStat(key: string, value: number): void {
@@ -235,12 +286,12 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
     return this.stats.health;
   }
 
-  set attack(value: number) {
-    this.stats.attack = value;
+  set damage(value: number) {
+    this.stats.damage = value;
   }
 
-  get attack(): number {
-    return this.stats.attack;
+  get damage(): number {
+    return this.stats.damage;
   }
 
   getDist(other: Entity): number {
@@ -249,5 +300,29 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
 
   getAngle(other: Entity): number {
     return Phaser.Math.Angle.Between(this.x, this.y, other.x, other.y);
+  }
+
+  delayedCall(delay: number, callback: () => void): Phaser.Time.TimerEvent {
+    const event = this.scene.time.delayedCall(delay, callback, [], this);
+    this.delayEvents.push(event);
+    return event;
+  }
+
+  addStatusEffect(id: string, duration: number) {
+    this.statusEffects.push({
+      id, duration
+    });
+  }
+
+  hasStatusEffect(id: string): boolean {
+    return this.statusEffects.some(effect => effect.id === id);
+  }
+
+  getStatusEffect(id: string): StatusEffect | undefined {
+    return this.statusEffects.find(effect => effect.id === id);
+  }
+
+  removeStatusEffect(id: string): void {
+    this.statusEffects = this.statusEffects.filter(effect => effect.id !== id);
   }
 }

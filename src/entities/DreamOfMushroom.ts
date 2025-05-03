@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import Enemy from './Enemy';
+import Enemy, { SpriteBullet } from './Enemy';
 import GameScene from '../scenes/GameScene';
 import RedMushroom from './RedMushroom';
 import FakeRedMushroom from './FakeRedMushroom';
+import BossEnemy from './BossEnemy';
 
-export default class DreamOfMushroom extends Enemy {
+export default class DreamOfMushroom extends BossEnemy {
   entityName = 'dream_of_mushroom';
   isFollowCamera: boolean = true;
   lastCoolTime: number = 0;
@@ -17,13 +18,13 @@ export default class DreamOfMushroom extends Enemy {
   modes: string[] = ['spawn_red_mushrooms', 'shot'];
   prevMode: string = 'idle';
   scaleRate: number = 1;
-  exp: number = 500;
 
   stats = {
-    health: 200,
-    attack: 2,
+    health: 100,
+    damage: 1,
     speed: 40,
     scale: 1,
+    defense: 5,
   }
 
   constructor(scene: GameScene, x: number, y: number) {
@@ -36,7 +37,7 @@ export default class DreamOfMushroom extends Enemy {
     this.setScale(this.stats.scale);
     this.rotation = - Math.PI / 2;
 
-    this.lastTransformTime = this.scene.time.now - 2000;
+    this.lastTransformTime = this.scene.now - 2000;
 
     this.createAnimations();
     this.updateAnimation();
@@ -57,14 +58,14 @@ export default class DreamOfMushroom extends Enemy {
     // this.mode = "shot";
     console.log(this.mode);
     
-    this.lastTransformTime = this.scene.time.now;
-    this.lastCoolTime = this.scene.time.now;
+    this.lastTransformTime = this.scene.now;
+    this.lastCoolTime = this.scene.now;
     
     if (this.mode != "spawn_red_mushrooms" && this.prevMode === "spawn_red_mushrooms") {
       const omode = this.mode;
       this.mode = this.prevMode;
       
-      this.scene.time.delayedCall(1500, () => {
+      this.delayedCall(1500, () => {
         if (this.isDestroyed) return;
 
         this.removeState("charging");
@@ -104,7 +105,7 @@ export default class DreamOfMushroom extends Enemy {
         });
       }
 
-      this.lastTransformTime = this.scene.time.now + 1000;
+      this.lastTransformTime = this.scene.now + 1000;
     }
     
     if (this.mode === "shot") {
@@ -113,6 +114,7 @@ export default class DreamOfMushroom extends Enemy {
   }
 
   update(delta: number) {
+    super.update(delta);
     // const x = Math.floor(this.x);
     // const y = Math.floor(this.y);
     
@@ -131,10 +133,10 @@ export default class DreamOfMushroom extends Enemy {
     //   console.log(`x: ${x}\t y: ${y}`);
     // }
 
-    const now = this.scene.time.now;
+    const now = this.scene.now;
 
     if (now - this.lastTransformTime > 5000) {
-      this.lastTransformTime = this.scene.time.now;
+      this.lastTransformTime = this.scene.now;
       this.randomTransform();
     }
 
@@ -150,17 +152,17 @@ export default class DreamOfMushroom extends Enemy {
       this.addState('charging');
       this.stopBlink();
 
-      this.scene.time.delayedCall(500, () => {
+      this.delayedCall(500, () => {
         if (!this.isDestroyed) {
           this.removeState('charging');
           this.addState('charge');
   
-          this.scene.playSound('charge', {
+          this.playSound('charge', {
             volume: 0.4,
             detune: 1000,
           });
           
-          this.scene.time.delayedCall(1000, () => {
+          this.delayedCall(1000, () => {
             if (!this.isDestroyed) {
               this.removeState('charge');
             }
@@ -168,7 +170,7 @@ export default class DreamOfMushroom extends Enemy {
         }
       });
 
-      const count = 3;
+      const count = 1 + this.level;
       for (let i = 0; i < count; i++) {
         const redMushroom = this.scene.spawnEnemy("fake_red_mushroom") as FakeRedMushroom;
         redMushroom.setPosition(
@@ -179,6 +181,7 @@ export default class DreamOfMushroom extends Enemy {
         redMushroom.isPlayerInSight(this.scene.player);
         redMushroom.rotation
           = redMushroom.getAngle(this.scene.player) + Math.PI / 2 + Math.random() * Math.PI / 8 - Math.PI / 16;
+        redMushroom.chargingTime = 500;
       }
       this.lastCoolTime = now;
     }
@@ -212,57 +215,50 @@ export default class DreamOfMushroom extends Enemy {
       this.rotation += angleDiff / 480 * delta;
     }
 
-    if (this.mode === 'shot' && now - this.lastCoolTime > 500) {
+    if (this.mode === 'shot' && now - this.lastCoolTime > 1500 / (this.level + 1) * (Math.random() + 0.5)) {
       if (!this.hasState('shot')) {
         this.addState('shot');
       }
       this.lastCoolTime = now;
-      this.scene.time.delayedCall(125 * 3, () => {
+      this.delayedCall(125 * 3, () => {
         if (this.isDestroyed) return;
+        const trans = Math.random() < 0.5 ? 1 : 0;
 
-        for (let i = 0; i < 3; i++) {
-          const angle = this.rotation - Math.PI / 16 + Math.PI / 16 * i;
-          
-          for (let j = 0; j < 8; j++) {
-            const bullet = this.shotToPlayer(angle + Math.PI / 16 * i, Math.random() * 3 + 1, 200, 2000);
-            // const dist = Math.floor(Math.random() * 65) ** 0.5
-            // const r = Math.random() * Math.PI * 2;
-            bullet?.setPosition(
-              bullet.x + Math.random() * 11 - 5,
-              bullet.y + Math.random() * 11 - 5,
-            )
-          }
+        for (let i = 0; i < (this.level * 2 - trans) - 1; i++) {
+          const angle = this.rotation + Math.PI / 8 * (i - this.level + 1) + trans * Math.PI / 16;
+          const bullet = this.shotToPlayer(angle, Math.random() * 3 + 1, 200, 2000);
         }
       })
-      this.scene.playSound('charge', {
+      this.playSound('charge', {
         volume: 0.4,
         detune: 1000,
       });
     }
   }
 
-  shotToPlayer(toRotate: number, size: number, speed: number, life: number): (Phaser.GameObjects.Arc & {
-    body: Phaser.Physics.Arcade.Body;
-  }) | null {
+  shotToPlayer(toRotate: number, size: number, speed: number, life: number): void {
     if (this.health <= 0 || !this.active) {
-      return null;
+      return;
     }
     
-    const bullet = this.createBullet(Phaser.Utils.Array.GetRandom([0x3949ac, 0x5283d2, 0x73b7e1]), size, life);
-    bullet?.setPosition(
+    // const bullet = this.createBullet(Phaser.Utils.Array.GetRandom([0x3949ac, 0x5283d2, 0x73b7e1]), size, life);
+    const bullet = this.scene.add.sprite(
       this.x + Math.cos(this.rotation - Math.PI / 2) * this.width / 2,
-      this.y + Math.sin(this.rotation - Math.PI / 2) * this.width / 2
-    );
-    bullet?.body.setVelocity(
+      this.y + Math.sin(this.rotation - Math.PI / 2) * this.width / 2,
+      'effects',
+    ).play("blue_spore") as SpriteBullet;
+
+    bullet.isBullet = true;
+    bullet.owner = this;
+    bullet.damage = 1;
+
+    this.scene.addInBulletGroup(bullet, 1);
+    const body = bullet.body as Phaser.Physics.Arcade.Body;
+    body.setSize(8, 8);
+    bullet.setOrigin(0.5, 0.5);
+    body.setVelocity(
       Math.cos(toRotate - Math.PI / 2) * speed,
       Math.sin(toRotate - Math.PI / 2) * speed
     );
-
-    bullet?.body.setGravityY(20);
-    return bullet;
-  }
-
-  dead() {
-    this.scene.bossIsDead = true;
   }
 }

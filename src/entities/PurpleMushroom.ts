@@ -5,12 +5,14 @@ import GameScene from '../scenes/GameScene';
 export default class PurpleMushroom extends Enemy {
   entityName = 'purple_mushroom';
   rotationClockwise = 1;
+  exp = 20;
 
   stats = {
-    health: 5,
-    attack: 1,
+    health: 8,
+    damage: 1,
     speed: 0,
     scale: 1,
+    defense: 2,
   }
 
   constructor(scene: GameScene, x: number, y: number) {
@@ -18,7 +20,7 @@ export default class PurpleMushroom extends Enemy {
       "idle",
     ], scene, x, y);
 
-    this.body!.setSize(12, 12);
+    this.body!.setSize(16, 16);
     this.rotation = Math.random() * Math.PI * 2;
     this.rotationClockwise = Math.random() < 0.5 ? 1 : -1;
     this.setScale(this.stats.scale);
@@ -28,38 +30,38 @@ export default class PurpleMushroom extends Enemy {
   }
 
   createAnimations(): void {
-    this.createAnimation('purple_mushroom_idle', [0, 1], 12);
+    this.createAnimation('purple_mushroom_idle', [0, 1], 6);
   }
 
   update(delta: number) {
-    this.velocity = {x: 0, y: 0};
-    this.rotation += (Math.PI * delta / 5000) * this.rotationClockwise;
+    super.update(delta);
+    // this.velocity = [0, 0];
+    this.rotation += (Math.PI * delta / 20000) * this.rotationClockwise;
   }
 
-  dead(): void {
-    const cnt = 50;
+  onDead(): void {
+    const cnt = 24 * (0.5 + this.level * 0.5);
     for (let i = 0; i < cnt; i++) {
-      const bullet = this.createBullet(0x643499, Math.random() * 5 + 2, Math.random() * 2000 + 500)!;
-      const speed = 120 * Math.random() + 80;
-      bullet.rotation = Math.PI / (cnt / 2) * i;
+      const speed = 110 * Math.random() * (0.5 + this.level * 0.5) + 60;
+      const angle = Math.PI / (cnt / 2) * i;
       
-      (bullet as any)._ovx = Math.cos(bullet.rotation) * speed;
-      (bullet as any)._ovy = Math.sin(bullet.rotation) * speed;
+      const bullet = this.createBullet(0x643499, Math.random() * 6 + 3, (Math.random() * 2000 + 500) * this.level, 1, {
+        drag: 0.002,
+        speed: [
+          Math.cos(angle) * speed,
+          Math.sin(angle) * speed,
+        ]
+      })!;
 
-      const player = this.scene.player;
-      
-      bullet.update = (time, delta) => {
-        (bullet as any)._ovx *= 0.97;
-        (bullet as any)._ovy *= 0.97;
-        const vx = (bullet as any)._ovx
-        const vy = (bullet as any)._ovy;
+      // bullet.update = (time, delta) => {
+      //   (bullet as any)._ovx *= 0.97;
+      //   (bullet as any)._ovy *= 0.97;
+      //   const vx = (bullet as any)._ovx
+      //   const vy = (bullet as any)._ovy;
         
-        bullet.body?.setVelocityX(vx - player.speed);
-        bullet.body?.setVelocityY(vy - 10);
-      }
-
-      bullet.body.setDamping(true);
-      bullet.body.setDrag(0.025);
+      //   bullet.body?.setVelocityX(vx - player.speed);
+      //   bullet.body?.setVelocityY(vy - 10);
+      // }
     }
   }
 }

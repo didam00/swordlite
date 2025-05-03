@@ -1,5 +1,5 @@
 { "frames": {
-   "giant_sword-0": {
+   "green_heart-0": {
     "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -7,7 +7,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "green_heart-0": {
+   "big_mushroom-0": {
     "frame": { "x": 0, "y": 16, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -15,7 +15,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "big_mushroom-0": {
+   "wind_mushroom-0": {
     "frame": { "x": 0, "y": 32, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -23,7 +23,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "wind_mushroom-0": {
+   "strategy_book-0": {
     "frame": { "x": 0, "y": 48, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -31,7 +31,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "strategy_book-0": {
+   "great_magnet-0": {
     "frame": { "x": 0, "y": 64, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -39,7 +39,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "great_magnet-0": {
+   "black_cloak-0": {
     "frame": { "x": 0, "y": 80, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -47,7 +47,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "black_cloak-0": {
+   "bug_boots-0": {
     "frame": { "x": 0, "y": 96, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -55,7 +55,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "bug_boots-0": {
+   "weight-0": {
     "frame": { "x": 0, "y": 112, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -63,7 +63,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "weight-0": {
+   "shadow_water-0": {
     "frame": { "x": 0, "y": 128, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -71,7 +71,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "shadow_water-0": {
+   "light_rod-0": {
     "frame": { "x": 0, "y": 144, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -79,7 +79,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "light_rod-0": {
+   "black_coffee-0": {
     "frame": { "x": 0, "y": 160, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -87,7 +87,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "black_coffee-0": {
+   "sugar_cube-0": {
     "frame": { "x": 0, "y": 176, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -95,7 +95,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "sugar_cube-0": {
+   "cracker-0": {
     "frame": { "x": 0, "y": 192, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -103,7 +103,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "cracker-0": {
+   "giant_sword-0": {
     "frame": { "x": 0, "y": 208, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -111,7 +111,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "double_giant_swords-0": {
+   "black_pearl-0": {
     "frame": { "x": 0, "y": 224, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -119,7 +119,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "black_pearl-0": {
+   "double_daggers-0": {
     "frame": { "x": 0, "y": 240, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -127,7 +127,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "double_daggers-0": {
+   "windy_fan-0": {
     "frame": { "x": 0, "y": 256, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -135,7 +135,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "windy_fan-0": {
+   "eye_crystal-0": {
     "frame": { "x": 0, "y": 272, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -143,7 +143,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "magic_crystal-0": {
+   "pale_whetstone-0": {
     "frame": { "x": 0, "y": 288, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -151,7 +151,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "pale_whetstone-0": {
+   "shiny_sandclock-0": {
     "frame": { "x": 0, "y": 304, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -159,8 +159,144 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
    },
-   "shiny_sandclock-0": {
+   "helmet-0": {
     "frame": { "x": 0, "y": 320, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "cloud_wing-0": {
+    "frame": { "x": 0, "y": 336, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "soul_candle-0": {
+    "frame": { "x": 0, "y": 352, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "ninja_banana-0": {
+    "frame": { "x": 0, "y": 368, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "rusty_shield-0": {
+    "frame": { "x": 0, "y": 384, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "portable_mirror-0": {
+    "frame": { "x": 0, "y": 400, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "soul_of_power-0": {
+    "frame": { "x": 0, "y": 416, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "soul_of_life-0": {
+    "frame": { "x": 0, "y": 432, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "soul_of_knowledge-0": {
+    "frame": { "x": 0, "y": 448, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "lucky_coin-0": {
+    "frame": { "x": 0, "y": 464, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "lightning_rod-0": {
+    "frame": { "x": 0, "y": 480, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "conquest_flag-0": {
+    "frame": { "x": 0, "y": 496, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "copper_sword-0": {
+    "frame": { "x": 0, "y": 512, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "flame_crystal-0": {
+    "frame": { "x": 0, "y": 528, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "lightning_crystal-0": {
+    "frame": { "x": 0, "y": 544, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "death_crystal-0": {
+    "frame": { "x": 0, "y": 560, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "boomerang-0": {
+    "frame": { "x": 0, "y": 576, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   "pickaxe-0": {
+    "frame": { "x": 0, "y": 592, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
@@ -173,34 +309,50 @@
   "version": "1.x-dev",
   "image": "items.png",
   "format": "RGBA8888",
-  "size": { "w": 16, "h": 336 },
+  "size": { "w": 16, "h": 608 },
   "scale": "1",
   "frameTags": [
-   { "name": "giant_sword", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
-   { "name": "green_heart", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" },
-   { "name": "big_mushroom", "from": 2, "to": 2, "direction": "forward", "color": "#000000ff" },
-   { "name": "wind_mushroom", "from": 3, "to": 3, "direction": "forward", "color": "#000000ff" },
-   { "name": "strategy_book", "from": 4, "to": 4, "direction": "forward", "color": "#000000ff" },
-   { "name": "great_magnet", "from": 5, "to": 5, "direction": "forward", "color": "#000000ff" },
-   { "name": "black_cloak", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
-   { "name": "bug_boots", "from": 7, "to": 7, "direction": "forward", "color": "#000000ff" },
-   { "name": "weight", "from": 8, "to": 8, "direction": "forward", "color": "#000000ff" },
-   { "name": "shadow_water", "from": 9, "to": 9, "direction": "forward", "color": "#000000ff" },
-   { "name": "light_rod", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
-   { "name": "black_coffee", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
-   { "name": "sugar_cube", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
-   { "name": "cracker", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
-   { "name": "double_giant_swords", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
-   { "name": "black_pearl", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
-   { "name": "double_daggers", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
-   { "name": "windy_fan", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
-   { "name": "magic_crystal", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
-   { "name": "pale_whetstone", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
-   { "name": "shiny_sandclock", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" }
+   { "name": "green_heart", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "big_mushroom", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" },
+   { "name": "wind_mushroom", "from": 2, "to": 2, "direction": "forward", "color": "#000000ff" },
+   { "name": "strategy_book", "from": 3, "to": 3, "direction": "forward", "color": "#000000ff" },
+   { "name": "great_magnet", "from": 4, "to": 4, "direction": "forward", "color": "#000000ff" },
+   { "name": "black_cloak", "from": 5, "to": 5, "direction": "forward", "color": "#000000ff" },
+   { "name": "bug_boots", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
+   { "name": "weight", "from": 7, "to": 7, "direction": "forward", "color": "#000000ff" },
+   { "name": "shadow_water", "from": 8, "to": 8, "direction": "forward", "color": "#000000ff" },
+   { "name": "light_rod", "from": 9, "to": 9, "direction": "forward", "color": "#000000ff" },
+   { "name": "black_coffee", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
+   { "name": "sugar_cube", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
+   { "name": "cracker", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
+   { "name": "giant_sword", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
+   { "name": "black_pearl", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "double_daggers", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
+   { "name": "windy_fan", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
+   { "name": "eye_crystal", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
+   { "name": "pale_whetstone", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
+   { "name": "shiny_sandclock", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
+   { "name": "helmet", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" },
+   { "name": "cloud_wing", "from": 21, "to": 21, "direction": "forward", "color": "#000000ff" },
+   { "name": "soul_candle", "from": 22, "to": 22, "direction": "forward", "color": "#000000ff" },
+   { "name": "ninja_banana", "from": 23, "to": 23, "direction": "forward", "color": "#000000ff" },
+   { "name": "rusty_shield", "from": 24, "to": 24, "direction": "forward", "color": "#000000ff" },
+   { "name": "portable_mirror", "from": 25, "to": 25, "direction": "forward", "color": "#000000ff" },
+   { "name": "soul_of_power", "from": 26, "to": 26, "direction": "forward", "color": "#000000ff" },
+   { "name": "soul_of_life", "from": 27, "to": 27, "direction": "forward", "color": "#000000ff" },
+   { "name": "soul_of_knowledge", "from": 28, "to": 28, "direction": "forward", "color": "#000000ff" },
+   { "name": "lucky_coin", "from": 29, "to": 29, "direction": "forward", "color": "#000000ff" },
+   { "name": "lightning_rod", "from": 30, "to": 30, "direction": "forward", "color": "#000000ff" },
+   { "name": "conquest_flag", "from": 31, "to": 31, "direction": "forward", "color": "#000000ff" },
+   { "name": "copper_sword", "from": 32, "to": 32, "direction": "forward", "color": "#000000ff" },
+   { "name": "flame_crystal", "from": 33, "to": 33, "direction": "forward", "color": "#000000ff" },
+   { "name": "lightning_crystal", "from": 34, "to": 34, "direction": "forward", "color": "#000000ff" },
+   { "name": "death_crystal", "from": 35, "to": 35, "direction": "forward", "color": "#000000ff" },
+   { "name": "boomerang", "from": 36, "to": 36, "direction": "forward", "color": "#000000ff" },
+   { "name": "pickaxe", "from": 37, "to": 37, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
-   { "name": "Layer", "opacity": 255, "blendMode": "normal" },
-   { "name": "Layer 1", "opacity": 38, "blendMode": "normal" }
+   { "name": "Layer", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [
   ]
