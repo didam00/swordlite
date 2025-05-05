@@ -7,6 +7,7 @@ export default class Starfish extends Enemy {
   exp = 10;
   wasCharged: boolean = false;
   wasDamaged: boolean = false;
+  isBombed: boolean = false;
 
   stats = {
     health: 8,
@@ -43,12 +44,13 @@ export default class Starfish extends Enemy {
     super.update(delta);
     
     if ((this.getDist(this.scene.player) < 60 + 10 * this.level || this.wasDamaged) 
-      && !this.wasCharged
+      && !this.isBombed && !this.hasState('charge')
     ) {
       this.addState('charge');
       this.wasCharged = true;
 
       this.delayedCall(1000 / 4 * 3, () => {
+        if (this.isDead) return;
         const count = 50 * (0.5 + this.level * 0.5);
         // const emptyAngle = Math.random() * Math.PI - Math.PI / 2;
 
@@ -65,6 +67,8 @@ export default class Starfish extends Enemy {
             ],
           });
         }
+
+        this.isBombed = true;
         
         this.playSound("bubble", {
           volume: 0.6,

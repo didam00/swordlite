@@ -23,8 +23,16 @@
     "sourceSize": { "w": 512, "h": 512 },
     "duration": 100
    },
-   "void": {
+   "brown": {
     "frame": { "x": 1536, "y": 0, "w": 512, "h": 512 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 512, "h": 512 },
+    "sourceSize": { "w": 512, "h": 512 },
+    "duration": 100
+   },
+   "void": {
+    "frame": { "x": 2048, "y": 0, "w": 512, "h": 512 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 512, "h": 512 },
@@ -37,13 +45,14 @@
   "version": "1.x-dev",
   "image": "backgrounds.png",
   "format": "RGBA8888",
-  "size": { "w": 2048, "h": 512 },
+  "size": { "w": 2560, "h": 512 },
   "scale": "1",
   "frameTags": [
    { "name": "indigo", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
    { "name": "violet", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" },
    { "name": "blue", "from": 2, "to": 2, "direction": "forward", "color": "#000000ff" },
-   { "name": "void", "from": 3, "to": 3, "direction": "forward", "color": "#000000ff" }
+   { "name": "brown", "from": 3, "to": 3, "direction": "forward", "color": "#000000ff" },
+   { "name": "void", "from": 4, "to": 4, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "Layer", "opacity": 255, "blendMode": "normal" },

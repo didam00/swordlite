@@ -9,7 +9,7 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
   positionAngle: number = 0;
   private index: number = 0;
   readonly weaponName: string;
-  private emitter: Phaser.GameObjects.Particles.ParticleEmitter = null!;
+  emitter: Phaser.GameObjects.Particles.ParticleEmitter = null!;
   private lastAttackTime: number = 0;
   private attackEffect: Phaser.GameObjects.Sprite | null = null;
   private isAttacking: boolean = false;
@@ -272,15 +272,20 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
             } else {
               size = (bullet.body.width * bullet.body.height) ** 0.5;
             }
+
+            this.scene.time.delayedCall(bullet.config.emitterDeleteTime ?? 0, () => {
+              bullet.config.emitter?.destroy();
+            });
+
             bullet.destroy();
   
-            for (let i = 0; i < size / 20 * portableMirror + size * (this.player.stats.mana / 200); i++) {
+            for (let i = 0; i < size / 20 * portableMirror * 2 + size * (this.player.stats.mana / 200); i++) {
               const lightBullet = this.scene.add.sprite(x!, y!, 'effects', 'light_bullet-0').play('light_bullet');
               this.scene.physics.add.existing(lightBullet);
     
               // lightBullet.play('light_bullet');
               lightBullet.setOrigin(0.5, 0.5);
-              const scale = Math.random() * 0.5 + 0.25
+              const scale = Math.random() * 0.5 + 0.25 + (portableMirror * 0.05)
               lightBullet.setScale(scale);
               lightBullet.setAlpha(0.9);
               // lightBullet.rotation = Math.random() * Math.PI * 2;
@@ -290,7 +295,7 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
               body.setSize(10, 10);
   
               // const randRotation = Math.random() * Math.PI * 2;
-              const speed = (100 * Math.random() + 300) * (portableMirror * 0.33 + 0.66);
+              const speed = (100 * Math.random() + 300) * (portableMirror * 0.25 + 0.75);
 
               // body.setVelocity(
               //   Math.cos(randRotation) * speed - this.player.speed,
@@ -300,20 +305,20 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
               const moveAngle = Phaser.Math.Angle.Between(
                 this.player.x, this.player.y,
                 lightBullet.x, lightBullet.y,
-              ) + (Math.PI / 8 * (1 + this.player.stats.mana / 100)) * (Math.random() - 0.5);
+              ) + (Math.PI / 8 * portableMirror) * (Math.random() - 0.5);
 
               body.setVelocity(
                 Math.cos(moveAngle) * speed - this.player.speed,
                 Math.sin(moveAngle) * speed
               );
 
-              body.setDrag(400 * (portableMirror * 0.1 + 0.9), 400 * (portableMirror * 0.2 + 0.8));
+              body.setDrag(400 * (portableMirror * 0.2 + 0.8), 400 * (portableMirror * 0.2 + 0.8));
     
               this.scene.physics.add.collider(lightBullet, this.scene.enemyGroup, (light, enemy) => {
                 if (this.hitEnemies.includes(enemy as Enemy)) {
                   return;
                 }
-                const damage = this.player.damage / 2;
+                const damage = this.player.damage * portableMirror / 2;
                 (enemy as Enemy).takeDamage(damage, false, ["magic", "light"]);
                 lightBullet.destroy();
                 this.hitEnemies.push(enemy as Enemy);

@@ -935,38 +935,6 @@
     "sourceSize": { "w": 128, "h": 128 },
     "duration": 41
    },
-   "fireball_spawn-6": {
-    "frame": { "x": 768, "y": 2560, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_spawn-7": {
-    "frame": { "x": 896, "y": 2560, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_spawn-8": {
-    "frame": { "x": 1024, "y": 2560, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_spawn-9": {
-    "frame": { "x": 1152, "y": 2560, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
    "fireball_shoot-0": {
     "frame": { "x": 0, "y": 2688, "w": 128, "h": 128 },
     "rotated": false,
@@ -977,54 +945,6 @@
    },
    "fireball_shoot-1": {
     "frame": { "x": 128, "y": 2688, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_shoot-2": {
-    "frame": { "x": 256, "y": 2688, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_shoot-3": {
-    "frame": { "x": 384, "y": 2688, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_shoot-4": {
-    "frame": { "x": 512, "y": 2688, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_shoot-5": {
-    "frame": { "x": 640, "y": 2688, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_shoot-6": {
-    "frame": { "x": 768, "y": 2688, "w": 128, "h": 128 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
-    "sourceSize": { "w": 128, "h": 128 },
-    "duration": 41
-   },
-   "fireball_shoot-7": {
-    "frame": { "x": 896, "y": 2688, "w": 128, "h": 128 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 128 },
@@ -1068,9 +988,9 @@
    { "name": "ninja_banana", "from": 95, "to": 100, "direction": "forward", "color": "#000000ff" },
    { "name": "lightning", "from": 101, "to": 103, "direction": "forward", "color": "#000000ff" },
    { "name": "fireball_boom", "from": 104, "to": 112, "direction": "forward", "color": "#000000ff" },
-   { "name": "fireball_spawn", "from": 113, "to": 122, "direction": "forward", "color": "#000000ff" },
-   { "name": "fireball_shoot", "from": 123, "to": 130, "direction": "forward", "color": "#000000ff" },
-   { "name": "boomerang", "from": 131, "to": 131, "direction": "forward", "color": "#000000ff" }
+   { "name": "fireball_spawn", "from": 113, "to": 118, "direction": "forward", "color": "#000000ff" },
+   { "name": "fireball_shoot", "from": 119, "to": 120, "direction": "forward", "color": "#000000ff" },
+   { "name": "boomerang", "from": 121, "to": 121, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "bottom", "opacity": 128, "blendMode": "normal" },

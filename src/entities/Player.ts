@@ -50,7 +50,7 @@ class Player extends Entity {
   curse: number = 0;
   level: number = 1;
   private _exp: number = 0;
-  needExp: number = 60;
+  needExp: number = 120;
   followEffects: Phaser.GameObjects.Sprite[] = [];
   private _o__gravity: number = 300;
   private _gravity: number = 1;
@@ -68,7 +68,6 @@ class Player extends Entity {
   itemNameText: Phaser.GameObjects.BitmapText | null = null;
   itemDescText: Phaser.GameObjects.BitmapText | null = null;
   lastNinjaBananaActive: number = 0;
-  isThrowingBoomerang: boolean = false;
   
   constructor(scene: GameScene, x: number, y: number) {
     super([
@@ -137,18 +136,6 @@ class Player extends Entity {
       })
     }
 
-    const boomerangCount = this.hasItem("boomerang");
-    const boomerangAngle = Math.PI / 64;
-    const totalAngle = boomerangCount * boomerangAngle;
-
-    if (!this.isThrowingBoomerang) {
-      this.isThrowingBoomerang = true;
-
-      for (let i = 0; i < boomerangCount; i++) {
-        this.createBoomerang(boomerangAngle * i - totalAngle / 2);
-      }
-    }
-
     this.createJumpEffect();
   }
 
@@ -196,7 +183,6 @@ class Player extends Entity {
         if (Phaser.Math.Distance.Between(this.x, this.y, boomerang.x, boomerang.y) < this.body!.width * 2) {
           boomerang.destroy();
           this.scene.events.off('update', update);
-          this.isThrowingBoomerang = false;
           return;
         }
       }
@@ -538,7 +524,7 @@ class Player extends Entity {
     while (this._exp >= this.needExp) {
       this._exp -= this.needExp;
       this.level += 1;
-      this.needExp = this.needExp + 10;
+      this.needExp = this.needExp + 20;
 
       // level up event
       this.events.emit('levelUp', this.level);
@@ -794,7 +780,7 @@ class Player extends Entity {
     } else {
       // 이미 있는 경우
       hasSkill[0].level += 1;
-      hasSkill[0].cooltime *= magic.itemData.cooldownForLevel ?? 1;
+      hasSkill[0].cooltime *= 1 - (magic.itemData.cooldownForLevel ?? 0);
     }
   }
 

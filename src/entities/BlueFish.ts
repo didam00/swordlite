@@ -9,8 +9,9 @@ export default class BlueFish extends Enemy {
   exp = 4;
   clockwise: boolean = false;
   stepSize: number = 0.1;
-  emitters: Phaser.GameObjects.Particles.ParticleEmitter[] = [];
   isMainSpawn: boolean = false;
+
+  moveSpeedX: number = 15;
 
   stats = {
     health: 4,
@@ -28,7 +29,7 @@ export default class BlueFish extends Enemy {
     this.setSize(12, 6);
     this.stats.speed = Math.random() * 5 + 15;
     this.stats.health = Math.floor(Math.random() * 5 + 2);
-    this.stats.defense = Math.floor(Math.random() * 4 + 1);
+    this.stats.defense = Math.floor(Math.random() * 2 + 1);
 
     this.createAnimations();
     this.updateAnimation();

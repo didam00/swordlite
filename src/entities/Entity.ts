@@ -295,7 +295,12 @@ export default abstract class Entity extends Phaser.Physics.Arcade.Sprite {
   }
 
   getDist(other: Entity): number {
-    return Phaser.Math.Distance.Between(this.x, this.y, other.x, other.y);
+    const centerDist = Phaser.Math.Distance.Between(this.x, this.y, other.x, other.y);
+    
+    const thisRadius = Math.max(this.body!.width, this.body!.height) / 2;
+    const otherRadius = Math.max(other.body!.width, other.body!.height) / 2;
+    
+    return Math.max(0, centerDist - (thisRadius + otherRadius));
   }
 
   getAngle(other: Entity): number {

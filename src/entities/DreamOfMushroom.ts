@@ -215,7 +215,7 @@ export default class DreamOfMushroom extends BossEnemy {
       this.rotation += angleDiff / 480 * delta;
     }
 
-    if (this.mode === 'shot' && now - this.lastCoolTime > 1500 / (this.level + 1) * (Math.random() + 0.5)) {
+    if (this.mode === 'shot' && now - this.lastCoolTime > 2500 / (this.level + 1) * (Math.random() + 0.5)) {
       if (!this.hasState('shot')) {
         this.addState('shot');
       }

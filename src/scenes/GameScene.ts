@@ -13,19 +13,27 @@ import BlueMushroom from '../entities/BlueMushroom';
 import itemList from '../items/ItemList';
 import { createItem, Item } from '../items/Item';
 import DreamOfMushroom from '../entities/DreamOfMushroom';
-import CRTFilter from '..';
 import FakeRedMushroom from '../entities/FakeRedMushroom';
-import $s from '../utils/randomSIgn';
-import Weapon from '../weapons/Weapon';
-import Sword from '../weapons/Sword';
-import Spear from '../weapons/Spear';
-import Axe from '../weapons/Axe';
 import { StatusEffect } from '../types';
-import CopperSword from '../weapons/CopperSword';
 import Squid from '../entities/Squid';
 import BlueFish from '../entities/BlueFish';
 import Starfish from '../entities/Starfish';
 import SeaAnemone from '../entities/SeaAnemone';
+import Bat from '../entities/Bat';
+import Torch from '../entities/Torch';
+import Henge from '../entities/Henge';
+import MiniStone from '../entities/MiniStone';
+import Stone from '../entities/Stone';
+import CRTFilter from '..';
+
+// GameObject 타입 확장
+declare module 'phaser' {
+  namespace GameObjects {
+    interface GameObject {
+      uptime?: number;
+    }
+  }
+}
 
 class GameScene extends Phaser.Scene {
   readonly layers: {
@@ -66,6 +74,8 @@ class GameScene extends Phaser.Scene {
     dash: 2,
     bubble: 1,
     splash: 1,
+    bat: 1,
+    fire: 1,
   };
 
   debugMode: boolean = false;
@@ -108,10 +118,6 @@ class GameScene extends Phaser.Scene {
   private debugText: string[] = [];
   private isChangingMap: boolean = false;
   private allowSpawnEnemy: boolean = true;
-
-  private keyboard: {
-    [key: string]: Phaser.Input.Keyboard.Key
-  } = {};
   
   pointer: {
     x: number;
@@ -128,8 +134,14 @@ class GameScene extends Phaser.Scene {
     "void": [],
     "violet": ["purple_mushroom", "blue_mushroom", "red_mushroom"],
     "blue": ["squid", "blue_fish", "starfish"],
+    "brown": ["bat", "torch", "henge"],
   }
   
+  private _gameSpeed: number = 1.0;
+  private isPaused: boolean = false;
+  private pauseOverlay: Phaser.GameObjects.Rectangle = null!;
+  private pauseText: Phaser.GameObjects.Text = null!;
+
   constructor() {
     super('GameScene')
   }
@@ -153,12 +165,19 @@ class GameScene extends Phaser.Scene {
   create() {
     this.cameras.main.preFX?.addColorMatrix
 
-    // // 필터
-    // const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
-    // if (!renderer.pipelines.has('CRTFilter')) {
-    //   renderer.pipelines.addPostPipeline('CRTFilter', CRTFilter);
-    // }
-    // this.cameras.main.setPostPipeline('CRTFilter');
+    // 필터
+    const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+    if (!renderer.pipelines.has('CRTFilter')) {
+      renderer.pipelines.addPostPipeline('CRTFilter', CRTFilter);
+    }
+    this.cameras.main.setPostPipeline('CRTFilter');
+
+    // 비네트 효과 추가
+    this.cameras.main.postFX.addVignette(0.5, 0.5, 0.9, 0.2);
+
+    // 망원 렌즈 효과 추가
+    this.cameras.main.postFX.addBarrel(1.05);
+    // this.cameras.main.setZoom(1.2);
 
     // debug functions
     this.createDebugFunction();
@@ -183,9 +202,6 @@ class GameScene extends Phaser.Scene {
     // 배경 생성 및 설정
     this.createBackground();
 
-    // 배경 음악 재생 - 에러 처리 추가
-    this.playBackgroundMusic();
-    
     // 총알 그룹 생성
     this.createBulletGroup();
     
@@ -255,6 +271,54 @@ class GameScene extends Phaser.Scene {
       }
     })
 
+    this.input.keyboard?.addKey('B').on('down', () => {
+      if (this.debugMode) {
+        this.background.visible = !this.background.visible;
+        this.cameras.main.setBackgroundColor(this.background.visible ? '#000000' : '#606060');
+        this.showDebugModeText('Background: ' + (this.background.visible ? 'ON' : 'OFF'));
+      }
+    })
+    
+    this.input.keyboard?.addKey('esc').on('down', () => {
+      this.togglePause();
+    })
+
+    // effect and emitters on/off
+    // this.input.keyboard?.addKey('E').on('down', () => {
+    //   if (this.debugMode) {
+    //     this.layers.effect.visible = !this.layers.effect.visible;
+    //     // 모든 레이어의 파티클 제어
+    //     Object.values(this.layers).forEach(layer => {
+    //       if (layer instanceof Phaser.GameObjects.Container) {
+    //         layer.list.forEach((obj: any) => {
+    //           if (obj instanceof Phaser.GameObjects.Particles.ParticleEmitter) {
+    //             if (this.layers.effect.visible) {
+    //               obj.start();
+    //             } else {
+    //               obj.stop();
+    //             }
+    //           }
+    //         });
+    //       }
+    //     });
+    //     this.showDebugModeText('Effect: ' + (this.layers.effect.visible ? 'ON' : 'OFF'));
+    //   }
+    // })
+
+    this.input.keyboard?.on('keydown-PLUS', () => {
+      if (this.debugMode) {
+        this.gameSpeed = Math.min(10, this.gameSpeed + 0.1);
+        this.showDebugModeText(`Game Speed: ${this.gameSpeed.toFixed(1)}x`);
+      }
+    });
+    
+    this.input.keyboard?.on('keydown-MINUS', () => {
+      if (this.debugMode) {
+        this.gameSpeed = Math.max(0.1, this.gameSpeed - 0.1);
+        this.showDebugModeText(`Game Speed: ${this.gameSpeed.toFixed(1)}x`);
+      }
+    });
+
     // 거리 표시
     this.meterText = this.add.text(this.cameras.main.width - 8, 8, '0M', {
       fontFamily: 'monospace',
@@ -310,6 +374,40 @@ class GameScene extends Phaser.Scene {
     this.layers.ui.add(this.itemListContainer);
 
     this.startGame();
+
+    // 일시정지 오버레이 생성
+    this.pauseOverlay = this.add.rectangle(
+      0, 0,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      0x000000,
+      0.7
+    );
+    this.pauseOverlay.setOrigin(0, 0);
+    this.pauseOverlay.setScrollFactor(0);
+    this.pauseOverlay.setDepth(9999);
+    this.pauseOverlay.setVisible(false);
+
+    this.pauseText = this.add.text(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      'PAUSED',
+      {
+        fontFamily: 'monospace',
+        // fontSize: '32px',
+        color: '#ffffff',
+        resolution: 1,
+      }
+    );
+    this.pauseText.setOrigin(0.5);
+    this.pauseText.setScrollFactor(0);
+    this.pauseText.setDepth(10000);
+    this.pauseText.setVisible(false);
+
+    // 객체 생성 시간 추적을 위한 이벤트 리스너 추가
+    this.events.on('add', (gameObject: Phaser.GameObjects.GameObject) => {
+      gameObject.uptime = this._now;
+    });
   }
 
   createAnimations(): void {
@@ -322,8 +420,8 @@ class GameScene extends Phaser.Scene {
     this.createAnimation("effects", "ninja_banana", [0, 5], 24, 0);
     this.createAnimation("effects", "jump", [0, 6], 32, 0);
     this.createAnimation("effects", "lightning", [0, 2], 24);
-    this.createAnimation("effects", "fireball_spawn", [0, 9], 20, 0);
-    this.createAnimation("effects", "fireball_shoot", [0, 7], 24);
+    this.createAnimation("effects", "fireball_spawn", [0, 5], 48, 0);
+    this.createAnimation("effects", "fireball_shoot", [0, 1], 48);
     this.createAnimation("effects", "fireball_boom", [0, 7], 32, 0);
   }
 
@@ -363,6 +461,12 @@ class GameScene extends Phaser.Scene {
         'blue_fish': BlueFish,
         'starfish': Starfish,
         'sea_anemone': SeaAnemone,
+
+        'bat': Bat,
+        'torch': Torch,
+        'henge': Henge,
+        'stone': Stone,
+        'mini_stone': MiniStone,
       }[id] || FakeRedMushroom;
 
       enemy = new EnemyClass(
@@ -377,8 +481,8 @@ class GameScene extends Phaser.Scene {
     this.enemyGroup.add(enemy);
     
     enemy.velocity = [0, 0];
-    enemy.health = enemy.stats.health * (level * 2 - 1);
-    enemy.stats.defence = enemy.stats.defense * (level * 2 - 1);
+    enemy.health = Math.floor(enemy.stats.health * (level * 2.25 - 1.25));
+    enemy.stats.defence = Math.floor(enemy.stats.defense * (level ** 2.5));
     enemy.level = level;
 
     enemy.onSpawn();
@@ -701,24 +805,27 @@ class GameScene extends Phaser.Scene {
     // this.player.collectItem("portable_mirror");
     // this.player.collectItem("soul_candle");
     // this.player.collectItem("lightning_rod");
-    // this.player.collectItem("lightning_crystal");
-    // this.player.collectItem("flame_crystal");
+    // this.player.collectItem("lightning_book");
+    // this.player.collectItem("flame_book");
     // this.player.collectItem("shiny_sandclock");
     // this.player.collectItem("copper_sword");
     // this.player.collectItem("giant_sword");
-
-    // this.player.collectItem("ninja_banana");
     // this.player.collectItem("boomerang");
-    this.player.collectItem("pickaxe");
-    this.player.collectItem("boomerang");
+    // this.player.collectItem("pickaxe");
+
+    this.player.collectItem(
+      Phaser.Utils.Array.GetRandom(itemList.filter(item => item.rarity === "epic")).id
+    );
     
-    // this.setMap("violet");
+    // this.setMap("brown");
 
     this.setMap(
       Phaser.Utils.Array.GetRandom(
         Object.keys(this.maps).filter(map => map !== "void")
       )
     );
+
+    // this.gameSpeed = 0.5;
     // this.setMap(
     //   "blue"
     // );
@@ -730,8 +837,6 @@ class GameScene extends Phaser.Scene {
       if (!enemy.isFollowCamera) {
         // enemy.velocity.x += diff;
         enemy.setVelocityX(-diff + enemy.velocity.x);
-        if (enemy.entityName === 'purple_mushroom') {
-        }
       }
 
       enemy.playerSpeedUpdated(diff);
@@ -747,10 +852,14 @@ class GameScene extends Phaser.Scene {
   }
   
   update(time: number, delta: number): void {
+    // 일시정지 상태면 업데이트 중단
+    if (this.isPaused) return;
+    
+    delta = delta * this._gameSpeed;
     this._now += delta;
 
     if (this.background && this.player) {
-      this.background.tilePositionX += (this.player.speed * 0.5) * delta / 1000;
+      this.background.tilePositionX += (this.player.speed * 0.4) * delta / 1000;
     }
     
     if (this.player) {
@@ -869,7 +978,7 @@ class GameScene extends Phaser.Scene {
 
         const soulCandle = this.player.hasItem("soul_candle");
         // Soul Candle 효과
-        if (Math.random() < (soulCandle / 10) * (this.player.stats.luck / 100)) {
+        if (soulCandle > 0 && Math.random() < ((1 + soulCandle) / 20) * (this.player.stats.luck / 100)) {
           const itemId = Phaser.Utils.Array.GetRandom([
             "soul_of_power",
             "soul_of_life",
@@ -953,6 +1062,12 @@ class GameScene extends Phaser.Scene {
         || effect.x > this.cameras.main.width + 40)
         && !((effect as any).isBoomerang)
       ) {
+        if (effect.config?.emitter) {
+          this.time.delayedCall(effect.config.emitterDeleteTime, () => {
+            effect.config.emitter.destroy();
+          });
+        }
+
         effect.destroy();
       }
 
@@ -965,7 +1080,18 @@ class GameScene extends Phaser.Scene {
   }
 
   updateDebugText(): void {
-    const enemyCount = this.enemies.length;
+    let allCount = this.children.length;
+    const visibleCount = this.children.list.filter((child: any) => 
+      child.x > 0 && child.x < this.cameras.main.width &&
+      child.y > 0 && child.y < this.cameras.main.height
+    ).length;
+
+    this.children.list.forEach((child: any) => {
+      if (child instanceof Phaser.GameObjects.Particles.ParticleEmitter) {
+        allCount += (child as any).alive.length ?? 0;
+      }
+    });
+
     const visibleEnemyCount = this.enemies.filter(enemy => 
       enemy.x > 0 && enemy.x < this.cameras.main.width &&
       enemy.y > 0 && enemy.y < this.cameras.main.height
@@ -977,16 +1103,10 @@ class GameScene extends Phaser.Scene {
       effect.y > 0 && effect.y < this.cameras.main.height
     ).length;
 
-    const itemCount = this.layers.item.list.length;
-    const visibleItemCount = (this.layers.item.list as Item[]).filter(item =>
-      item.x > 0 && item.x < this.cameras.main.width &&
-      item.y > 0 && item.y < this.cameras.main.height
-    ).length;
-
     this.debugText = [
-      `enemies: ${visibleEnemyCount} / ${enemyCount}`,
-      `effects: ${visibleEffectCount} / ${effectCount}`,
-      `items: ${visibleItemCount} / ${itemCount}`,
+      `all:${visibleCount} / ${allCount}`,
+      `enemies:${visibleEnemyCount}`,
+      `effects:${visibleEffectCount}`,
     ]
 
     this.debugTextObject.setText(this.debugText.join('\n'));
@@ -1133,30 +1253,35 @@ class GameScene extends Phaser.Scene {
   /**
    * 배경 음악을 재생하는 메서드
    */
-  playBackgroundMusic(): void {
-    // 이미 재생 중인 배경음악이 있다면 중지
-    if (this.bgMusic && this.bgMusic.isPlaying) {
-      this.bgMusic.stop();
-    }
-    
-    try {
-      // 배경음악 생성 및 설정
-      this.bgMusic = this.sound.add('bgm', {
+  playBackgroundMusic(name: string): void {
+    const playMusic = () => {
+      this.bgMusic = this.sound.add(name, {
         volume: 0.6,
         loop: true,
         delay: 0
       });
-      
-      // 배경음악 재생
+  
       this.bgMusic.play();
-      
-      // 오류 처리
-      this.bgMusic.once('loaderror', () => {
-        console.warn('오디오 로드 실패:', 'bgm');
-      });
-    } catch (error) {
-      console.error('배경음악 재생 실패:', error);
     }
+
+    // 이미 있다면 기존 노래 페이드 아웃
+    if (this.bgMusic) {
+      this.tweens.add({
+        targets: this.bgMusic,
+        volume: 0,
+        duration: 500,
+        onComplete: () => {
+          playMusic();
+        }
+      });
+    } else {
+
+    }
+
+    // 500ms 뒤에 페이드인
+    this.time.delayedCall(500, () => {
+      playMusic();
+    });
   }
   
   // 게임 종료 시 음악 중지 (필요할 경우 추가)
@@ -1217,6 +1342,12 @@ class GameScene extends Phaser.Scene {
     (globalThis as any).immuneMode = () => {
       if (this.debugMode) {
         this.player.stats.evade = 100;
+      }
+    }
+
+    (globalThis as any).getObjects = () => {
+      if (this.debugMode) {
+        console.log(this.getObjects());
       }
     }
   }
@@ -1342,10 +1473,60 @@ class GameScene extends Phaser.Scene {
         this.isChangingMap = false;
       }
     })
+
+    this.playBackgroundMusic(`${this.map}_bgm`);
+  }
+
+  getObjects(sort: boolean = true) {
+    const objects = this.children.list;
+
+    if (sort) {
+      objects.sort((a: any, b: any) => (a.uptime ?? 0) - (b.uptime ?? 0));
+    }
+
+    return objects;
   }
 
   get now(): number {
     return this._now;
+  }
+
+  get gameSpeed(): number {
+    return this._gameSpeed;
+  }
+
+  set gameSpeed(value: number) {
+    this._gameSpeed = value;
+    this.time.timeScale = 1 / value;  // Scene의 timeScale 설정
+    this.physics.world.timeScale = 1 / value;  // 물리 엔진의 timeScale 설정
+  }
+
+  togglePause(): void {
+    this.isPaused = !this.isPaused;
+    
+    if (this.isPaused) {
+      // 게임 일시정지
+      this.gameSpeed = 0;
+      this.physics.world.pause();  // 물리 엔진 일시정지
+      this.pauseOverlay.setVisible(true);
+      this.pauseText.setVisible(true);
+      
+      // 배경음악 일시정지
+      if (this.bgMusic && this.bgMusic.isPlaying) {
+        this.bgMusic.pause();
+      }
+    } else {
+      // 게임 재개
+      this.gameSpeed = 1;
+      this.physics.world.resume();  // 물리 엔진 재개
+      this.pauseOverlay.setVisible(false);
+      this.pauseText.setVisible(false);
+      
+      // 배경음악 재개
+      if (this.bgMusic && !this.bgMusic.isPlaying) {
+        this.bgMusic.resume();
+      }
+    }
   }
 }
 

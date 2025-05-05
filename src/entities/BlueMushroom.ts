@@ -86,7 +86,7 @@ export default class BlueMushroom extends Enemy {
 
       if (this.x >= 100 && this.scene.now - this.lastShotTime >= this.bulletCooldown && this.bulletCooldown != 0) {
         this.setShotMode();
-        this.lastShotTime = this.scene.time.now;
+        this.lastShotTime = this.scene.now;
       }
     }
     
@@ -114,9 +114,9 @@ export default class BlueMushroom extends Enemy {
 
       for (let i = 0; i < 24; i++) {
         this.shotToPlayer(
-          this.rotation - Math.PI / 40 + Math.PI / 20 * Math.random(),
+          this.rotation - Math.PI / 32 + Math.PI / 16 * Math.random(),
           Math.random() * 4 + 2,
-          Math.random() * 80 + 100,
+          Math.random() * 240 + 160,
           Math.random() * 560 + 400
         );
       }
@@ -136,15 +136,17 @@ export default class BlueMushroom extends Enemy {
       return;
     }
     
-    const bullet = this.createBullet(0x6b74b2, size, life);
-    bullet?.setPosition(
-      this.x + Math.cos(toRotate - Math.PI / 2) * 12,
-      this.y + Math.sin(toRotate - Math.PI / 2) * 12
-    )
-    bullet?.body.setVelocity(
-      Math.cos(toRotate - Math.PI / 2) * speed,
-      Math.sin(toRotate - Math.PI / 2) * speed
-    );
+    const bullet = this.createBullet(0x6b74b2, size, life, 1, {
+      speed: [
+        Math.cos(toRotate - Math.PI / 2) * speed,
+        Math.sin(toRotate - Math.PI / 2) * speed
+      ],
+      drag: 0.01,
+    });
+    // bullet?.body.setVelocity(
+    //   Math.cos(toRotate - Math.PI / 2) * speed,
+    //   Math.sin(toRotate - Math.PI / 2) * speed
+    // );
 
     bullet?.body.setGravityY(20);
   }

@@ -35,7 +35,7 @@ export default class PurpleMushroom extends Enemy {
 
   update(delta: number) {
     super.update(delta);
-    // this.velocity = [0, 0];
+    this.velocity = [0, 0];
     this.rotation += (Math.PI * delta / 20000) * this.rotationClockwise;
   }
 

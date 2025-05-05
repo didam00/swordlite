@@ -135,12 +135,12 @@ const itemList: ItemDefinition[] = [
   {
     id: "strategy_book",
     name: "Strategy Book",
-    description: "exp gain +20% and magic damage +10",
+    description: "exp gain +20% and magic damage +5",
     rarity: "common",
     type: "normal",
     effect: (scene: GameScene, data: number = 1): void => {
       scene.player.stats.expGain += 20;
-      scene.player.stats.magicDamage += 10;
+      scene.player.stats.magicDamage += 5;
     },
     displayOnList: true,
   },
@@ -206,7 +206,7 @@ const itemList: ItemDefinition[] = [
     id: "soul_candle",
     name: "Soul Candle",
     description: "enemies drop souls",
-    rarity: "epic",
+    rarity: "none",
     type: "normal",
     effect: (scene: GameScene, data: number = 1): void => {
       
@@ -354,17 +354,17 @@ const itemList: ItemDefinition[] = [
     },
     displayOnList: true,
   },
-  {
-    id: "pickaxe",
-    name: "Pickaxe",
-    description: "what is this?",
-    rarity: "epic",
-    type: "weapon",
-    effect: (scene: GameScene, data: number = 1): void => {
+  // {
+  //   id: "pickaxe",
+  //   name: "Pickaxe",
+  //   description: "what is this?",
+  //   rarity: "epic",
+  //   type: "weapon",
+  //   effect: (scene: GameScene, data: number = 1): void => {
 
-    },
-    displayOnList: true,
-  },
+  //   },
+  //   displayOnList: true,
+  // },
   {
     id: "boomerang",
     name: "Boomerang",
@@ -377,12 +377,13 @@ const itemList: ItemDefinition[] = [
     displayOnList: true,
   },
   {
-    id: "flame_crystal",
-    name: "Flame Crystal",
+    id: "flame_book",
+    name: "Flame Book",
     description: "magic.throw fireball",
     rarity: "epic",
     type: "magic",
-    cooldown: 10000,
+    cooldown: 5000,
+    cooldownForLevel: 0.2,
     effect: (scene: GameScene, data: number = 1): void => {
       const player = scene.player;
       const fireball = scene.add.sprite(
@@ -394,8 +395,8 @@ const itemList: ItemDefinition[] = [
 
       scene.physics.world.enable(fireball);
       const body = fireball.body as Phaser.Physics.Arcade.Body;
-      body.setSize(16, 16);
-      fireball.setScale(1 + (player.stats.mana / 200));
+      body.setSize(6, 6);
+      fireball.setScale((1 + (player.stats.mana / 200)));
 
       const randomAngle = Math.PI * Math.random() * 2;
       fireball.setPosition(
@@ -403,19 +404,20 @@ const itemList: ItemDefinition[] = [
         player.y + Math.sin(randomAngle) * (16 + player.scale * 16)
       )
       scene.layers.effect.add(fireball);
+      const speed = 600;
 
-      scene.time.delayedCall(500, () => {
+      scene.time.delayedCall(125, () => {
         if (!fireball) return;
 
         if (scene.enemies.length === 0) {
-          body.setVelocityX(200 - player.speed);
+          body.setVelocityX(speed - player.speed);
         } else {
           const enemy: Enemy = Phaser.Utils.Array.GetRandom(scene.enemies);
-  
+
           const angle = Phaser.Math.Angle.Between(fireball.x, fireball.y, enemy.x, enemy.y);
           body.setVelocity(
-            Math.cos(angle) * 100 - player.speed,
-            Math.sin(angle) * 100
+            Math.cos(angle) * speed - player.speed,
+            Math.sin(angle) * speed
           );
 
           fireball.setRotation(angle + Math.PI / 2);
@@ -433,25 +435,25 @@ const itemList: ItemDefinition[] = [
           //   return Phaser.Math.Between(this.body!.velocity.y - 20, this.body!.velocity.y + 20);
           // },
           speed: { min: 10, max: 20 },
-          scale: { start: 3, end: 0 },
+          scale: { start: 2, end: 0 },
           alpha: 1,
-          quantity: 2,
+          quantity: 4,
           frequency: 10,
           // blendMode: 'ADD',
-          tint: [0xd83843],
+          tint: [0xd83843, 0xff965f, 0xffe091],
         });
         scene.layers.bottom.add(emitter);
 
         scene.physics.add.collider(fireball, scene.enemies, (fireball, enemy) => {
-          (enemy as Enemy).takeDamage((player.damage + player.stats.magicDamage) * 2 * data, false, ["fire", "magic"]);
+          (enemy as Enemy).takeDamage((player.damage + player.stats.magicDamage) * (.5 + data * 0.25), false, ["fire", "magic"]);
           
           const fireballBoom = scene.add.sprite(body.x, body.y, "effects", "fireball_boom-0").play("fireball_boom");
-          fireballBoom.setScale((1 + player.stats.mana / 100) * data / 2);
+          fireballBoom.setScale(0.5 + player.stats.mana / 200);
           
           scene.enemies.forEach((enemy) => {
             const dist = Phaser.Math.Distance.Between(body.x, body.y, enemy.x, enemy.y);
-            if (dist < (50 + 25 * data) * (1 + (player.stats.mana / 100))) {
-              (enemy as Enemy).takeDamage((player.damage + player.stats.magicDamage) * data);
+            if (dist < 50 * (1 + (player.stats.mana / 200))) {
+              (enemy as Enemy).takeDamage((player.damage + player.stats.magicDamage) * (.5 + data * 0.25));
             }
           });
   
@@ -470,19 +472,21 @@ const itemList: ItemDefinition[] = [
     displayOnList: true,
   },
   {
-    id: "lightning_crystal",
-    name: "Lightning Crystal",
+    id: "lightning_book",
+    name: "Lightning Book",
     description: "damage and stun nearby enemies",
     rarity: "epic",
     cooldown: 1500,
-    cooldownForLevel: 0.75,
+    cooldownForLevel: 0.25,
     type: "magic",
     effect: (scene: GameScene, data: number = 1): void => {
       scene.enemies.forEach((enemy) => {
         const dist = Phaser.Math.Distance.Between(scene.player.x, scene.player.y, enemy.x, enemy.y);
         if (dist < (50 + data * 10) * (1 + (scene.player.stats.mana / 100))) {
-          (enemy as Enemy).takeDamage((scene.player.damage + scene.player.stats.magicDamage) / 4, false, ["magic", "lightning"]);
-          (enemy as Enemy).takeStun(250 * data);
+          (enemy as Enemy).takeDamage((scene.player.damage + scene.player.stats.magicDamage) / 2, false, ["magic", "lightning"]);
+          if (Math.random() < 0.5 * (scene.player.stats.luck / 100)) {
+            (enemy as Enemy).takeStun(250 * (data + 1));
+          }
           
           const lightning = scene.add.sprite(scene.player.x, scene.player.y, "effects", "lightning-0").play("lightning");
           lightning.displayHeight = dist;

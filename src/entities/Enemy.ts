@@ -213,10 +213,14 @@ export default abstract class Enemy extends Entity {
     const player = scene.player;
 
     config = {
+      x: this.x,
+      y: this.y,
       drag: 1, /** 초당 줄어드는 비율 */
       speed: [0, 0],
       strokeWidth: 0,
       strokeColor: 0xffffff,
+      emitter: null,
+      emitterDeleteTime: 0,
       ...config,
     }
 
@@ -226,7 +230,7 @@ export default abstract class Enemy extends Entity {
       damage = this.stats.damage;
     }
     
-    const bullet = scene.add.circle(this.x, this.y, size, color) as CircleBullet;
+    const bullet = scene.add.circle(config.x, config.y, size, color) as CircleBullet;
     bullet.setStrokeStyle(config.strokeWidth!, config.strokeColor!);
     
     scene.physics.add.existing(bullet);
@@ -240,12 +244,19 @@ export default abstract class Enemy extends Entity {
     scene.physics.add.overlap(bullet, scene.player, () => {
       player.takeDamage(damage);
       bullet.destroy();
+      if (config.emitter) {
+        scene.time.delayedCall(config.emitterDeleteTime ?? 0, () => {
+          config.emitter?.destroy();
+        });
+      }
     });
 
     if (config.drag! < 1) {
       const scene = this.scene;
 
       const dragUpdate = (time: number, delta: number) => {
+        delta = delta / scene.gameSpeed;
+        
         if (!bullet || !bullet.active) {
           scene.events.off('update', dragUpdate, this);
           return;
@@ -280,6 +291,7 @@ export default abstract class Enemy extends Entity {
     bullet.owner = this;
     bullet.isBullet = true;
     bullet.damage = 1;
+    bullet.config = config;
 
     return bullet;
   }
@@ -335,6 +347,7 @@ export interface Bullet {
   isBullet: boolean;
   body: Phaser.Physics.Arcade.Body;
   damage: number;
+  config: BulletConfig;
 }
 
 export interface BulletConfig {
@@ -342,6 +355,10 @@ export interface BulletConfig {
   speed?: [number, number];
   strokeWidth?: number;
   strokeColor?: number;
+  emitter?: Phaser.GameObjects.Particles.ParticleEmitter | null;
+  emitterDeleteTime?: number;
+  x?: number;
+  y?: number;
 }
 
 // 특정 형태의 총알 타입 정의 (타입 교차를 통한 확장)

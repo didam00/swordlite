@@ -45,7 +45,9 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('cursor', 'assets/images/cursor.png');
     
     // 배경음악 로드
-    this.load.audio('bgm', 'assets/music/resolution.wav');
+    this.load.audio('violet_bgm', 'assets/music/resolution.wav');
+    this.load.audio('blue_bgm', 'assets/music/peaceful.wav');
+    this.load.audio('brown_bgm', 'assets/music/go for it.wav');
     // this.load.audio('bgm', 'assets/music/pensive.wav');
   }
 
