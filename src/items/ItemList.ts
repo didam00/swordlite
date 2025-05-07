@@ -180,6 +180,7 @@ const itemList: ItemDefinition[] = [
     },
     displayOnList: true,
   },
+  // 최적화 해결
   {
     id: "ninja_banana",
     name: "Ninja Banana",
@@ -365,6 +366,17 @@ const itemList: ItemDefinition[] = [
   //   },
   //   displayOnList: true,
   // },
+  {
+    id: "mace",
+    name: "Mace",
+    description: "gravity power attack",
+    rarity: "epic",
+    type: "weapon",
+    effect: (scene: GameScene, data: number = 1): void => {
+
+    },
+    displayOnList: true,
+  },
   {
     id: "boomerang",
     name: "Boomerang",

@@ -82,5 +82,6 @@ export default class Starfish extends Enemy {
     }
 
     this.rotation += 0.0001 * delta;
+    this.velocity = [0, 0];
   }
 }

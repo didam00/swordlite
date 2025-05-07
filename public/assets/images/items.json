@@ -326,6 +326,14 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 100
+   },
+   "mace-0": {
+    "frame": { "x": 0, "y": 656, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
    }
  },
  "meta": {
@@ -333,7 +341,7 @@
   "version": "1.x-dev",
   "image": "items.png",
   "format": "RGBA8888",
-  "size": { "w": 16, "h": 656 },
+  "size": { "w": 16, "h": 672 },
   "scale": "1",
   "frameTags": [
    { "name": "green_heart", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
@@ -376,7 +384,8 @@
    { "name": "death_crystal", "from": 37, "to": 37, "direction": "forward", "color": "#000000ff" },
    { "name": "rock_crystal", "from": 38, "to": 38, "direction": "forward", "color": "#000000ff" },
    { "name": "boomerang", "from": 39, "to": 39, "direction": "forward", "color": "#000000ff" },
-   { "name": "pickaxe", "from": 40, "to": 40, "direction": "forward", "color": "#000000ff" }
+   { "name": "pickaxe", "from": 40, "to": 40, "direction": "forward", "color": "#000000ff" },
+   { "name": "mace", "from": 41, "to": 41, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "Layer", "opacity": 255, "blendMode": "normal" }

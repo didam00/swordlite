@@ -9,6 +9,7 @@ import CopperSword from '../weapons/CopperSword';
 import Pickaxe from '../weapons/Pickaxe';
 import { Magic } from '../types';
 import Boomerang from '../weapons/Boomerang';
+import Mace from '../weapons/Mace';
 
 class Player extends Entity {
   entityName = 'player';
@@ -25,7 +26,7 @@ class Player extends Entity {
     jumpPower: 150,
     range: 15,
     jumpCoolDown: 250,
-    attackCoolDown: 0,
+    attackCoolDown: 250,
     immuneTime: 1000,
     criticalChance: 0,
     criticalDamage: 1.5,
@@ -93,6 +94,12 @@ class Player extends Entity {
     const currentTime = this.scene.now;
     power = power || this.stats.jumpPower;
     
+    this.events.emit('jump', {
+      x: this.x,
+      y: this.y - 4,
+      isPlayerJumping: true
+    });
+    
     if (currentTime - this.lastJumpTime < this.stats.jumpCoolDown) {
       return;
     }
@@ -104,11 +111,6 @@ class Player extends Entity {
     this.removeState('fall');
     this.addState('jump');
     
-    this.events.emit('jump', {
-      x: this.x,
-      y: this.y - 4,
-      isPlayerJumping: true
-    });
 
     if (this.hasItem("ninja_banana")) {
       this.lastNinjaBananaActive = this.scene.now;
@@ -295,6 +297,10 @@ class Player extends Entity {
 
             prevEnemy = closestEnemy;
             this.scene.cameras.main.shake(50, 0.01);
+
+            this.scene.time.delayedCall(250, () => {
+              bananaNinjaEffect.destroy();
+            })
           }
         },
       })
@@ -524,7 +530,7 @@ class Player extends Entity {
     while (this._exp >= this.needExp) {
       this._exp -= this.needExp;
       this.level += 1;
-      this.needExp = this.needExp + 20;
+      this.needExp = this.needExp + 40;
 
       // level up event
       this.events.emit('levelUp', this.level);
@@ -743,22 +749,18 @@ class Player extends Entity {
 
   addWeapon(weapon: Weapon | string): Weapon | null {
     if (typeof weapon === "string") {
-      switch (weapon) {
-        case "sword":
-          weapon = new Sword(this.scene, this, this.weaponCount);
-          break;
-        case "copper_sword":
-          weapon = new CopperSword(this.scene, this, this.weaponCount);
-          break;
-        case "pickaxe":
-          weapon = new Pickaxe(this.scene, this, this.weaponCount);
-          break;
-        case "boomerang":
-          weapon = new Boomerang(this.scene, this, this.weaponCount);
-          break;
-        default:
-          return null;
-      }
+      const weaponMap: { [key: string]: new (scene: GameScene, player: Player, index: number) => Weapon } = {
+        sword: Sword,
+        copper_sword: CopperSword,
+        pickaxe: Pickaxe,
+        boomerang: Boomerang,
+        mace: Mace
+      };
+
+      const WeaponClass = weaponMap[weapon];
+      if (!WeaponClass) return null;
+      
+      weapon = new WeaponClass(this.scene, this, this.weaponCount);
     }
 
     this.weapons.push(weapon);

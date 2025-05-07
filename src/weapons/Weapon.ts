@@ -16,7 +16,8 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
   private attackBody: Phaser.Physics.Arcade.Body | null = null;
   private hitEnemies: Enemy[] = [];
   particleColor: number[] = [0xffffff];
-  readonly useSwordAttackEffect: boolean = true;
+  useDefaultAttackEffect: boolean = true;
+  attackEffectColor: number = 0xffffff;
   dontAttack: boolean = false;
 
   private pointer: {
@@ -31,7 +32,7 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
   } = {
     attack: 100,
     range: 100,
-    cooldown: 100,
+    cooldown: 0,
     angleArea: 360,
   }
   
@@ -52,7 +53,7 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
   createAnimations() {
     let animName = `sword_attack`;
 
-    if (!this.useSwordAttackEffect) {
+    if (!this.useDefaultAttackEffect) {
       animName = `${this.weaponName}_attack`;
     }
 
@@ -94,7 +95,7 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
       const weaponCount = this.scene.player.weaponCount;
   
       const now = this.scene.now;
-      if (now - this.lastAttackTime < this.player.stats.attackCoolDown) {
+      if (now - this.lastAttackTime < this.player.stats.attackCoolDown * (this.option.cooldown / 100)) {
         return;
       }
   
@@ -139,8 +140,15 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
           const body = windy_attack.body as Phaser.Physics.Arcade.Body;
           windy_attack.setScale(1, Math.min(scene.player.range / 30));
           body.setSize(32, 64);
+
+          if (this.player.hasItem("portable_mirror")) {
+            const portableMirrorUpdate = () => {
+              this.applyPortableMirror(body);
+            }
+            this.scene.events.on('update', portableMirrorUpdate);
+          }
   
-          const speed = 600;
+          const speed = 900;
           let angle = 0;
           if (this.option.angleArea < 360) {
             angle = this.positionAngle;
@@ -148,8 +156,8 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
   
           windy_attack.setRotation(angle);
           body.setVelocity(
-            Math.cos(angle) * 600 - scene.player.stats.speed,
-            Math.sin(angle) * 600
+            Math.cos(angle) * speed - scene.player.stats.speed,
+            Math.sin(angle) * speed
           );
       
           // 엔티티와 충돌하면 사라지고 플레이어 공격력만큼 데미지
@@ -160,7 +168,7 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
             light.destroy();
           });
       
-          this.scene.time.delayedCall(windyFan * 200 + this.player.range * (this.option.range / 100) - 50, () => {
+          this.scene.time.delayedCall(windyFan * 125 + this.player.range * (this.option.range / 100) - 50, () => {
             if (windy_attack && windy_attack.active) {
               windy_attack.destroy();
             }
@@ -187,10 +195,11 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
     this.attackEffect.setOrigin(0.5, 0.5);
     this.attackEffect.setRotation(angle);
     this.attackEffect.setScale(this.getDist() / 40);
+    this.attackEffect.setTint(this.attackEffectColor);
     
     this.scene.layers.effect.add(this.attackEffect);
 
-    if (!this.useSwordAttackEffect) {
+    if (!this.useDefaultAttackEffect) {
       this.attackEffect.play(this.weaponName + '_attack');
     } else {
       this.attackEffect.play('sword_attack');
@@ -212,6 +221,12 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
   }
   
   update() {
+    if (this.scene.now - this.lastAttackTime < this.player.stats.attackCoolDown * (this.option.cooldown / 100)) {
+      this.setAlpha(0.5);
+    } else {
+      this.setAlpha(1);
+    }
+
     if (this.isAttacking && this.attackEffect && this.attackBody) {
       this.attackEffect.setPosition(this.player.x, this.player.y);
       this.attackBody.position.x = this.player.x - this.attackBody.width / 2;
@@ -246,95 +261,7 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
         }
       }
 
-      const portableMirror = this.player.hasItem("portable_mirror");
-
-      if (portableMirror) {
-        for (const bullet of this.scene.getBulletList()) {
-          if (this.scene.physics.world.overlap(this.attackBody, (bullet.body as Phaser.Physics.Arcade.Body))) {
-            if (this.option.angleArea < 360) {
-              const bulletAngle = Phaser.Math.Angle.Between(this.player.x, this.player.y, bullet.x, bullet.y);
-              const angleDiff = Math.abs(
-                Phaser.Math.Angle.ShortestBetween(
-                  Phaser.Math.RadToDeg(bulletAngle),
-                  Phaser.Math.RadToDeg(this.positionAngle)
-                )
-              ) * Phaser.Math.DEG_TO_RAD;
-              if (angleDiff > Phaser.Math.DegToRad(this.option.angleArea / 2)) {
-                continue;
-              };
-            }
-
-            const [x, y] = [bullet.body?.position.x, bullet.body?.position.y];
-            const owner = bullet.owner;
-            let size = 0;
-            if (bullet.body.isCircle) {
-              size = bullet.body.radius * 2;
-            } else {
-              size = (bullet.body.width * bullet.body.height) ** 0.5;
-            }
-
-            this.scene.time.delayedCall(bullet.config.emitterDeleteTime ?? 0, () => {
-              bullet.config.emitter?.destroy();
-            });
-
-            bullet.destroy();
-  
-            for (let i = 0; i < size / 20 * portableMirror * 2 + size * (this.player.stats.mana / 200); i++) {
-              const lightBullet = this.scene.add.sprite(x!, y!, 'effects', 'light_bullet-0').play('light_bullet');
-              this.scene.physics.add.existing(lightBullet);
-    
-              // lightBullet.play('light_bullet');
-              lightBullet.setOrigin(0.5, 0.5);
-              const scale = Math.random() * 0.5 + 0.25 + (portableMirror * 0.05)
-              lightBullet.setScale(scale);
-              lightBullet.setAlpha(0.9);
-              // lightBullet.rotation = Math.random() * Math.PI * 2;
-              
-              const body = lightBullet.body as Phaser.Physics.Arcade.Body;
-              
-              body.setSize(10, 10);
-  
-              // const randRotation = Math.random() * Math.PI * 2;
-              const speed = (100 * Math.random() + 300) * (portableMirror * 0.25 + 0.75);
-
-              // body.setVelocity(
-              //   Math.cos(randRotation) * speed - this.player.speed,
-              //   Math.sin(randRotation) * speed
-              // );
-              
-              const moveAngle = Phaser.Math.Angle.Between(
-                this.player.x, this.player.y,
-                lightBullet.x, lightBullet.y,
-              ) + (Math.PI / 8 * portableMirror) * (Math.random() - 0.5);
-
-              body.setVelocity(
-                Math.cos(moveAngle) * speed - this.player.speed,
-                Math.sin(moveAngle) * speed
-              );
-
-              body.setDrag(400 * (portableMirror * 0.2 + 0.8), 400 * (portableMirror * 0.2 + 0.8));
-    
-              this.scene.physics.add.collider(lightBullet, this.scene.enemyGroup, (light, enemy) => {
-                if (this.hitEnemies.includes(enemy as Enemy)) {
-                  return;
-                }
-                const damage = this.player.damage * portableMirror / 2;
-                (enemy as Enemy).takeDamage(damage, false, ["magic", "light"]);
-                lightBullet.destroy();
-                this.hitEnemies.push(enemy as Enemy);
-              });
-    
-              this.scene.layers.effect.add(lightBullet);
-  
-              this.scene.time.delayedCall((Math.random() * 500 + 50) * (1 + this.player.stats.mana / 400), () => {
-                if (lightBullet) {
-                  lightBullet.destroy();
-                }
-              })
-            }
-          }
-        }
-      }
+      this.applyPortableMirror(this.attackBody);
     }
     this.updateWeaponPosition();
   }
@@ -365,13 +292,105 @@ abstract class Weapon extends Phaser.GameObjects.Sprite {
 
   onAttack(enemy: Enemy) {
     const isCritcal = Math.random() < (this.player.stats.criticalChance / 100);
-    const preDamage = this.player.damage + this.player.stats.trueAttack;
+    const preDamage = (this.player.damage + this.player.stats.trueAttack) * this.option.attack / 100;
     const damage = isCritcal ? preDamage * 2 : preDamage;
-    enemy.takeDamage(damage, isCritcal, ["attack"]);
+    enemy.takeDamage(Math.floor(damage), isCritcal, ["attack"]);
 
     this.scene.playSound('attack', {
       volume: 0.8
     })
+  }
+
+  applyPortableMirror(body: Phaser.Physics.Arcade.Body): void {
+    const portableMirror = this.player.hasItem("portable_mirror");
+
+    if (portableMirror) {
+      for (const bullet of this.scene.getBulletList()) {
+        if (this.scene.physics.world.overlap(body, (bullet.body as Phaser.Physics.Arcade.Body))) {
+          if (this.option.angleArea < 360) {
+            const bulletAngle = Phaser.Math.Angle.Between(this.player.x, this.player.y, bullet.x, bullet.y);
+            const angleDiff = Math.abs(
+              Phaser.Math.Angle.ShortestBetween(
+                Phaser.Math.RadToDeg(bulletAngle),
+                Phaser.Math.RadToDeg(this.positionAngle)
+              )
+            ) * Phaser.Math.DEG_TO_RAD;
+            if (angleDiff > Phaser.Math.DegToRad(this.option.angleArea / 2)) {
+              continue;
+            };
+          }
+
+          const [x, y] = [bullet.body?.position.x, bullet.body?.position.y];
+          const owner = bullet.owner;
+          let size = 0;
+          if (bullet.body.isCircle) {
+            size = bullet.body.radius * 2;
+          } else {
+            size = (bullet.body.width * bullet.body.height) ** 0.5;
+          }
+
+          this.scene.time.delayedCall(bullet.config.emitterDeleteTime ?? 0, () => {
+            bullet.config.emitter?.destroy();
+          });
+
+          bullet.destroy();
+
+          for (let i = 0; i < size / 20 * portableMirror * 2 + size * (this.player.stats.mana / 200); i++) {
+            const lightBullet = this.scene.add.sprite(x!, y!, 'effects', 'light_bullet-0').play('light_bullet');
+            this.scene.physics.add.existing(lightBullet);
+  
+            // lightBullet.play('light_bullet');
+            lightBullet.setOrigin(0.5, 0.5);
+            const scale = Math.random() * 0.5 + 0.25 + (portableMirror * 0.05)
+            lightBullet.setScale(scale);
+            lightBullet.setAlpha(0.9);
+            // lightBullet.rotation = Math.random() * Math.PI * 2;
+            
+            const body = lightBullet.body as Phaser.Physics.Arcade.Body;
+            
+            body.setSize(10, 10);
+
+            // const randRotation = Math.random() * Math.PI * 2;
+            const speed = (100 * Math.random() + 300) * (portableMirror * 0.25 + 0.75);
+
+            // body.setVelocity(
+            //   Math.cos(randRotation) * speed - this.player.speed,
+            //   Math.sin(randRotation) * speed
+            // );
+            
+            const moveAngle = Phaser.Math.Angle.Between(
+              this.player.x, this.player.y,
+              lightBullet.x, lightBullet.y,
+            ) + (Math.PI / 8 * portableMirror) * (Math.random() - 0.5);
+
+            body.setVelocity(
+              Math.cos(moveAngle) * speed - this.player.speed,
+              Math.sin(moveAngle) * speed
+            );
+
+            body.setDrag(400 * (portableMirror * 0.2 + 0.8), 400 * (portableMirror * 0.2 + 0.8));
+  
+            this.scene.physics.add.collider(lightBullet, this.scene.enemyGroup, (light, enemy) => {
+              if (this.hitEnemies.includes(enemy as Enemy)) {
+                return;
+              }
+              const damage = this.player.damage * portableMirror / 2;
+              (enemy as Enemy).takeDamage(damage, false, ["magic", "light"]);
+              lightBullet.destroy();
+              this.hitEnemies.push(enemy as Enemy);
+            });
+  
+            this.scene.layers.effect.add(lightBullet);
+
+            this.scene.time.delayedCall((Math.random() * 500 + 50) * (1 + this.player.stats.mana / 400), () => {
+              if (lightBullet) {
+                lightBullet.destroy();
+              }
+            })
+          }
+        }
+      }
+    }
   }
 
   /** 수치상 실제 거리 */

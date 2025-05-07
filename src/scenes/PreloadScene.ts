@@ -42,6 +42,11 @@ export default class PreloadScene extends Phaser.Scene {
       'assets/images/backgrounds.json'
     );
 
+    this.load.atlas('foregrounds',
+      'assets/images/foregrounds.png',
+      'assets/images/foregrounds.json'
+    );
+
     this.load.image('cursor', 'assets/images/cursor.png');
     
     // 배경음악 로드

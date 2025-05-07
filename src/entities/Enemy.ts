@@ -208,7 +208,10 @@ export default abstract class Enemy extends Entity {
     });
   }
 
-  createBullet(color: number = 0x00ffff, size: number = 3, life: number = 5000, damage: number = 1, config: BulletConfig = {}): CircleBullet | null {
+  createBullet(sprite: Phaser.GameObjects.Sprite, size: number, life: number, damage: number, config: BulletConfig): CircleBullet | null;
+  createBullet(color: number, size: number, life: number, damage: number, config: BulletConfig): SpriteBullet | null;
+
+  createBullet(spriteOrColor: number | Phaser.GameObjects.Sprite = 0x00ffff, size: number = 3, life: number = 5000, damage: number = 1, config: BulletConfig = {}): CircleBullet | SpriteBullet | null {
     const scene = this.scene as GameScene;
     const player = scene.player;
 
@@ -221,6 +224,7 @@ export default abstract class Enemy extends Entity {
       strokeColor: 0xffffff,
       emitter: null,
       emitterDeleteTime: 0,
+      // size: [0, 0],
       ...config,
     }
 
@@ -230,11 +234,20 @@ export default abstract class Enemy extends Entity {
       damage = this.stats.damage;
     }
     
-    const bullet = scene.add.circle(config.x, config.y, size, color) as CircleBullet;
-    bullet.setStrokeStyle(config.strokeWidth!, config.strokeColor!);
+    let bullet: SpriteBullet | CircleBullet | null = null;
+    if (typeof spriteOrColor === "number") {
+      bullet = scene.add.circle(config.x, config.y, size, spriteOrColor) as CircleBullet;
+      bullet.setStrokeStyle(config.strokeWidth!, config.strokeColor!);
+      
+      scene.physics.add.existing(bullet);
+      bullet.body!.setCircle(size);
+    } else {
+      bullet = spriteOrColor as SpriteBullet
+      
+      scene.physics.add.existing(bullet);
+      bullet.body.setSize(size, size);
+    }
     
-    scene.physics.add.existing(bullet);
-    bullet.body.setCircle(size);
 
     if (scene.getBulletGroup()) {
       scene.getBulletGroup().add(bullet);
@@ -265,7 +278,7 @@ export default abstract class Enemy extends Entity {
         config.speed![0] *= config.drag! ** (delta / 1000);
         config.speed![1] *= config.drag! ** (delta / 1000);
 
-        bullet.body.setVelocity(
+        bullet.body!.setVelocity(
           config.speed![0] - scene.player.speed!,
           config.speed![1],
         )
@@ -359,6 +372,7 @@ export interface BulletConfig {
   emitterDeleteTime?: number;
   x?: number;
   y?: number;
+  // size?: [number, number]
 }
 
 // 특정 형태의 총알 타입 정의 (타입 교차를 통한 확장)

@@ -20,11 +20,11 @@ export default class DreamOfMushroom extends BossEnemy {
   scaleRate: number = 1;
 
   stats = {
-    health: 100,
+    health: 120,
     damage: 1,
     speed: 40,
     scale: 1,
-    defense: 5,
+    defense: 4,
   }
 
   constructor(scene: GameScene, x: number, y: number) {
@@ -243,22 +243,16 @@ export default class DreamOfMushroom extends BossEnemy {
     
     // const bullet = this.createBullet(Phaser.Utils.Array.GetRandom([0x3949ac, 0x5283d2, 0x73b7e1]), size, life);
     const bullet = this.scene.add.sprite(
-      this.x + Math.cos(this.rotation - Math.PI / 2) * this.width / 2,
-      this.y + Math.sin(this.rotation - Math.PI / 2) * this.width / 2,
+      this.x + Math.cos(this.rotation - Math.PI / 2) * (this.body!.width / 2 + 20),
+      this.y + Math.sin(this.rotation - Math.PI / 2) * (this.body!.width / 2 + 20),
       'effects',
-    ).play("blue_spore") as SpriteBullet;
+    ).play("blue_spore");
 
-    bullet.isBullet = true;
-    bullet.owner = this;
-    bullet.damage = 1;
-
-    this.scene.addInBulletGroup(bullet, 1);
-    const body = bullet.body as Phaser.Physics.Arcade.Body;
-    body.setSize(8, 8);
-    bullet.setOrigin(0.5, 0.5);
-    body.setVelocity(
-      Math.cos(toRotate - Math.PI / 2) * speed,
-      Math.sin(toRotate - Math.PI / 2) * speed
-    );
+    this.createBullet(bullet, 8, 1500, 1, {
+      speed: [
+        Math.cos(toRotate - Math.PI / 2) * speed,
+        Math.sin(toRotate - Math.PI / 2) * speed
+      ]
+    });
   }
 }

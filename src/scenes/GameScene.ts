@@ -45,6 +45,7 @@ class GameScene extends Phaser.Scene {
     effect: Phaser.GameObjects.Container,
     item: Phaser.GameObjects.Container,
     top: Phaser.GameObjects.Container,
+    foreground: Phaser.GameObjects.Container,
     ui: Phaser.GameObjects.Container,
     [key: string]: Phaser.GameObjects.Container,
   } = {
@@ -56,6 +57,7 @@ class GameScene extends Phaser.Scene {
     player: null!,
     effect: null!,
     top: null!,
+    foreground: null!,
     ui: null!,
   };
 
@@ -105,6 +107,8 @@ class GameScene extends Phaser.Scene {
   
   private bulletGroup: Phaser.Physics.Arcade.Group = null!;
   private background: Phaser.GameObjects.TileSprite = null!;
+  private foreground1: Phaser.GameObjects.TileSprite = null!;
+  private foreground2: Phaser.GameObjects.TileSprite = null!;
   private bgMusic: Phaser.Sound.BaseSound = null!;
 
   private expBar: Phaser.GameObjects.Graphics = null!;
@@ -141,6 +145,12 @@ class GameScene extends Phaser.Scene {
   private isPaused: boolean = false;
   private pauseOverlay: Phaser.GameObjects.Rectangle = null!;
   private pauseText: Phaser.GameObjects.Text = null!;
+  private debugLog: {
+    effectCount: number,
+    emitterCount: number,
+    entityCount: number,
+    allCount: number,
+  }[] = [];
 
   constructor() {
     super('GameScene')
@@ -163,21 +173,20 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.preFX?.addColorMatrix
+    // this.cameras.main.preFX?.addColorMatrix
 
-    // 필터
-    const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
-    if (!renderer.pipelines.has('CRTFilter')) {
-      renderer.pipelines.addPostPipeline('CRTFilter', CRTFilter);
-    }
-    this.cameras.main.setPostPipeline('CRTFilter');
+    // // 필터
+    // const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+    // if (!renderer.pipelines.has('CRTFilter')) {
+    //   renderer.pipelines.addPostPipeline('CRTFilter', CRTFilter);
+    // }
+    // this.cameras.main.setPostPipeline('CRTFilter');
 
-    // 비네트 효과 추가
-    this.cameras.main.postFX.addVignette(0.5, 0.5, 0.9, 0.2);
+    // // 비네트 효과 추가
+    // this.cameras.main.postFX.addVignette(0.5, 0.5, 0.9, 0.25);
 
-    // 망원 렌즈 효과 추가
-    this.cameras.main.postFX.addBarrel(1.05);
-    // this.cameras.main.setZoom(1.2);
+    // // 망원 렌즈 효과 추가
+    // this.cameras.main.postFX.addBarrel(1.15);
 
     // debug functions
     this.createDebugFunction();
@@ -218,8 +227,8 @@ class GameScene extends Phaser.Scene {
       console.error('키보드 입력을 사용할 수 없습니다.');
     }
 
-    this.attackRangeGraphics = this.add.graphics();
-    this.layers.effect.add(this.attackRangeGraphics);
+    // this.attackRangeGraphics = this.add.graphics();
+    // this.layers.effect.add(this.attackRangeGraphics);
 
     this.debugModeText = this.add.text(10, 10, "", {
       fontSize: '12px',
@@ -227,7 +236,7 @@ class GameScene extends Phaser.Scene {
       backgroundColor: '#000000',
       fontFamily: 'monospace',
       resolution: 1,
-    }).setScrollFactor(0);
+    }).setScrollFactor(0).setName("debug_mode_text");
     
     // 디버그 모드 토글 키 설정 (D 키)
     this.input.keyboard?.addKey('D').on('down', () => {
@@ -238,7 +247,9 @@ class GameScene extends Phaser.Scene {
 
       if (this.physics.world.drawDebug) {
         if (!this.physics.world.debugGraphic) {
-          this.physics.world.debugGraphic = this.add.graphics().setDepth(999);
+          this.physics.world.debugGraphic = this.add.graphics()
+            .setDepth(999)
+            .setName("debug_graphic");
         }
         this.physics.world.drawDebug = true;
       } else {
@@ -276,6 +287,9 @@ class GameScene extends Phaser.Scene {
         this.background.visible = !this.background.visible;
         this.cameras.main.setBackgroundColor(this.background.visible ? '#000000' : '#606060');
         this.showDebugModeText('Background: ' + (this.background.visible ? 'ON' : 'OFF'));
+
+        this.foreground1.visible = !this.foreground1.visible;
+        this.foreground2.visible = !this.foreground2.visible;
       }
     })
     
@@ -307,15 +321,22 @@ class GameScene extends Phaser.Scene {
 
     this.input.keyboard?.on('keydown-PLUS', () => {
       if (this.debugMode) {
-        this.gameSpeed = Math.min(10, this.gameSpeed + 0.1);
+        this.gameSpeed = Math.min(25, this.gameSpeed + 0.25);
         this.showDebugModeText(`Game Speed: ${this.gameSpeed.toFixed(1)}x`);
       }
     });
     
     this.input.keyboard?.on('keydown-MINUS', () => {
       if (this.debugMode) {
-        this.gameSpeed = Math.max(0.1, this.gameSpeed - 0.1);
+        this.gameSpeed = Math.max(0.1, this.gameSpeed - 0.25);
         this.showDebugModeText(`Game Speed: ${this.gameSpeed.toFixed(1)}x`);
+      }
+    });
+    
+    this.input.keyboard?.on('keydown-RIGHT', () => {
+      if (this.debugMode) {
+        this.meter += 1000
+        this.showDebugModeText(`Teleport to ${this.meter}`);
       }
     });
 
@@ -325,7 +346,7 @@ class GameScene extends Phaser.Scene {
       fontSize: '12px',
       color: '#ffffff',
       resolution: 1,
-    })
+    }).setName("meter_text_ui")
       .setScrollFactor(0)
       .setOrigin(1, 0);
     this.layers.ui.add(this.meterText);
@@ -336,13 +357,16 @@ class GameScene extends Phaser.Scene {
       fontSize: '9pt',
       color: '#ffffff',
       resolution: 1,
-    }).setScrollFactor(0).setOrigin(0.5, 0);
-    this.expBar = this.add.graphics();
+    }).setName("exp_text_ui")
+      .setScrollFactor(0)
+      .setOrigin(0.5, 0);
+    this.expBar = this.add.graphics().setName("exp_bar_ui");
     this.updateExpBar();
 
     // 디버그 표시
     this.debugTextObject = this.add.bitmapText(10, 28, 'mini', '', 10)
     this.debugTextObject
+      .setName("debug_text_ui")
       .setScrollFactor(0)
       .setOrigin(0, 0)
       .setTint(0xffffff);
@@ -357,8 +381,10 @@ class GameScene extends Phaser.Scene {
       }
     });
 
-    this.cursorSprite = this.add.sprite(0, 0, 'cursor');
+    this.cursorSprite = this.add.sprite(0, 0, 'cursor').setName("cursor");
     this.cursorSprite.setScrollFactor(0);
+    this.cursorSprite.setDepth(9999);
+    this.cursorSprite.setBlendMode(Phaser.BlendModes.DIFFERENCE);
     this.layers.ui.add(this.cursorSprite);
 
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
@@ -369,7 +395,7 @@ class GameScene extends Phaser.Scene {
       this.cursorSprite.y = pointer.y;
     })
 
-    this.itemListContainer = this.add.container(this.cameras.main.width - 14, 32);
+    this.itemListContainer = this.add.container(this.cameras.main.width - 14, 32).setName("item_list_ui");
     this.itemListContainer.setScrollFactor(0);
     this.layers.ui.add(this.itemListContainer);
 
@@ -382,7 +408,7 @@ class GameScene extends Phaser.Scene {
       this.cameras.main.height,
       0x000000,
       0.7
-    );
+    ).setName("pause_overlay_rect");
     this.pauseOverlay.setOrigin(0, 0);
     this.pauseOverlay.setScrollFactor(0);
     this.pauseOverlay.setDepth(9999);
@@ -398,7 +424,9 @@ class GameScene extends Phaser.Scene {
         color: '#ffffff',
         resolution: 1,
       }
-    );
+    ).setName("pause_text");
+
+    
     this.pauseText.setOrigin(0.5);
     this.pauseText.setScrollFactor(0);
     this.pauseText.setDepth(10000);
@@ -415,7 +443,7 @@ class GameScene extends Phaser.Scene {
     this.createAnimation("effects", "item", [0, 6], 24);
     this.createAnimation("effects", "light_bullet", [0, 1], 24);
     this.createAnimation("effects", "soul", [0, 1], 24);
-    this.createAnimation("effects", "soul_boom", [0, 9], 40, 0);
+    this.createAnimation("effects", "soul_boom", [0, 9], 24, 0);
     this.createAnimation("effects", "windy_attack", [0, 1], 24, 0);
     this.createAnimation("effects", "ninja_banana", [0, 5], 24, 0);
     this.createAnimation("effects", "jump", [0, 6], 32, 0);
@@ -481,8 +509,8 @@ class GameScene extends Phaser.Scene {
     this.enemyGroup.add(enemy);
     
     enemy.velocity = [0, 0];
-    enemy.health = Math.floor(enemy.stats.health * (level * 2.25 - 1.25));
-    enemy.stats.defence = Math.floor(enemy.stats.defense * (level ** 2.5));
+    enemy.health = Math.floor(enemy.stats.health * (level ** 2));
+    enemy.stats.defense = Math.floor(enemy.stats.defense * (level ** 1.5));
     enemy.level = level;
 
     enemy.onSpawn();
@@ -540,6 +568,7 @@ class GameScene extends Phaser.Scene {
   initLayers(): void {
     for (const key in this.layers) {
       this.layers[key] = this.add.container(0, 0);
+      this.layers[key].setName(`${key}_layer`)
     }
   }
   
@@ -595,6 +624,8 @@ class GameScene extends Phaser.Scene {
         'ui',
         'heart-outline'
       );
+
+      outline.name = `heart-outline-${i}`
       
       outline.setScrollFactor(0)
              .setScale(1)
@@ -630,6 +661,7 @@ class GameScene extends Phaser.Scene {
         'ui',
         i < this.player.health ? fullHeartFrame : emptyHeartFrame
       );
+      heart.name = `heart-${i}`
       
       // 명시적으로 모든 속성 설정
       heart.setScrollFactor(0)
@@ -781,11 +813,13 @@ class GameScene extends Phaser.Scene {
       const itemSprite = this.add.sprite(0, i * 14, 'items', `${item}-0`);
       itemSprite.setOrigin(0.5, 0.5).setAlpha(0.5);
       this.itemListContainer.add(itemSprite);
-
+      itemSprite.name = `item_display-${item}`
+      
       if (this.player.items[item] > 1) {
         const countText = this.add.bitmapText(4, i * 14 + 2, 'mini', `${this.player.items[item]}`);
         countText.setOrigin(0.5, 0.5).setTint(0xffe091).setAlpha(0.75);
         this.itemListContainer.add(countText);
+        itemSprite.name = `item_display_text-${item}`
       }
 
       i++;
@@ -800,18 +834,21 @@ class GameScene extends Phaser.Scene {
     
     // ! CUSTOM
 
-    // this.player.collectItem("windy_fan");
-    // this.player.collectItem("black_coffee");
-    // this.player.collectItem("portable_mirror");
-    // this.player.collectItem("soul_candle");
-    // this.player.collectItem("lightning_rod");
-    // this.player.collectItem("lightning_book");
-    // this.player.collectItem("flame_book");
-    // this.player.collectItem("shiny_sandclock");
+    for (let i = 0; i < 3; i++) {
+      // this.player.collectItem("windy_fan");
+      // this.player.collectItem("black_coffee");
+      // this.player.collectItem("portable_mirror");
+      // this.player.collectItem("lightning_rod");
+      // this.player.collectItem("lightning_book");
+      // this.player.collectItem("flame_book");
+      // this.player.collectItem("copper_sword");
+      // this.player.collectItem("giant_sword");
+      // this.player.collectItem("boomerang");
+      // // this.player.collectItem("pickaxe");
+      // this.player.collectItem("ninja_banana");
+    }
+    this.player.collectItem("mace");
     // this.player.collectItem("copper_sword");
-    // this.player.collectItem("giant_sword");
-    // this.player.collectItem("boomerang");
-    // this.player.collectItem("pickaxe");
 
     this.player.collectItem(
       Phaser.Utils.Array.GetRandom(itemList.filter(item => item.rarity === "epic")).id
@@ -858,8 +895,10 @@ class GameScene extends Phaser.Scene {
     delta = delta * this._gameSpeed;
     this._now += delta;
 
-    if (this.background && this.player) {
+    if (this.background && this.foreground1 && this.foreground2 && this.player) {
       this.background.tilePositionX += (this.player.speed * 0.4) * delta / 1000;
+      this.foreground1.tilePositionX += (this.player.speed * 1.5) * delta / 1000;
+      this.foreground2.tilePositionX += (this.player.speed * 2) * delta / 1000;
     }
     
     if (this.player) {
@@ -1081,33 +1120,49 @@ class GameScene extends Phaser.Scene {
 
   updateDebugText(): void {
     let allCount = this.children.length;
-    const visibleCount = this.children.list.filter((child: any) => 
-      child.x > 0 && child.x < this.cameras.main.width &&
-      child.y > 0 && child.y < this.cameras.main.height
-    ).length;
+    let emitterCount = 0;
+
+    // let visibleCount = this.children.list.filter((child: any) => 
+    //   child.x > -20 && child.x < this.cameras.main.width + 20 &&
+    //   child.y > -20 && child.y < this.cameras.main.height + 20
+    // ).length;
 
     this.children.list.forEach((child: any) => {
       if (child instanceof Phaser.GameObjects.Particles.ParticleEmitter) {
         allCount += (child as any).alive.length ?? 0;
+        emitterCount += (child as any).alive.length ?? 0;
       }
     });
 
-    const visibleEnemyCount = this.enemies.filter(enemy => 
-      enemy.x > 0 && enemy.x < this.cameras.main.width &&
-      enemy.y > 0 && enemy.y < this.cameras.main.height
-    ).length;
+    const enemyCount = this.enemies.length + this.layers.player.list.length;
+    const effectCount = this.layers.effect.list.length + this.layers.top.list.length + this.layers.bottom.list.length;
 
-    const effectCount = this.layers.effect.list.length;
-    const visibleEffectCount = (this.layers.effect.list as any[]).filter(effect =>
-      effect.x > 0 && effect.x < this.cameras.main.width &&
-      effect.y > 0 && effect.y < this.cameras.main.height
-    ).length;
+    Object.values(this.layers).forEach(layer => {
+      if (layer instanceof Phaser.GameObjects.Container) {
+        allCount += layer.list.length;
+        
+        layer.list.forEach((child: any) => {
+          if (child instanceof Phaser.GameObjects.Particles.ParticleEmitter) {
+            allCount += (child as any).alive.length ?? 0;
+            emitterCount += (child as any).alive.length;
+          }
+        })
+      }
+    });
 
     this.debugText = [
-      `all:${visibleCount} / ${allCount}`,
-      `enemies:${visibleEnemyCount}`,
-      `effects:${visibleEffectCount}`,
+      `all: ${allCount}`,
+      `enemies: ${enemyCount}`,
+      `effects: ${effectCount}`,
+      `emitter: ${emitterCount}`,
     ]
+    
+    this.debugLog.push({
+      entityCount: enemyCount,
+      effectCount: effectCount,
+      emitterCount: emitterCount,
+      allCount: allCount,
+    })
 
     this.debugTextObject.setText(this.debugText.join('\n'));
   }
@@ -1241,13 +1296,36 @@ class GameScene extends Phaser.Scene {
       this.cameras.main.height,
       'backgrounds',
       this.map
-    );
+    ).setName("background");
     
     // 원점을 왼쪽 상단으로 설정
     this.background.setOrigin(0, 0);
     
     // 배경을 배경 레이어에 추가
     this.layers.background.add(this.background);
+
+    this.foreground1 = this.add.tileSprite(
+      0, 0,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      'foregrounds',
+      this.map
+    ).setName("foreground1");
+
+    this.foreground2 = this.add.tileSprite(
+      0, -32,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      'foregrounds',
+      this.map
+    ).setName("foreground2");
+
+    this.foreground1.setOrigin(0, 0);
+    this.layers.foreground.add(this.foreground1);
+
+    this.foreground2.setOrigin(0, 0);
+    this.foreground2.setScale(1.25);
+    this.layers.foreground.add(this.foreground2);
   }
   
   /**
@@ -1347,7 +1425,13 @@ class GameScene extends Phaser.Scene {
 
     (globalThis as any).getObjects = () => {
       if (this.debugMode) {
-        console.log(this.getObjects());
+        return this.getObjects();
+      }
+    }
+
+    (globalThis as any).getLog = () => {
+      if (this.debugMode) {
+        return this.debugLog;
       }
     }
   }
@@ -1458,15 +1542,29 @@ class GameScene extends Phaser.Scene {
     this.isChangingMap = true;
 
     this.tweens.add({
-      targets: [this.background],
+      targets: [this.background, this.foreground1, this.foreground2],
       alpha: 0,
       duration: 1000,
       onComplete: () => {
         this.background.setTexture('backgrounds', key);
+        this.foreground1.setTexture('foregrounds', key);
+        this.foreground2.setTexture('foregrounds', key);
 
         this.tweens.add({
           targets: [this.background],
           alpha: 1,
+          duration: 1000,
+        })
+
+        this.tweens.add({
+          targets: [this.foreground1],
+          alpha: 0.25,
+          duration: 1000,
+        })
+
+        this.tweens.add({
+          targets: [this.foreground2],
+          alpha: 0.1,
           duration: 1000,
         })
 

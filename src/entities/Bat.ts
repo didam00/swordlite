@@ -9,7 +9,7 @@ export default class Bat extends Enemy {
   stats = {
     health: 10,
     damage: 1,
-    speed: 80,
+    speed: 75,
     scale: 1,
     defense: 2,
   }
@@ -35,7 +35,7 @@ export default class Bat extends Enemy {
       this.scaleY = -1;
     }
 
-    this.stats.speed = this.level * 10 + 70;
+    this.stats.speed = this.level * 10 + 65;
   }
   
   createAnimations(): void {
@@ -62,7 +62,7 @@ export default class Bat extends Enemy {
     // }
     const dist = this.getDist(this.scene.player)
 
-    if (this.hasState("stop") && dist < this.scene.cameras.main.height / 3 + this.level * 20) {
+    if (this.hasState("stop") && dist < this.scene.cameras.main.height / 4 + this.level * 30) {
       this.removeState("stop");
       if (this.scaleY === -1) this.scaleY = 1;
       this.playSound("bat");

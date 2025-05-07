@@ -5,7 +5,7 @@ import Henge from './Henge';
 
 export default class MiniStone extends Enemy {
   entityName = 'mini_stone';
-  exp = 0;
+  exp = 1;
   index: number = 0;
   henge: Henge | null = null;
 

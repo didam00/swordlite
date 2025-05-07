@@ -17,5 +17,6 @@ export default abstract class BossEnemy extends Enemy {
       )
     );
     scene.spawnItem("green_heart")
+    scene.spawnCooldown *= 0.8;
   }
 }

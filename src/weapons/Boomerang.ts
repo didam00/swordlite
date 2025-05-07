@@ -4,7 +4,7 @@ import GameScene from "../scenes/GameScene";
 import Weapon from "./Weapon";
 
 export default class Boomerang extends Weapon {
-  useSwordAttackEffect = false;
+  useDefaultAttackEffect = false;
   dontAttack = true;
   isThrowing: boolean = false;
 
@@ -82,10 +82,17 @@ export default class Boomerang extends Weapon {
 
       this.scene.physics.world.overlap(boomerang, this.scene.enemyGroup, (boomerang, enemy) => {
         if (enemy instanceof Enemy && !boomerangHits.includes(enemy)) {
+          const isCritical = Math.random() < this.player.stats.criticalChance;
+          let damage = (this.player.damage + this.player.stats.trueAttack) * 0.5;
+          if (isCritical) {
+            damage *= this.player.stats.criticalDamage;
+          }
           enemy.takeDamage(this.player.damage, false, ["attack"]);
           boomerangHits.push(enemy);
         }
       });
+
+      this.applyPortableMirror(body);
     }
 
     this.scene.events.on('update', update);

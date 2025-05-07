@@ -3,7 +3,7 @@ import GameScene from "../scenes/GameScene";
 import Weapon from "./Weapon";
 
 export default class Pixckaxe extends Weapon {
-  useSwordAttackEffect = false;
+  useDefaultAttackEffect = false;
   dontAttack = true;
 
   option = {

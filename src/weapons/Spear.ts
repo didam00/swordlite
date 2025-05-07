@@ -4,7 +4,7 @@ import GameScene from "../scenes/GameScene";
 import Weapon from "./Weapon";
 
 export default class Spear extends Weapon {
-  useSwordAttackEffect = false;
+  useDefaultAttackEffect = false;
   option = {
     attack: 125,
     range: 150,

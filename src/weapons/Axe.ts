@@ -3,7 +3,7 @@ import GameScene from "../scenes/GameScene";
 import Weapon from "./Weapon";
 
 export default class Axe extends Weapon {
-  useSwordAttackEffect = false;
+  useDefaultAttackEffect = false;
 
   option = {
     attack: 150,
